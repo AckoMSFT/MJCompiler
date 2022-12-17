@@ -1,0 +1,16 @@
+package rs.ac.bg.etf.pp1;
+
+import java_cup.runtime.*;
+import rs.ac.bg.etf.pp1.ast.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+terminal PROGRAM, SEMI_COLON;
+nonterminal Program, ProgramName;
+
+terminal String IDENT;
+terminal Integer NUMBER;
+
+Program ::= (Program) PROGRAM ProgramName SEMI_COLON;
+ProgramName ::= (ProgramName) IDENT:programName;

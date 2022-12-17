@@ -10,6 +10,13 @@ repositories {
 }
 
 dependencies {
+    implementation files('lib/cup_v10k.jar')
+    implementation files('lib/JFLex.jar')
+    implementation files('lib/log4j-api-2.19.0.jar')
+    implementation files('lib/log4j-core-2.19.0.jar')
+    implementation files('lib/mj-runtime-1.1.jar')
+    implementation files('lib/symboltable-1-1.jar')
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
