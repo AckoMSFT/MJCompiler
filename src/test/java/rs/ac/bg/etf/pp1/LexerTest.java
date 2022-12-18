@@ -4,6 +4,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import java_cup.runtime.Symbol;
 
@@ -20,11 +24,30 @@ public class LexerTest {
 
             MJLexer lexer = new MJLexer(bufferedReader);
             Symbol currentToken;
-            while ((currentToken = lexer.next_token()).sym != sym.EOF) {
-                if (currentToken.value != null) {
-                    logger.info("Recognized token with id " + currentToken + " with value " + currentToken.value);
+
+            // Extract identifiers from sym.java
+            HashMap<String, String> id = new HashMap<>();
+            Field[] declaredFields = sym.class.getDeclaredFields();
+            List<Field> staticFields = new ArrayList<>();
+            for (Field field : declaredFields) {
+                if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                    staticFields.add(field);
+                    field.setAccessible(true);
+                    try {
+                        Integer value = (Integer) field.get(sym.class);
+                        id.put("#" + value, field.getName());
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
+
+            while ((currentToken = lexer.next_token()).sym != sym.EOF) {
+                if (currentToken.value != null) {
+                    logger.info("Recognized token with id " + id.get(currentToken.toString()) + " and value " + currentToken.value);
+                }
+            }
+
         } finally {
             if (bufferedReader != null) try {
                 bufferedReader.close();

@@ -5,6 +5,9 @@
             <fileset dir="src/main/java/rs/ac/bg/etf/pp1">
                 <exclude name="sym.java"/>
                 <exclude name="MJLexer.java"/>
+                <exclude name="MJCompiler.java"/>
+                <exclude name="CodeGenerator.java"/>
+                <exclude name="SemanticAnalyzer.java"/>
             </fileset>
         </delete>
 
