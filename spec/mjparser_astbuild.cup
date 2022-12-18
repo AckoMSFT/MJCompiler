@@ -2,9 +2,53 @@ package rs.ac.bg.etf.pp1;
 
 import java_cup.runtime.*;
 import rs.ac.bg.etf.pp1.ast.*;
+import rs.ac.bg.etf.pp1.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+parser code {:
+    Logger logger = LogManager.getLogger(MJParser.class);
+
+    // slede redefinisani metodi za prijavu gresaka radi izmene teksta poruke
+
+    boolean errorDetected = false;
+
+    public void report_fatal_error(String message, Object info) throws java.lang.Exception {
+        done_parsing();
+        report_error(message, info);
+    }
+
+    public void syntax_error(Symbol curr_token) {
+        report_error("Syntax error while parsing", curr_token);
+    }
+
+    public void unrecovered_syntax_error(Symbol curr_token) throws java.lang.Exception {
+        report_fatal_error("Could not recover from syntax error", curr_token);
+    }
+
+    public void report_error(String message, Object info) {
+        StringBuilder msg = new StringBuilder(message);
+        if (info instanceof Symbol) {
+            Symbol symbol = (Symbol) info;
+            msg.append(" on line ").append(symbol.left);
+            msg.append(" and column ").append(symbol.right);
+            msg.append(" while parsing ").append(LexerUtils.GetLexicalIdentifier(symbol.toString()));
+            msg.append(" with value ").append(symbol.value);
+        }
+        logger.error(msg.toString());
+
+        errorDetected = true;
+    }
+:}
+
+scan with {:
+    Symbol symbol = this.getScanner().next_token();
+    if (symbol != null && symbol.value != null) {
+        logger.info("Line " + symbol.left + ": " + "Parsed symbol: " + symbol.value + " - " + LexerUtils.GetLexicalIdentifier(symbol.toString()));
+    }
+    return symbol;
+:}
 
 terminal PROGRAM;
 nonterminal Program Program;
@@ -26,6 +70,74 @@ terminal AND, OR;
 terminal LAMBDA;
 terminal LEFT_PARENTHESES, RIGHT_PARENTHESES, LEFT_BRACKET, RIGHT_BRACKET, LEFT_BRACE, RIGHT_BRACE;
 terminal DOT, COLON, SEMI_COLON;
+terminal ASSIGNMENT;
+terminal EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL_THAN, LESS_OR_EQUAL_THAN;
 
-Program ::= (Program) PROGRAM ProgramName:P1 SEMI_COLON {: RESULT=new Program(P1); RESULT.setLine(P1left); :};
-ProgramName ::= (ProgramName) IDENTIFIER:programName {: RESULT=new ProgramName(programName); RESULT.setLine(programNameleft); :};
+nonterminal GlobalDeclarationList GlobalDeclarationList;
+nonterminal GlobalDeclarataion GlobalDeclarataion;
+nonterminal ConstantDeclarationList ConstantDeclarationList;
+nonterminal VariableDeclarationList VariableDeclarationList;
+nonterminal ClassDeclarationList ClassDeclarationList;
+nonterminal MethodDeclarationList MethodDeclarationList;
+nonterminal AssignmentOperator AssignmentOperator;
+nonterminal RelationOperator RelationOperator;
+nonterminal AdditionOperator AdditionOperator;
+nonterminal MultiplicationOperator MultiplicationOperator;
+
+/*  "program" ident { ConstDecl | VarDecl | ClassDecl } "{" {MethodDecl} "}" */
+
+Program ::=
+    (Program) PROGRAM ProgramName:P1 GlobalDeclarationList:G2
+        LEFT_BRACE MethodDeclarationList:M3 RIGHT_BRACE {: RESULT=new Program(P1, G2, M3); RESULT.setLine(P1left); :};
+
+ProgramName ::=
+    (ProgramName) IDENTIFIER:programName {: RESULT=new ProgramName(programName); RESULT.setLine(programNameleft); :};
+
+GlobalDeclarationList ::=
+    (GlobalDeclarations) GlobalDeclarationList:G1 GlobalDeclarataion:G2 {: RESULT=new GlobalDeclarations(G1, G2); RESULT.setLine(G1left); :}
+    | (GlobalDeclarationEpsilon) {: RESULT=new GlobalDeclarationEpsilon(); :} /* epsilon */;
+
+GlobalDeclarataion ::=
+    (GlobalDeclarationConstantDeclarationList) ConstantDeclarationList:C1 {: RESULT=new GlobalDeclarationConstantDeclarationList(C1); RESULT.setLine(C1left); :}
+    | (GlobalDeclarationVariableDeclarationList) VariableDeclarationList:V1 {: RESULT=new GlobalDeclarationVariableDeclarationList(V1); RESULT.setLine(V1left); :}
+    | (GlobalDeclarationClassDeclarationList) ClassDeclarationList:C1 {: RESULT=new GlobalDeclarationClassDeclarationList(C1); RESULT.setLine(C1left); :};
+
+ConstantDeclarationList ::=
+    (ConstantDeclarationList) CONST_BOOLEAN {: RESULT=new ConstantDeclarationList(); :} /* epsilon */;
+
+VariableDeclarationList ::=
+    (VariableDeclarationList) IDENTIFIER:I1 {: RESULT=new VariableDeclarationList(I1); RESULT.setLine(I1left); :} /* epsilon */;
+
+ClassDeclarationList ::=
+    (ClassDeclarationList) CLASS {: RESULT=new ClassDeclarationList(); :} /* epsilon */;
+
+MethodDeclarationList ::= {: RESULT=new MethodDeclarationListDerived1(); :} /* TODO (acko): Fix me please.
+    (MethodDeclarationList) RelationOperator AdditionOperator MultiplicationOperator /* epsilon */;
+
+/* Assignop = "=" */
+
+AssignmentOperator ::=
+    (AssignmentOperator) ASSIGNMENT {: RESULT=new AssignmentOperator(); :};
+
+/* Relop = "==" | "!=" | ">" | ">=" | "<" | "<=" */
+
+RelationOperator ::=
+    (RelationOperatorquals) EQUALS {: RESULT=new RelationOperatorquals(); :}
+    | (RelationOperatorNotEquals) NOT_EQUALS {: RESULT=new RelationOperatorNotEquals(); :}
+    | (RelationOperatorGreaterThan) GREATER_THAN {: RESULT=new RelationOperatorGreaterThan(); :}
+    | (RelationOperatorGreaterOrEqualThan) GREATER_OR_EQUAL_THAN {: RESULT=new RelationOperatorGreaterOrEqualThan(); :}
+    | (RelationOperatorLessThan) LESS_THAN {: RESULT=new RelationOperatorLessThan(); :}
+    | (RelationOperatorLessOrEqualThan) LESS_OR_EQUAL_THAN {: RESULT=new RelationOperatorLessOrEqualThan(); :};
+
+/* Addop = "+" | "â€?" */
+
+AdditionOperator ::=
+    (AdditionOperatorAddition) ADDITION {: RESULT=new AdditionOperatorAddition(); :}
+    | (AdditionOperatorSubtraction) SUBTRACTION {: RESULT=new AdditionOperatorSubtraction(); :};
+
+/* Mulop = "*" | "/" | "%" */
+
+MultiplicationOperator ::=
+    (MultiplicationOperatorMultiplication) MULTIPLICATION {: RESULT=new MultiplicationOperatorMultiplication(); :}
+    | (MultiplicationOperatorDivision) DIVISION {: RESULT=new MultiplicationOperatorDivision(); :}
+    | (MultiplicationOperatorModulo) MODULO {: RESULT=new MultiplicationOperatorModulo(); :};

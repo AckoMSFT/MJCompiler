@@ -5,22 +5,22 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ProgramName implements SyntaxNode {
+public class VariableDeclarationList implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String programName;
+    private String I1;
 
-    public ProgramName (String programName) {
-        this.programName=programName;
+    public VariableDeclarationList (String I1) {
+        this.I1=I1;
     }
 
-    public String getProgramName() {
-        return programName;
+    public String getI1() {
+        return I1;
     }
 
-    public void setProgramName(String programName) {
-        this.programName=programName;
+    public void setI1(String I1) {
+        this.I1=I1;
     }
 
     public SyntaxNode getParent() {
@@ -57,13 +57,13 @@ public class ProgramName implements SyntaxNode {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("ProgramName(\n");
+        buffer.append("VariableDeclarationList(\n");
 
-        buffer.append(" "+tab+programName);
+        buffer.append(" "+tab+I1);
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [ProgramName]");
+        buffer.append(") [VariableDeclarationList]");
         return buffer.toString();
     }
 }

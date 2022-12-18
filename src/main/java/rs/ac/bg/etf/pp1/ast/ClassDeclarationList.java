@@ -5,22 +5,11 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ProgramName implements SyntaxNode {
+public class ClassDeclarationList implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String programName;
-
-    public ProgramName (String programName) {
-        this.programName=programName;
-    }
-
-    public String getProgramName() {
-        return programName;
-    }
-
-    public void setProgramName(String programName) {
-        this.programName=programName;
+    public ClassDeclarationList () {
     }
 
     public SyntaxNode getParent() {
@@ -57,13 +46,10 @@ public class ProgramName implements SyntaxNode {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("ProgramName(\n");
-
-        buffer.append(" "+tab+programName);
-        buffer.append("\n");
+        buffer.append("ClassDeclarationList(\n");
 
         buffer.append(tab);
-        buffer.append(") [ProgramName]");
+        buffer.append(") [ClassDeclarationList]");
         return buffer.toString();
     }
 }

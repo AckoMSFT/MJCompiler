@@ -11,8 +11,8 @@ import java.util.List;
 
 import java_cup.runtime.Symbol;
 
-public class LexerTest {
-    static Logger logger = LogManager.getLogger(LexerTest.class);
+public class MJLexerTest {
+    static Logger logger = LogManager.getLogger(MJLexerTest.class);
 
     public static void main(String[] args) throws IOException {
         Reader bufferedReader = null;
@@ -44,7 +44,9 @@ public class LexerTest {
 
             while ((currentToken = lexer.next_token()).sym != sym.EOF) {
                 if (currentToken.value != null) {
-                    logger.info("Recognized token with id " + id.get(currentToken.toString()) + " and value " + currentToken.value);
+                    logger.info("Recognized token with id: [" + id.get(currentToken.toString()) +
+                            "] and value: [" + currentToken.value + "] on line: " + currentToken.left +
+                            " and column: " + currentToken.right);
                 }
             }
 

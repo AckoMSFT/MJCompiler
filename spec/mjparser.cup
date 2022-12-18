@@ -2,9 +2,53 @@ package rs.ac.bg.etf.pp1;
 
 import java_cup.runtime.*;
 import rs.ac.bg.etf.pp1.ast.*;
+import rs.ac.bg.etf.pp1.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+parser code {:
+    Logger logger = LogManager.getLogger(MJParser.class);
+
+    // slede redefinisani metodi za prijavu gresaka radi izmene teksta poruke
+
+    boolean errorDetected = false;
+
+    public void report_fatal_error(String message, Object info) throws java.lang.Exception {
+        done_parsing();
+        report_error(message, info);
+    }
+
+    public void syntax_error(Symbol curr_token) {
+        report_error("Syntax error while parsing", curr_token);
+    }
+
+    public void unrecovered_syntax_error(Symbol curr_token) throws java.lang.Exception {
+        report_fatal_error("Could not recover from syntax error", curr_token);
+    }
+
+    public void report_error(String message, Object info) {
+        StringBuilder msg = new StringBuilder(message);
+        if (info instanceof Symbol) {
+            Symbol symbol = (Symbol) info;
+            msg.append(" on line ").append(symbol.left);
+            msg.append(" and column ").append(symbol.right);
+            msg.append(" while parsing ").append(LexerUtils.GetLexicalIdentifier(symbol.toString()));
+            msg.append(" with value ").append(symbol.value);
+        }
+        logger.error(msg.toString());
+
+        errorDetected = true;
+    }
+:}
+
+scan with {:
+    Symbol symbol = this.getScanner().next_token();
+    if (symbol != null && symbol.value != null) {
+        logger.info("Line " + symbol.left + ": " + "Parsed symbol: " + symbol.value + " - " + LexerUtils.GetLexicalIdentifier(symbol.toString()));
+    }
+    return symbol;
+:}
 
 terminal PROGRAM;
 nonterminal Program, ProgramName;
@@ -25,6 +69,67 @@ terminal AND, OR;
 terminal LAMBDA;
 terminal LEFT_PARENTHESES, RIGHT_PARENTHESES, LEFT_BRACKET, RIGHT_BRACKET, LEFT_BRACE, RIGHT_BRACE;
 terminal DOT, COLON, SEMI_COLON;
+terminal ASSIGNMENT;
+terminal EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL_THAN, LESS_OR_EQUAL_THAN;
 
-Program ::= (Program) PROGRAM ProgramName SEMI_COLON;
-ProgramName ::= (ProgramName) IDENTIFIER:programName;
+nonterminal GlobalDeclarationList, GlobalDeclarataion;
+nonterminal ConstantDeclarationList, VariableDeclarationList, ClassDeclarationList, MethodDeclarationList;
+nonterminal AssignmentOperator, RelationOperator, AdditionOperator, MultiplicationOperator;
+
+/*  "program" ident { ConstDecl | VarDecl | ClassDecl } "{" {MethodDecl} "}" */
+
+Program ::=
+    (Program) PROGRAM ProgramName GlobalDeclarationList
+        LEFT_BRACE MethodDeclarationList RIGHT_BRACE;
+
+ProgramName ::=
+    (ProgramName) IDENTIFIER:programName;
+
+GlobalDeclarationList ::=
+    (GlobalDeclarations) GlobalDeclarationList GlobalDeclarataion
+    | (GlobalDeclarationEpsilon) /* epsilon */;
+
+GlobalDeclarataion ::=
+    (GlobalDeclarationConstantDeclarationList) ConstantDeclarationList
+    | (GlobalDeclarationVariableDeclarationList) VariableDeclarationList
+    | (GlobalDeclarationClassDeclarationList) ClassDeclarationList;
+
+ConstantDeclarationList ::=
+    (ConstantDeclarationList) CONST_BOOLEAN /* epsilon */;
+
+VariableDeclarationList ::=
+    (VariableDeclarationList) IDENTIFIER /* epsilon */;
+
+ClassDeclarationList ::=
+    (ClassDeclarationList) CLASS /* epsilon */;
+
+MethodDeclarationList ::= /* TODO (acko): Fix me please.
+    (MethodDeclarationList) RelationOperator AdditionOperator MultiplicationOperator /* epsilon */;
+
+/* Assignop = "=" */
+
+AssignmentOperator ::=
+    (AssignmentOperator) ASSIGNMENT;
+
+/* Relop = "==" | "!=" | ">" | ">=" | "<" | "<=" */
+
+RelationOperator ::=
+    (RelationOperatorquals) EQUALS
+    | (RelationOperatorNotEquals) NOT_EQUALS
+    | (RelationOperatorGreaterThan) GREATER_THAN
+    | (RelationOperatorGreaterOrEqualThan) GREATER_OR_EQUAL_THAN
+    | (RelationOperatorLessThan) LESS_THAN
+    | (RelationOperatorLessOrEqualThan) LESS_OR_EQUAL_THAN;
+
+/* Addop = "+" | "‐" */
+
+AdditionOperator ::=
+    (AdditionOperatorAddition) ADDITION
+    | (AdditionOperatorSubtraction) SUBTRACTION;
+
+/* Mulop = "*" | "/" | "%" */
+
+MultiplicationOperator ::=
+    (MultiplicationOperatorMultiplication) MULTIPLICATION
+    | (MultiplicationOperatorDivision) DIVISION
+    | (MultiplicationOperatorModulo) MODULO;
