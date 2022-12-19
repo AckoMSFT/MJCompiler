@@ -1,8 +1,10 @@
 program acko123
-true
+
 class
-false
 ackoackoacko
+
+const int foo = 5;
+const bool bar = 16;
 
 {
     void main (=>) ackoooo

@@ -5,13 +5,16 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class GlobalDeclarationConstantDeclarationList extends GlobalDeclarataion {
+public class ConstantDeclarations extends ConstantDeclarationList {
 
     private ConstantDeclarationList ConstantDeclarationList;
+    private ConstantDeclaration ConstantDeclaration;
 
-    public GlobalDeclarationConstantDeclarationList (ConstantDeclarationList ConstantDeclarationList) {
+    public ConstantDeclarations (ConstantDeclarationList ConstantDeclarationList, ConstantDeclaration ConstantDeclaration) {
         this.ConstantDeclarationList=ConstantDeclarationList;
         if(ConstantDeclarationList!=null) ConstantDeclarationList.setParent(this);
+        this.ConstantDeclaration=ConstantDeclaration;
+        if(ConstantDeclaration!=null) ConstantDeclaration.setParent(this);
     }
 
     public ConstantDeclarationList getConstantDeclarationList() {
@@ -22,28 +25,39 @@ public class GlobalDeclarationConstantDeclarationList extends GlobalDeclarataion
         this.ConstantDeclarationList=ConstantDeclarationList;
     }
 
+    public ConstantDeclaration getConstantDeclaration() {
+        return ConstantDeclaration;
+    }
+
+    public void setConstantDeclaration(ConstantDeclaration ConstantDeclaration) {
+        this.ConstantDeclaration=ConstantDeclaration;
+    }
+
     public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 
     public void childrenAccept(Visitor visitor) {
         if(ConstantDeclarationList!=null) ConstantDeclarationList.accept(visitor);
+        if(ConstantDeclaration!=null) ConstantDeclaration.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
         if(ConstantDeclarationList!=null) ConstantDeclarationList.traverseTopDown(visitor);
+        if(ConstantDeclaration!=null) ConstantDeclaration.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
         if(ConstantDeclarationList!=null) ConstantDeclarationList.traverseBottomUp(visitor);
+        if(ConstantDeclaration!=null) ConstantDeclaration.traverseBottomUp(visitor);
         accept(visitor);
     }
 
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("GlobalDeclarationConstantDeclarationList(\n");
+        buffer.append("ConstantDeclarations(\n");
 
         if(ConstantDeclarationList!=null)
             buffer.append(ConstantDeclarationList.toString("  "+tab));
@@ -51,8 +65,14 @@ public class GlobalDeclarationConstantDeclarationList extends GlobalDeclarataion
             buffer.append(tab+"  null");
         buffer.append("\n");
 
+        if(ConstantDeclaration!=null)
+            buffer.append(ConstantDeclaration.toString("  "+tab));
+        else
+            buffer.append(tab+"  null");
+        buffer.append("\n");
+
         buffer.append(tab);
-        buffer.append(") [GlobalDeclarationConstantDeclarationList]");
+        buffer.append(") [ConstantDeclarations]");
         return buffer.toString();
     }
 }

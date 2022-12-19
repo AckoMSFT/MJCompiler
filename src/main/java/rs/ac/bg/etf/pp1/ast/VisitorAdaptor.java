@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 19/11/2022 1:19:54
+// 19/11/2022 1:31:19
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -13,6 +13,7 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(AdditionOperator AdditionOperator) { }
     public void visit(GlobalDeclarataion GlobalDeclarataion) { }
     public void visit(MethodDeclarationList MethodDeclarationList) { }
+    public void visit(ConstantDeclarationList ConstantDeclarationList) { }
     public void visit(MultiplicationOperatorModulo MultiplicationOperatorModulo) { visit(); }
     public void visit(MultiplicationOperatorDivision MultiplicationOperatorDivision) { visit(); }
     public void visit(MultiplicationOperatorMultiplication MultiplicationOperatorMultiplication) { visit(); }
@@ -25,6 +26,9 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(RelationOperatorNotEquals RelationOperatorNotEquals) { visit(); }
     public void visit(RelationOperatorquals RelationOperatorquals) { visit(); }
     public void visit(AssignmentOperator AssignmentOperator) { visit(); }
+    public void visit(VariableTypeName VariableTypeName) { visit(); }
+    public void visit(Constant Constant) { visit(); }
+    public void visit(ConstantDeclaration ConstantDeclaration) { visit(); }
     public void visit(StatementList StatementList) { visit(); }
     public void visit(FormalParameters FormalParameters) { visit(); }
     public void visit(MethodTypeName MethodTypeName) { visit(); }
@@ -34,7 +38,8 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(MethodDeclarations MethodDeclarations) { visit(); }
     public void visit(ClassDeclarationList ClassDeclarationList) { visit(); }
     public void visit(VariableDeclarationList VariableDeclarationList) { visit(); }
-    public void visit(ConstantDeclarationList ConstantDeclarationList) { visit(); }
+    public void visit(ConstantDeclarationEpsilon ConstantDeclarationEpsilon) { visit(); }
+    public void visit(ConstantDeclarations ConstantDeclarations) { visit(); }
     public void visit(GlobalDeclarationClassDeclarationList GlobalDeclarationClassDeclarationList) { visit(); }
     public void visit(GlobalDeclarationVariableDeclarationList GlobalDeclarationVariableDeclarationList) { visit(); }
     public void visit(GlobalDeclarationConstantDeclarationList GlobalDeclarationConstantDeclarationList) { visit(); }

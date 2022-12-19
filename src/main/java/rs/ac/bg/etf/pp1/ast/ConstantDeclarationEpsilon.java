@@ -5,9 +5,9 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class GlobalDeclarationEpsilon extends GlobalDeclarationList {
+public class ConstantDeclarationEpsilon extends ConstantDeclarationList {
 
-    public GlobalDeclarationEpsilon () {
+    public ConstantDeclarationEpsilon () {
     }
 
     public void accept(Visitor visitor) {
@@ -28,10 +28,10 @@ public class GlobalDeclarationEpsilon extends GlobalDeclarationList {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("GlobalDeclarationEpsilon(\n");
+        buffer.append("ConstantDeclarationEpsilon(\n");
 
         buffer.append(tab);
-        buffer.append(") [GlobalDeclarationEpsilon]");
+        buffer.append(") [ConstantDeclarationEpsilon]");
         return buffer.toString();
     }
 }

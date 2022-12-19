@@ -71,12 +71,15 @@ terminal LEFT_PARENTHESES, RIGHT_PARENTHESES, LEFT_BRACKET, RIGHT_BRACKET, LEFT_
 terminal DOT, COLON, SEMI_COLON;
 terminal ASSIGNMENT;
 terminal EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL_THAN, LESS_OR_EQUAL_THAN;
+terminal CONST;
 
 nonterminal GlobalDeclarationList, GlobalDeclarataion;
 nonterminal ConstantDeclarationList, VariableDeclarationList, ClassDeclarationList, MethodDeclarationList;
 nonterminal AssignmentOperator, RelationOperator, AdditionOperator, MultiplicationOperator;
 
 nonterminal Type, MethodDeclaration, MethodTypeName, FormalParameters, StatementList;
+
+nonterminal ConstantDeclaration, VariableTypeName, Constant;
 
 /*  "program" ident { ConstDecl | VarDecl | ClassDecl } "{" {MethodDecl} "}" */
 
@@ -97,7 +100,8 @@ GlobalDeclarataion ::=
     | (GlobalDeclarationClassDeclarationList) ClassDeclarationList;
 
 ConstantDeclarationList ::=
-    (ConstantDeclarationList) CONST_BOOLEAN /* epsilon */;
+    (ConstantDeclarations) ConstantDeclarationList ConstantDeclaration
+    | (ConstantDeclarationEpsilon) /* epsilon */;
 
 VariableDeclarationList ::=
     (VariableDeclarationList) IDENTIFIER /* epsilon */;
@@ -124,6 +128,18 @@ MethodTypeName ::=
 
 FormalParameters ::= (FormalParameters) LAMBDA;
 StatementList ::= (StatementList) MULTIPLICATION;
+
+
+/* ConstDecl = "const" Type ident "=" (numConst | charConst | boolConst) ";" */
+
+ConstantDeclaration ::=
+    (ConstantDeclaration) CONST VariableTypeName ASSIGNMENT Constant SEMI_COLON;
+
+Constant ::=
+    (Constant) NUMBER;
+
+VariableTypeName ::=
+    (VariableTypeName) Type:variableType IDENTIFIER:variable;
 
 
 /* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */

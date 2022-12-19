@@ -72,6 +72,7 @@ terminal LEFT_PARENTHESES, RIGHT_PARENTHESES, LEFT_BRACKET, RIGHT_BRACKET, LEFT_
 terminal DOT, COLON, SEMI_COLON;
 terminal ASSIGNMENT;
 terminal EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL_THAN, LESS_OR_EQUAL_THAN;
+terminal CONST;
 
 nonterminal GlobalDeclarationList GlobalDeclarationList;
 nonterminal GlobalDeclarataion GlobalDeclarataion;
@@ -89,6 +90,10 @@ nonterminal MethodDeclaration MethodDeclaration;
 nonterminal MethodTypeName MethodTypeName;
 nonterminal FormalParameters FormalParameters;
 nonterminal StatementList StatementList;
+
+nonterminal ConstantDeclaration ConstantDeclaration;
+nonterminal VariableTypeName VariableTypeName;
+nonterminal Constant Constant;
 
 /*  "program" ident { ConstDecl | VarDecl | ClassDecl } "{" {MethodDecl} "}" */
 
@@ -109,7 +114,8 @@ GlobalDeclarataion ::=
     | (GlobalDeclarationClassDeclarationList) ClassDeclarationList:C1 {: RESULT=new GlobalDeclarationClassDeclarationList(C1); RESULT.setLine(C1left); :};
 
 ConstantDeclarationList ::=
-    (ConstantDeclarationList) CONST_BOOLEAN {: RESULT=new ConstantDeclarationList(); :} /* epsilon */;
+    (ConstantDeclarations) ConstantDeclarationList:C1 ConstantDeclaration:C2 {: RESULT=new ConstantDeclarations(C1, C2); RESULT.setLine(C1left); :}
+    | (ConstantDeclarationEpsilon) {: RESULT=new ConstantDeclarationEpsilon(); :} /* epsilon */;
 
 VariableDeclarationList ::=
     (VariableDeclarationList) IDENTIFIER:I1 {: RESULT=new VariableDeclarationList(I1); RESULT.setLine(I1left); :} /* epsilon */;
@@ -136,6 +142,18 @@ MethodTypeName ::=
 
 FormalParameters ::= (FormalParameters) LAMBDA {: RESULT=new FormalParameters(); :};
 StatementList ::= (StatementList) MULTIPLICATION {: RESULT=new StatementList(); :};
+
+
+/* ConstDecl = "const" Type ident "=" (numConst | charConst | boolConst) ";" */
+
+ConstantDeclaration ::=
+    (ConstantDeclaration) CONST VariableTypeName:V1 ASSIGNMENT Constant:C2 SEMI_COLON {: RESULT=new ConstantDeclaration(V1, C2); RESULT.setLine(V1left); :};
+
+Constant ::=
+    (Constant) NUMBER:N1 {: RESULT=new Constant(N1); RESULT.setLine(N1left); :};
+
+VariableTypeName ::=
+    (VariableTypeName) Type:variableType IDENTIFIER:variable {: RESULT=new VariableTypeName(variableType, variable); RESULT.setLine(variableTypeleft); :};
 
 
 /* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */

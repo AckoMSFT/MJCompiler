@@ -5,22 +5,33 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ProgramName implements SyntaxNode {
+public class VariableTypeName implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String programName;
+    private Type Type;
+    private String variable;
 
-    public ProgramName (String programName) {
-        this.programName=programName;
+    public VariableTypeName (Type Type, String variable) {
+        this.Type=Type;
+        if(Type!=null) Type.setParent(this);
+        this.variable=variable;
     }
 
-    public String getProgramName() {
-        return programName;
+    public Type getType() {
+        return Type;
     }
 
-    public void setProgramName(String programName) {
-        this.programName=programName;
+    public void setType(Type Type) {
+        this.Type=Type;
+    }
+
+    public String getVariable() {
+        return variable;
+    }
+
+    public void setVariable(String variable) {
+        this.variable=variable;
     }
 
     public SyntaxNode getParent() {
@@ -44,26 +55,35 @@ public class ProgramName implements SyntaxNode {
     }
 
     public void childrenAccept(Visitor visitor) {
+        if(Type!=null) Type.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
+        if(Type!=null) Type.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
+        if(Type!=null) Type.traverseBottomUp(visitor);
         accept(visitor);
     }
 
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("ProgramName(\n");
+        buffer.append("VariableTypeName(\n");
 
-        buffer.append(" "+tab+programName);
+        if(Type!=null)
+            buffer.append(Type.toString("  "+tab));
+        else
+            buffer.append(tab+"  null");
+        buffer.append("\n");
+
+        buffer.append(" "+tab+variable);
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [ProgramName]");
+        buffer.append(") [VariableTypeName]");
         return buffer.toString();
     }
 }
