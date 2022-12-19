@@ -5,27 +5,9 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class AssignmentOperator implements SyntaxNode {
+public class ConstantBoolean extends Constant {
 
-    private SyntaxNode parent;
-    private int line;
-    public AssignmentOperator () {
-    }
-
-    public SyntaxNode getParent() {
-        return parent;
-    }
-
-    public void setParent(SyntaxNode parent) {
-        this.parent=parent;
-    }
-
-    public int getLine() {
-        return line;
-    }
-
-    public void setLine(int line) {
-        this.line=line;
+    public ConstantBoolean () {
     }
 
     public void accept(Visitor visitor) {
@@ -46,10 +28,10 @@ public class AssignmentOperator implements SyntaxNode {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("AssignmentOperator(\n");
+        buffer.append("ConstantBoolean(\n");
 
         buffer.append(tab);
-        buffer.append(") [AssignmentOperator]");
+        buffer.append(") [ConstantBoolean]");
         return buffer.toString();
     }
 }

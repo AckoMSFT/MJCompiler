@@ -54,7 +54,8 @@ terminal PROGRAM;
 nonterminal Program, ProgramName;
 
 terminal String IDENTIFIER;
-terminal Integer NUMBER;
+terminal Integer CONST_NUMBER;
+terminal Character CONST_CHARACTER;
 
 /* Keywords */
 terminal BREAK, CONTINUE, READ, PRINT, WHILE, FOR_EACH, CLASS, EXTENDS, NEW, IF, ELSE, THEN, STATIC;
@@ -103,8 +104,12 @@ ConstantDeclarationList ::=
     (ConstantDeclarations) ConstantDeclarationList ConstantDeclaration
     | (ConstantDeclarationEpsilon) /* epsilon */;
 
+/* TODO(acko): Fix me please. */
+
 VariableDeclarationList ::=
     (VariableDeclarationList) IDENTIFIER /* epsilon */;
+
+/* TODO(acko): Fix me please. */
 
 ClassDeclarationList ::=
     (ClassDeclarationList) CLASS /* epsilon */;
@@ -136,7 +141,9 @@ ConstantDeclaration ::=
     (ConstantDeclaration) CONST VariableTypeName ASSIGNMENT Constant SEMI_COLON;
 
 Constant ::=
-    (Constant) NUMBER;
+    (ConstantNumber) CONST_NUMBER
+    | (ConstantCharacter) CONST_CHARACTER
+    | (ConstantBoolean) CONST_BOOLEAN;
 
 VariableTypeName ::=
     (VariableTypeName) Type:variableType IDENTIFIER:variable;

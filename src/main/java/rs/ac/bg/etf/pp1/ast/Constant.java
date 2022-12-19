@@ -1,27 +1,15 @@
 // generated with ast extension for cup
 // version 0.8
-// 19/11/2022 1:31:19
+// 19/11/2022 1:43:13
 
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class Constant implements SyntaxNode {
+public abstract class Constant implements SyntaxNode {
 
     private SyntaxNode parent;
+
     private int line;
-    private Integer N1;
-
-    public Constant (Integer N1) {
-        this.N1=N1;
-    }
-
-    public Integer getN1() {
-        return N1;
-    }
-
-    public void setN1(Integer N1) {
-        this.N1=N1;
-    }
 
     public SyntaxNode getParent() {
         return parent;
@@ -39,31 +27,11 @@ public class Constant implements SyntaxNode {
         this.line=line;
     }
 
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
-    }
+    public abstract void accept(Visitor visitor);
+    public abstract void childrenAccept(Visitor visitor);
+    public abstract void traverseTopDown(Visitor visitor);
+    public abstract void traverseBottomUp(Visitor visitor);
 
-    public void childrenAccept(Visitor visitor) {
-    }
-
-    public void traverseTopDown(Visitor visitor) {
-        accept(visitor);
-    }
-
-    public void traverseBottomUp(Visitor visitor) {
-        accept(visitor);
-    }
-
-    public String toString(String tab) {
-        StringBuffer buffer=new StringBuffer();
-        buffer.append(tab);
-        buffer.append("Constant(\n");
-
-        buffer.append(" "+tab+N1);
-        buffer.append("\n");
-
-        buffer.append(tab);
-        buffer.append(") [Constant]");
-        return buffer.toString();
-    }
+    public String toString() { return toString(""); }
+    public abstract String toString(String tab);
 }

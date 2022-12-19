@@ -93,8 +93,10 @@ import org.apache.logging.log4j.Logger;
 <COMMENT> . {yybegin(COMMENT);}
 <COMMENT> "\r\n" {yybegin(YYINITIAL);}
 
-[0-9]+ { return new_symbol(sym.NUMBER, new Integer(yytext())); }
+[0-9]+ { return new_symbol(sym.CONST_NUMBER, new Integer(yytext())); }
 ([a-z]|[A-Z])[a-zA-Z0-9]*  { return new_symbol(sym.IDENTIFIER, yytext()); }
+
+"'"[ -~]"'"		{ return new_symbol(sym.CONST_CHARACTER, new Character(yytext().charAt(1))); }
 
 . {
     logger.error("Lexical analysis failure on line: " + (yyline + 1) + " with token: " + yytext());

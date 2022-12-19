@@ -55,7 +55,8 @@ nonterminal Program Program;
 nonterminal ProgramName ProgramName;
 
 terminal String IDENTIFIER;
-terminal Integer NUMBER;
+terminal Integer CONST_NUMBER;
+terminal Character CONST_CHARACTER;
 
 /* Keywords */
 terminal BREAK, CONTINUE, READ, PRINT, WHILE, FOR_EACH, CLASS, EXTENDS, NEW, IF, ELSE, THEN, STATIC;
@@ -117,8 +118,12 @@ ConstantDeclarationList ::=
     (ConstantDeclarations) ConstantDeclarationList:C1 ConstantDeclaration:C2 {: RESULT=new ConstantDeclarations(C1, C2); RESULT.setLine(C1left); :}
     | (ConstantDeclarationEpsilon) {: RESULT=new ConstantDeclarationEpsilon(); :} /* epsilon */;
 
+/* TODO(acko): Fix me please. */
+
 VariableDeclarationList ::=
     (VariableDeclarationList) IDENTIFIER:I1 {: RESULT=new VariableDeclarationList(I1); RESULT.setLine(I1left); :} /* epsilon */;
+
+/* TODO(acko): Fix me please. */
 
 ClassDeclarationList ::=
     (ClassDeclarationList) CLASS {: RESULT=new ClassDeclarationList(); :} /* epsilon */;
@@ -149,8 +154,12 @@ StatementList ::= (StatementList) MULTIPLICATION {: RESULT=new StatementList(); 
 ConstantDeclaration ::=
     (ConstantDeclaration) CONST VariableTypeName:V1 ASSIGNMENT Constant:C2 SEMI_COLON {: RESULT=new ConstantDeclaration(V1, C2); RESULT.setLine(V1left); :};
 
+/* TODO(acko): Fix me please. */
+
 Constant ::=
-    (Constant) NUMBER:N1 {: RESULT=new Constant(N1); RESULT.setLine(N1left); :};
+    (ConstantNumber) CONST_NUMBER:C1 {: RESULT=new ConstantNumber(C1); RESULT.setLine(C1left); :}
+    | (ConstantCharacter) CONST_CHARACTER:C1 {: RESULT=new ConstantCharacter(C1); RESULT.setLine(C1left); :}
+    | (ConstantBoolean) CONST_BOOLEAN {: RESULT=new ConstantBoolean(); :};
 
 VariableTypeName ::=
     (VariableTypeName) Type:variableType IDENTIFIER:variable {: RESULT=new VariableTypeName(variableType, variable); RESULT.setLine(variableTypeleft); :};

@@ -5,27 +5,20 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class AssignmentOperator implements SyntaxNode {
+public class ConstantCharacter extends Constant {
 
-    private SyntaxNode parent;
-    private int line;
-    public AssignmentOperator () {
+    private Character C1;
+
+    public ConstantCharacter (Character C1) {
+        this.C1=C1;
     }
 
-    public SyntaxNode getParent() {
-        return parent;
+    public Character getC1() {
+        return C1;
     }
 
-    public void setParent(SyntaxNode parent) {
-        this.parent=parent;
-    }
-
-    public int getLine() {
-        return line;
-    }
-
-    public void setLine(int line) {
-        this.line=line;
+    public void setC1(Character C1) {
+        this.C1=C1;
     }
 
     public void accept(Visitor visitor) {
@@ -46,10 +39,13 @@ public class AssignmentOperator implements SyntaxNode {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("AssignmentOperator(\n");
+        buffer.append("ConstantCharacter(\n");
+
+        buffer.append(" "+tab+C1);
+        buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [AssignmentOperator]");
+        buffer.append(") [ConstantCharacter]");
         return buffer.toString();
     }
 }

@@ -4,7 +4,8 @@ class
 ackoackoacko
 
 const int foo = 5;
-const bool bar = 16;
+const bool bar = false;
+const char c = '+';
 
 {
     void main (=>) ackoooo
