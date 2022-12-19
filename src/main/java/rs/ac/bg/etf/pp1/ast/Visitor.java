@@ -1,18 +1,18 @@
 // generated with ast extension for cup
 // version 0.8
-// 18/11/2022 23:17:12
+// 19/11/2022 1:19:54
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public interface Visitor { 
 
-    public void visit(MultiplicationOperator MultiplicationOperator);
-    public void visit(AdditionOperator AdditionOperator);
     public void visit(GlobalDeclarationList GlobalDeclarationList);
-    public void visit(MethodDeclarationList MethodDeclarationList);
+    public void visit(MultiplicationOperator MultiplicationOperator);
     public void visit(RelationOperator RelationOperator);
+    public void visit(AdditionOperator AdditionOperator);
     public void visit(GlobalDeclarataion GlobalDeclarataion);
+    public void visit(MethodDeclarationList MethodDeclarationList);
     public void visit(MultiplicationOperatorModulo MultiplicationOperatorModulo);
     public void visit(MultiplicationOperatorDivision MultiplicationOperatorDivision);
     public void visit(MultiplicationOperatorMultiplication MultiplicationOperatorMultiplication);
@@ -25,7 +25,13 @@ public interface Visitor {
     public void visit(RelationOperatorNotEquals RelationOperatorNotEquals);
     public void visit(RelationOperatorquals RelationOperatorquals);
     public void visit(AssignmentOperator AssignmentOperator);
-    public void visit(MethodDeclarationListDerived1 MethodDeclarationListDerived1);
+    public void visit(StatementList StatementList);
+    public void visit(FormalParameters FormalParameters);
+    public void visit(MethodTypeName MethodTypeName);
+    public void visit(Type Type);
+    public void visit(MethodDeclaration MethodDeclaration);
+    public void visit(MethodDeclarationEpsilon MethodDeclarationEpsilon);
+    public void visit(MethodDeclarations MethodDeclarations);
     public void visit(ClassDeclarationList ClassDeclarationList);
     public void visit(VariableDeclarationList VariableDeclarationList);
     public void visit(ConstantDeclarationList ConstantDeclarationList);

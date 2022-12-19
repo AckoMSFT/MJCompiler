@@ -5,22 +5,11 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class VariableDeclarationList implements SyntaxNode {
+public class FormalParameters implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String I1;
-
-    public VariableDeclarationList (String I1) {
-        this.I1=I1;
-    }
-
-    public String getI1() {
-        return I1;
-    }
-
-    public void setI1(String I1) {
-        this.I1=I1;
+    public FormalParameters () {
     }
 
     public SyntaxNode getParent() {
@@ -57,13 +46,10 @@ public class VariableDeclarationList implements SyntaxNode {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("VariableDeclarationList(\n");
-
-        buffer.append(" "+tab+I1);
-        buffer.append("\n");
+        buffer.append("FormalParameters(\n");
 
         buffer.append(tab);
-        buffer.append(") [VariableDeclarationList]");
+        buffer.append(") [FormalParameters]");
         return buffer.toString();
     }
 }

@@ -5,22 +5,33 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class VariableDeclarationList implements SyntaxNode {
+public class MethodTypeName implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String I1;
+    private Type Type;
+    private String methodName;
 
-    public VariableDeclarationList (String I1) {
-        this.I1=I1;
+    public MethodTypeName (Type Type, String methodName) {
+        this.Type=Type;
+        if(Type!=null) Type.setParent(this);
+        this.methodName=methodName;
     }
 
-    public String getI1() {
-        return I1;
+    public Type getType() {
+        return Type;
     }
 
-    public void setI1(String I1) {
-        this.I1=I1;
+    public void setType(Type Type) {
+        this.Type=Type;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName=methodName;
     }
 
     public SyntaxNode getParent() {
@@ -44,26 +55,35 @@ public class VariableDeclarationList implements SyntaxNode {
     }
 
     public void childrenAccept(Visitor visitor) {
+        if(Type!=null) Type.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
+        if(Type!=null) Type.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
+        if(Type!=null) Type.traverseBottomUp(visitor);
         accept(visitor);
     }
 
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("VariableDeclarationList(\n");
+        buffer.append("MethodTypeName(\n");
 
-        buffer.append(" "+tab+I1);
+        if(Type!=null)
+            buffer.append(Type.toString("  "+tab));
+        else
+            buffer.append(tab+"  null");
+        buffer.append("\n");
+
+        buffer.append(" "+tab+methodName);
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [VariableDeclarationList]");
+        buffer.append(") [MethodTypeName]");
         return buffer.toString();
     }
 }

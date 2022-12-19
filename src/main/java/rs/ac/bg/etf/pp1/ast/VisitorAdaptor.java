@@ -1,18 +1,18 @@
 // generated with ast extension for cup
 // version 0.8
-// 18/11/2022 23:17:12
+// 19/11/2022 1:19:54
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public abstract class VisitorAdaptor implements Visitor { 
 
-    public void visit(MultiplicationOperator MultiplicationOperator) { }
-    public void visit(AdditionOperator AdditionOperator) { }
     public void visit(GlobalDeclarationList GlobalDeclarationList) { }
-    public void visit(MethodDeclarationList MethodDeclarationList) { }
+    public void visit(MultiplicationOperator MultiplicationOperator) { }
     public void visit(RelationOperator RelationOperator) { }
+    public void visit(AdditionOperator AdditionOperator) { }
     public void visit(GlobalDeclarataion GlobalDeclarataion) { }
+    public void visit(MethodDeclarationList MethodDeclarationList) { }
     public void visit(MultiplicationOperatorModulo MultiplicationOperatorModulo) { visit(); }
     public void visit(MultiplicationOperatorDivision MultiplicationOperatorDivision) { visit(); }
     public void visit(MultiplicationOperatorMultiplication MultiplicationOperatorMultiplication) { visit(); }
@@ -25,7 +25,13 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(RelationOperatorNotEquals RelationOperatorNotEquals) { visit(); }
     public void visit(RelationOperatorquals RelationOperatorquals) { visit(); }
     public void visit(AssignmentOperator AssignmentOperator) { visit(); }
-    public void visit(MethodDeclarationListDerived1 MethodDeclarationListDerived1) { visit(); }
+    public void visit(StatementList StatementList) { visit(); }
+    public void visit(FormalParameters FormalParameters) { visit(); }
+    public void visit(MethodTypeName MethodTypeName) { visit(); }
+    public void visit(Type Type) { visit(); }
+    public void visit(MethodDeclaration MethodDeclaration) { visit(); }
+    public void visit(MethodDeclarationEpsilon MethodDeclarationEpsilon) { visit(); }
+    public void visit(MethodDeclarations MethodDeclarations) { visit(); }
     public void visit(ClassDeclarationList ClassDeclarationList) { visit(); }
     public void visit(VariableDeclarationList VariableDeclarationList) { visit(); }
     public void visit(ConstantDeclarationList ConstantDeclarationList) { visit(); }

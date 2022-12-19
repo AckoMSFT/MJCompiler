@@ -84,6 +84,12 @@ nonterminal RelationOperator RelationOperator;
 nonterminal AdditionOperator AdditionOperator;
 nonterminal MultiplicationOperator MultiplicationOperator;
 
+nonterminal Type Type;
+nonterminal MethodDeclaration MethodDeclaration;
+nonterminal MethodTypeName MethodTypeName;
+nonterminal FormalParameters FormalParameters;
+nonterminal StatementList StatementList;
+
 /*  "program" ident { ConstDecl | VarDecl | ClassDecl } "{" {MethodDecl} "}" */
 
 Program ::=
@@ -111,8 +117,30 @@ VariableDeclarationList ::=
 ClassDeclarationList ::=
     (ClassDeclarationList) CLASS {: RESULT=new ClassDeclarationList(); :} /* epsilon */;
 
-MethodDeclarationList ::= {: RESULT=new MethodDeclarationListDerived1(); :} /* TODO (acko): Fix me please.
-    (MethodDeclarationList) RelationOperator AdditionOperator MultiplicationOperator /* epsilon */;
+MethodDeclarationList ::=
+    (MethodDeclarations) MethodDeclarationList:M1 MethodDeclaration:M2 {: RESULT=new MethodDeclarations(M1, M2); RESULT.setLine(M1left); :}
+    | (MethodDeclarationEpsilon) {: RESULT=new MethodDeclarationEpsilon(); :} /* epsilon */;
+
+MethodDeclaration ::=
+    (MethodDeclaration) MethodTypeName:M1 LEFT_PARENTHESES FormalParameters:F2 RIGHT_PARENTHESES
+        VariableDeclarationList:V3 LEFT_BRACE StatementList:S4 RIGHT_BRACE {: RESULT=new MethodDeclaration(M1, F2, V3, S4); RESULT.setLine(M1left); :};
+
+/* Type = ident */
+Type ::=
+    (Type) IDENTIFIER:typeName {: RESULT=new Type(typeName); RESULT.setLine(typeNameleft); :};
+
+MethodTypeName ::=
+    (MethodTypeName) Type:returnType IDENTIFIER:methodName {: RESULT=new MethodTypeName(returnType, methodName); RESULT.setLine(returnTypeleft); :};
+
+/* TODO(acko): Fix me please. */
+
+FormalParameters ::= (FormalParameters) LAMBDA {: RESULT=new FormalParameters(); :};
+StatementList ::= (StatementList) MULTIPLICATION {: RESULT=new StatementList(); :};
+
+
+/* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */
+/* FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]} */
+
 
 /* Assignop = "=" */
 

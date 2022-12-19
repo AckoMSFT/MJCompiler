@@ -1,13 +1,13 @@
 // generated with ast extension for cup
 // version 0.8
-// 18/11/2022 23:17:12
+// 19/11/2022 1:19:54
 
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class MethodDeclarationListDerived1 extends MethodDeclarationList {
+public class MethodDeclarationEpsilon extends MethodDeclarationList {
 
-    public MethodDeclarationListDerived1 () {
+    public MethodDeclarationEpsilon () {
     }
 
     public void accept(Visitor visitor) {
@@ -28,10 +28,10 @@ public class MethodDeclarationListDerived1 extends MethodDeclarationList {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("MethodDeclarationListDerived1(\n");
+        buffer.append("MethodDeclarationEpsilon(\n");
 
         buffer.append(tab);
-        buffer.append(") [MethodDeclarationListDerived1]");
+        buffer.append(") [MethodDeclarationEpsilon]");
         return buffer.toString();
     }
 }

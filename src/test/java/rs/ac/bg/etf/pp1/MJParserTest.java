@@ -3,6 +3,7 @@ package rs.ac.bg.etf.pp1;
 import java_cup.runtime.Symbol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import rs.ac.bg.etf.pp1.ast.MethodTypeName;
 import rs.ac.bg.etf.pp1.ast.Program;
 
 import java.io.*;

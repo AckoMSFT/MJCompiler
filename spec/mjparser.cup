@@ -76,6 +76,8 @@ nonterminal GlobalDeclarationList, GlobalDeclarataion;
 nonterminal ConstantDeclarationList, VariableDeclarationList, ClassDeclarationList, MethodDeclarationList;
 nonterminal AssignmentOperator, RelationOperator, AdditionOperator, MultiplicationOperator;
 
+nonterminal Type, MethodDeclaration, MethodTypeName, FormalParameters, StatementList;
+
 /*  "program" ident { ConstDecl | VarDecl | ClassDecl } "{" {MethodDecl} "}" */
 
 Program ::=
@@ -103,8 +105,30 @@ VariableDeclarationList ::=
 ClassDeclarationList ::=
     (ClassDeclarationList) CLASS /* epsilon */;
 
-MethodDeclarationList ::= /* TODO (acko): Fix me please.
-    (MethodDeclarationList) RelationOperator AdditionOperator MultiplicationOperator /* epsilon */;
+MethodDeclarationList ::=
+    (MethodDeclarations) MethodDeclarationList MethodDeclaration
+    | (MethodDeclarationEpsilon) /* epsilon */;
+
+MethodDeclaration ::=
+    (MethodDeclaration) MethodTypeName LEFT_PARENTHESES FormalParameters RIGHT_PARENTHESES
+        VariableDeclarationList LEFT_BRACE StatementList RIGHT_BRACE;
+
+/* Type = ident */
+Type ::=
+    (Type) IDENTIFIER:typeName;
+
+MethodTypeName ::=
+    (MethodTypeName) Type:returnType IDENTIFIER:methodName;
+
+/* TODO(acko): Fix me please. */
+
+FormalParameters ::= (FormalParameters) LAMBDA;
+StatementList ::= (StatementList) MULTIPLICATION;
+
+
+/* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */
+/* FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]} */
+
 
 /* Assignop = "=" */
 
