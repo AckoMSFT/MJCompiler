@@ -124,7 +124,7 @@ VariableDeclarationList ::=
 
 VariableDeclarationListWithSeparator ::=
     (VariableDeclarationListWithSeparatorNoError) VariableDeclarationList COMMA
-    | error COMMA:l {: parser.report_error("Syntax error while declaring variable on line " + lleft, null); :};
+    | (VariableDeclarationListWithSeparatorError) error COMMA:l {: parser.report_error("Syntax error while declaring variable on line " + lleft, null); :};
 
 /* TODO (acko): How do I recover here? */
 

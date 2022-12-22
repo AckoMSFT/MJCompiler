@@ -141,7 +141,7 @@ VariableDeclarationList ::=
 
 VariableDeclarationListWithSeparator ::=
     (VariableDeclarationListWithSeparatorNoError) VariableDeclarationList:V1 COMMA {: RESULT=new VariableDeclarationListWithSeparatorNoError(V1); RESULT.setLine(V1left); :}
-    | error COMMA:l {: parser.report_error("Syntax error while declaring variable on line " + lleft, null); :} {: RESULT=new VariableDeclarationListWithSeparatorDerived1(); :};
+    | (VariableDeclarationListWithSeparatorError) error COMMA:l {: parser.report_error("Syntax error while declaring variable on line " + lleft, null); :} {: RESULT=new VariableDeclarationListWithSeparatorError(); :};
 
 /* TODO (acko): How do I recover here? */
 
@@ -221,6 +221,19 @@ MaybeNegative ::=
 Term ::=
     (TermList) Term:T1 MultiplicationOperator:M2 Factor:F3 {: RESULT=new TermList(T1, M2, F3); RESULT.setLine(T1left); :}
     | (TermFactor) Factor:F1 {: RESULT=new TermFactor(F1); RESULT.setLine(F1left); :};
+
+/*
+Statement = DesignatorStatement ";"
+| "if" "(" Condition ")" Statement ["else" Statement]
+| "while" "(" Condition ")" Statement
+| "break" ";"
+| "continue" ";"
+| "return" [Expr] ";"
+| "read" "(" Designator ")" ";"
+| "print" "(" Expr ["," numConst] ")" ";"
+| Designator "." "foreach" "(" ident "=>" Statement ")" ";" * za B i C nivo
+| "{" {Statement} "}"
+*/
 
 /* TODO (acko): This needs to be upgraded to handle Expr and new and designator */
 

@@ -1,13 +1,13 @@
 // generated with ast extension for cup
 // version 0.8
-// 22/11/2022 0:5:25
+// 22/11/2022 1:37:43
 
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class VariableDeclarationListWithSeparatorDerived1 extends VariableDeclarationListWithSeparator {
+public class VariableDeclarationListWithSeparatorError extends VariableDeclarationListWithSeparator {
 
-    public VariableDeclarationListWithSeparatorDerived1 () {
+    public VariableDeclarationListWithSeparatorError () {
     }
 
     public void accept(Visitor visitor) {
@@ -28,10 +28,10 @@ public class VariableDeclarationListWithSeparatorDerived1 extends VariableDeclar
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("VariableDeclarationListWithSeparatorDerived1(\n");
+        buffer.append("VariableDeclarationListWithSeparatorError(\n");
 
         buffer.append(tab);
-        buffer.append(") [VariableDeclarationListWithSeparatorDerived1]");
+        buffer.append(") [VariableDeclarationListWithSeparatorError]");
         return buffer.toString();
     }
 }
