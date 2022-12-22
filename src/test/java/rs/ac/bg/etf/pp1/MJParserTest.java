@@ -5,6 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rs.ac.bg.etf.pp1.ast.MethodTypeName;
 import rs.ac.bg.etf.pp1.ast.Program;
+import rs.etf.pp1.mj.runtime.Code;
+import rs.etf.pp1.symboltable.Tab;
 
 import java.io.*;
 
@@ -31,6 +33,22 @@ public class MJParserTest {
             logger.info(program.toString(""));
             logger.info("===================================");
 
+            SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
+            program.traverseBottomUp(semanticAnalyzer);
+
+            logger.info("Declared #" + semanticAnalyzer.cntStaticVars + " static vars");
+            logger.info("Declared #" + semanticAnalyzer.cntArrays + " arrays");
+
+            logger.info("===================================");
+
+            Tab.init();
+
+            Tab.dump();
+
+
+            CodeGenerator codeGenerator = new CodeGenerator();
+
+            Code.mainPc = codeGenerator.getMainPC();
 
             //RuleVisitor v = new RuleVisitor();
             //program.traverseBottomUp(v);

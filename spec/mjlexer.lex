@@ -86,7 +86,7 @@ import org.apache.logging.log4j.Logger;
 "{" { return new_symbol(sym.LEFT_BRACE, yytext()); }
 "}" { return new_symbol(sym.RIGHT_BRACE, yytext()); }
 "." { return new_symbol(sym.DOT, yytext()); }
-"," { return new_symbol(sym.COLON, yytext()); }
+"," { return new_symbol(sym.COMMA, yytext()); }
 ";" { return new_symbol(sym.SEMI_COLON, yytext()); }
 
 "//" {yybegin(COMMENT);}

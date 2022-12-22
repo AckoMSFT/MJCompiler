@@ -5,33 +5,33 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ConstantDeclaration implements SyntaxNode {
+public class VariableDeclaration implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String variable;
-    private Constant Constant;
+    private String variableName;
+    private MaybeArray MaybeArray;
 
-    public ConstantDeclaration (String variable, Constant Constant) {
-        this.variable=variable;
-        this.Constant=Constant;
-        if(Constant!=null) Constant.setParent(this);
+    public VariableDeclaration (String variableName, MaybeArray MaybeArray) {
+        this.variableName=variableName;
+        this.MaybeArray=MaybeArray;
+        if(MaybeArray!=null) MaybeArray.setParent(this);
     }
 
-    public String getVariable() {
-        return variable;
+    public String getVariableName() {
+        return variableName;
     }
 
-    public void setVariable(String variable) {
-        this.variable=variable;
+    public void setVariableName(String variableName) {
+        this.variableName=variableName;
     }
 
-    public Constant getConstant() {
-        return Constant;
+    public MaybeArray getMaybeArray() {
+        return MaybeArray;
     }
 
-    public void setConstant(Constant Constant) {
-        this.Constant=Constant;
+    public void setMaybeArray(MaybeArray MaybeArray) {
+        this.MaybeArray=MaybeArray;
     }
 
     public SyntaxNode getParent() {
@@ -55,35 +55,35 @@ public class ConstantDeclaration implements SyntaxNode {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(Constant!=null) Constant.accept(visitor);
+        if(MaybeArray!=null) MaybeArray.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(Constant!=null) Constant.traverseTopDown(visitor);
+        if(MaybeArray!=null) MaybeArray.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(Constant!=null) Constant.traverseBottomUp(visitor);
+        if(MaybeArray!=null) MaybeArray.traverseBottomUp(visitor);
         accept(visitor);
     }
 
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("ConstantDeclaration(\n");
+        buffer.append("VariableDeclaration(\n");
 
-        buffer.append(" "+tab+variable);
+        buffer.append(" "+tab+variableName);
         buffer.append("\n");
 
-        if(Constant!=null)
-            buffer.append(Constant.toString("  "+tab));
+        if(MaybeArray!=null)
+            buffer.append(MaybeArray.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [ConstantDeclaration]");
+        buffer.append(") [VariableDeclaration]");
         return buffer.toString();
     }
 }

@@ -5,24 +5,13 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ConstantDeclarations extends ConstantDeclarationList {
+public class ConstantDeclarationListSingle extends ConstantDeclarationList {
 
-    private ConstantDeclarationList ConstantDeclarationList;
     private ConstantDeclaration ConstantDeclaration;
 
-    public ConstantDeclarations (ConstantDeclarationList ConstantDeclarationList, ConstantDeclaration ConstantDeclaration) {
-        this.ConstantDeclarationList=ConstantDeclarationList;
-        if(ConstantDeclarationList!=null) ConstantDeclarationList.setParent(this);
+    public ConstantDeclarationListSingle (ConstantDeclaration ConstantDeclaration) {
         this.ConstantDeclaration=ConstantDeclaration;
         if(ConstantDeclaration!=null) ConstantDeclaration.setParent(this);
-    }
-
-    public ConstantDeclarationList getConstantDeclarationList() {
-        return ConstantDeclarationList;
-    }
-
-    public void setConstantDeclarationList(ConstantDeclarationList ConstantDeclarationList) {
-        this.ConstantDeclarationList=ConstantDeclarationList;
     }
 
     public ConstantDeclaration getConstantDeclaration() {
@@ -38,18 +27,15 @@ public class ConstantDeclarations extends ConstantDeclarationList {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(ConstantDeclarationList!=null) ConstantDeclarationList.accept(visitor);
         if(ConstantDeclaration!=null) ConstantDeclaration.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(ConstantDeclarationList!=null) ConstantDeclarationList.traverseTopDown(visitor);
         if(ConstantDeclaration!=null) ConstantDeclaration.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(ConstantDeclarationList!=null) ConstantDeclarationList.traverseBottomUp(visitor);
         if(ConstantDeclaration!=null) ConstantDeclaration.traverseBottomUp(visitor);
         accept(visitor);
     }
@@ -57,13 +43,7 @@ public class ConstantDeclarations extends ConstantDeclarationList {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("ConstantDeclarations(\n");
-
-        if(ConstantDeclarationList!=null)
-            buffer.append(ConstantDeclarationList.toString("  "+tab));
-        else
-            buffer.append(tab+"  null");
-        buffer.append("\n");
+        buffer.append("ConstantDeclarationListSingle(\n");
 
         if(ConstantDeclaration!=null)
             buffer.append(ConstantDeclaration.toString("  "+tab));
@@ -72,7 +52,7 @@ public class ConstantDeclarations extends ConstantDeclarationList {
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [ConstantDeclarations]");
+        buffer.append(") [ConstantDeclarationListSingle]");
         return buffer.toString();
     }
 }

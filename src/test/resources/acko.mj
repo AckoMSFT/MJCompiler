@@ -1,9 +1,9 @@
 program acko123
 
 class
-ackoackoacko
+int var, bar , zooo[];
 
-const int foo = 5;
+const int foo = 5, acko = 18, yyy = 42;
 const bool bar = false;
 const char c = '+';
 

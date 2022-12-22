@@ -49,7 +49,7 @@
     <target name="parserGen" depends="delete">
         <java jar="lib/cup_v10k.jar" fork="true">
             <arg value="-expect"/>
-            <arg value="1000"/>
+            <arg value="0"/>
             <arg value="-destdir"/>
             <arg value="src/main/java/rs/ac/bg/etf/pp1"/>
             <arg value="-ast"/>

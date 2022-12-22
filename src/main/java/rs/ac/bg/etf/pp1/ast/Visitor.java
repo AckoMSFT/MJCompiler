@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 19/11/2022 1:43:13
+// 22/11/2022 0:5:25
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -9,11 +9,16 @@ public interface Visitor {
 
     public void visit(GlobalDeclarationList GlobalDeclarationList);
     public void visit(Constant Constant);
+    public void visit(MaybeArray MaybeArray);
+    public void visit(VariableDeclarationList VariableDeclarationList);
     public void visit(MultiplicationOperator MultiplicationOperator);
+    public void visit(MaybeNegative MaybeNegative);
+    public void visit(VariableDeclarationListWithSeparator VariableDeclarationListWithSeparator);
     public void visit(RelationOperator RelationOperator);
     public void visit(AdditionOperator AdditionOperator);
     public void visit(GlobalDeclarataion GlobalDeclarataion);
     public void visit(MethodDeclarationList MethodDeclarationList);
+    public void visit(Term Term);
     public void visit(ConstantDeclarationList ConstantDeclarationList);
     public void visit(MultiplicationOperatorModulo MultiplicationOperatorModulo);
     public void visit(MultiplicationOperatorDivision MultiplicationOperatorDivision);
@@ -27,6 +32,11 @@ public interface Visitor {
     public void visit(RelationOperatorNotEquals RelationOperatorNotEquals);
     public void visit(RelationOperatorquals RelationOperatorquals);
     public void visit(AssignmentOperator AssignmentOperator);
+    public void visit(Factor Factor);
+    public void visit(TermFactor TermFactor);
+    public void visit(TermList TermList);
+    public void visit(MaybeNegativeEpsilon MaybeNegativeEpsilon);
+    public void visit(MaybeNegativeIsNegative MaybeNegativeIsNegative);
     public void visit(VariableTypeName VariableTypeName);
     public void visit(ConstantBoolean ConstantBoolean);
     public void visit(ConstantCharacter ConstantCharacter);
@@ -40,8 +50,14 @@ public interface Visitor {
     public void visit(MethodDeclarationEpsilon MethodDeclarationEpsilon);
     public void visit(MethodDeclarations MethodDeclarations);
     public void visit(ClassDeclarationList ClassDeclarationList);
-    public void visit(VariableDeclarationList VariableDeclarationList);
-    public void visit(ConstantDeclarationEpsilon ConstantDeclarationEpsilon);
+    public void visit(MaybeArrayEpsilon MaybeArrayEpsilon);
+    public void visit(MaybeArrayIsArray MaybeArrayIsArray);
+    public void visit(VariableDeclaration VariableDeclaration);
+    public void visit(VariableDeclarationListWithSeparatorDerived1 VariableDeclarationListWithSeparatorDerived1);
+    public void visit(VariableDeclarationListWithSeparatorNoError VariableDeclarationListWithSeparatorNoError);
+    public void visit(VariableDeclerationListSingle VariableDeclerationListSingle);
+    public void visit(VariableDeclarations VariableDeclarations);
+    public void visit(ConstantDeclarationListSingle ConstantDeclarationListSingle);
     public void visit(ConstantDeclarations ConstantDeclarations);
     public void visit(GlobalDeclarationClassDeclarationList GlobalDeclarationClassDeclarationList);
     public void visit(GlobalDeclarationVariableDeclarationList GlobalDeclarationVariableDeclarationList);

@@ -5,7 +5,7 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public abstract class MethodDeclarationList implements SyntaxNode {
+public abstract class MaybeNegative implements SyntaxNode {
 
     private SyntaxNode parent;
 

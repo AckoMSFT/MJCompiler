@@ -5,11 +5,23 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ClassDeclarationList implements SyntaxNode {
+public class Factor implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    public ClassDeclarationList () {
+    private Constant Constant;
+
+    public Factor (Constant Constant) {
+        this.Constant=Constant;
+        if(Constant!=null) Constant.setParent(this);
+    }
+
+    public Constant getConstant() {
+        return Constant;
+    }
+
+    public void setConstant(Constant Constant) {
+        this.Constant=Constant;
     }
 
     public SyntaxNode getParent() {
@@ -33,23 +45,32 @@ public class ClassDeclarationList implements SyntaxNode {
     }
 
     public void childrenAccept(Visitor visitor) {
+        if(Constant!=null) Constant.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
+        if(Constant!=null) Constant.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
+        if(Constant!=null) Constant.traverseBottomUp(visitor);
         accept(visitor);
     }
 
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("ClassDeclarationList(\n");
+        buffer.append("Factor(\n");
+
+        if(Constant!=null)
+            buffer.append(Constant.toString("  "+tab));
+        else
+            buffer.append(tab+"  null");
+        buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [ClassDeclarationList]");
+        buffer.append(") [Factor]");
         return buffer.toString();
     }
 }

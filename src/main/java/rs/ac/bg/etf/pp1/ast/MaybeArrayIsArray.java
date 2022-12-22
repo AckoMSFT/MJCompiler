@@ -5,9 +5,9 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class RelationOperatorGreaterOrEqualThan extends RelationOperator {
+public class MaybeArrayIsArray extends MaybeArray {
 
-    public RelationOperatorGreaterOrEqualThan () {
+    public MaybeArrayIsArray () {
     }
 
     public void accept(Visitor visitor) {
@@ -28,10 +28,10 @@ public class RelationOperatorGreaterOrEqualThan extends RelationOperator {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("RelationOperatorGreaterOrEqualThan(\n");
+        buffer.append("MaybeArrayIsArray(\n");
 
         buffer.append(tab);
-        buffer.append(") [RelationOperatorGreaterOrEqualThan]");
+        buffer.append(") [MaybeArrayIsArray]");
         return buffer.toString();
     }
 }

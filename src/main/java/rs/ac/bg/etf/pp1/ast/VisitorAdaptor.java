@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 19/11/2022 1:43:13
+// 22/11/2022 0:5:25
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -9,11 +9,16 @@ public abstract class VisitorAdaptor implements Visitor {
 
     public void visit(GlobalDeclarationList GlobalDeclarationList) { }
     public void visit(Constant Constant) { }
+    public void visit(MaybeArray MaybeArray) { }
+    public void visit(VariableDeclarationList VariableDeclarationList) { }
     public void visit(MultiplicationOperator MultiplicationOperator) { }
+    public void visit(MaybeNegative MaybeNegative) { }
+    public void visit(VariableDeclarationListWithSeparator VariableDeclarationListWithSeparator) { }
     public void visit(RelationOperator RelationOperator) { }
     public void visit(AdditionOperator AdditionOperator) { }
     public void visit(GlobalDeclarataion GlobalDeclarataion) { }
     public void visit(MethodDeclarationList MethodDeclarationList) { }
+    public void visit(Term Term) { }
     public void visit(ConstantDeclarationList ConstantDeclarationList) { }
     public void visit(MultiplicationOperatorModulo MultiplicationOperatorModulo) { visit(); }
     public void visit(MultiplicationOperatorDivision MultiplicationOperatorDivision) { visit(); }
@@ -27,6 +32,11 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(RelationOperatorNotEquals RelationOperatorNotEquals) { visit(); }
     public void visit(RelationOperatorquals RelationOperatorquals) { visit(); }
     public void visit(AssignmentOperator AssignmentOperator) { visit(); }
+    public void visit(Factor Factor) { visit(); }
+    public void visit(TermFactor TermFactor) { visit(); }
+    public void visit(TermList TermList) { visit(); }
+    public void visit(MaybeNegativeEpsilon MaybeNegativeEpsilon) { visit(); }
+    public void visit(MaybeNegativeIsNegative MaybeNegativeIsNegative) { visit(); }
     public void visit(VariableTypeName VariableTypeName) { visit(); }
     public void visit(ConstantBoolean ConstantBoolean) { visit(); }
     public void visit(ConstantCharacter ConstantCharacter) { visit(); }
@@ -40,8 +50,14 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(MethodDeclarationEpsilon MethodDeclarationEpsilon) { visit(); }
     public void visit(MethodDeclarations MethodDeclarations) { visit(); }
     public void visit(ClassDeclarationList ClassDeclarationList) { visit(); }
-    public void visit(VariableDeclarationList VariableDeclarationList) { visit(); }
-    public void visit(ConstantDeclarationEpsilon ConstantDeclarationEpsilon) { visit(); }
+    public void visit(MaybeArrayEpsilon MaybeArrayEpsilon) { visit(); }
+    public void visit(MaybeArrayIsArray MaybeArrayIsArray) { visit(); }
+    public void visit(VariableDeclaration VariableDeclaration) { visit(); }
+    public void visit(VariableDeclarationListWithSeparatorDerived1 VariableDeclarationListWithSeparatorDerived1) { visit(); }
+    public void visit(VariableDeclarationListWithSeparatorNoError VariableDeclarationListWithSeparatorNoError) { visit(); }
+    public void visit(VariableDeclerationListSingle VariableDeclerationListSingle) { visit(); }
+    public void visit(VariableDeclarations VariableDeclarations) { visit(); }
+    public void visit(ConstantDeclarationListSingle ConstantDeclarationListSingle) { visit(); }
     public void visit(ConstantDeclarations ConstantDeclarations) { visit(); }
     public void visit(GlobalDeclarationClassDeclarationList GlobalDeclarationClassDeclarationList) { visit(); }
     public void visit(GlobalDeclarationVariableDeclarationList GlobalDeclarationVariableDeclarationList) { visit(); }
