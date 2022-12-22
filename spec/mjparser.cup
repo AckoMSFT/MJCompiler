@@ -67,6 +67,8 @@ terminal THEN, STATIC;
 
 /* TODO (acko): enum, do, this, return, void, this, THEN??? STATIC??? */
 
+terminal RETURN;
+
 /* Constants */
 terminal CONST_BOOLEAN;
 
@@ -84,7 +86,7 @@ nonterminal GlobalDeclarationList, GlobalDeclarataion;
 nonterminal ConstantDeclarationList, VariableDeclarationList, ClassDeclarationList, MethodDeclarationList;
 nonterminal AssignmentOperator, RelationOperator, AdditionOperator, MultiplicationOperator;
 
-nonterminal Type, MethodDeclaration, MethodTypeName, FormalParameters, StatementList;
+nonterminal Type, MethodDeclaration, MethodTypeName, FormalParameters;
 
 nonterminal ConstantDeclaration, VariableTypeName, Constant, Factor;
 
@@ -93,6 +95,19 @@ nonterminal Term;
 nonterminal MaybeArray, VariableDeclaration, VariableDeclarationListWithSeparator;
 
 nonterminal MaybeNegative;
+
+nonterminal Statement, MatchedStatement, UnmatchedStatement;
+nonterminal Condition, CondTerm, CondFact, Expr, MaybeExpr;
+
+nonterminal MaybePrintNumConst, Designator, StatementList;
+
+nonterminal DesignatorStatement;
+
+nonterminal ActPars, MaybeActPars;
+
+nonterminal MethodField, MethodFieldList;
+
+nonterminal MaybeSubscript;
 
 /*  "program" ident { ConstDecl | VarDecl | ClassDecl } "{" {MethodDecl} "}" */
 
@@ -146,7 +161,16 @@ MethodDeclarationList ::=
 
 MethodDeclaration ::=
     (MethodDeclaration) MethodTypeName LEFT_PARENTHESES FormalParameters RIGHT_PARENTHESES
-        VariableDeclarationList LEFT_BRACE StatementList RIGHT_BRACE;
+        MethodFieldList LEFT_BRACE StatementList RIGHT_BRACE;
+
+/* TODO (acko): Think of a better name for method fields... */
+
+MethodFieldList ::=
+    (MethodFieldListMulti) MethodField MethodFieldList
+    | (MethodFieldListEpsilon) /* Epsilon */;
+
+MethodField ::=
+    (MethodFieldComma) Type VariableDeclaration SEMI_COLON;
 
 /* Type = ident */
 Type ::=
@@ -158,7 +182,6 @@ MethodTypeName ::=
 /* TODO(acko): Fix me please. */
 
 FormalParameters ::= (FormalParameters) LAMBDA;
-StatementList ::= (StatementList) MULTIPLICATION;
 
 /* ConstDecl = "const" Type ident "=" (numConst | charConst | boolConst) ";" */
 
@@ -176,34 +199,9 @@ VariableTypeName ::=
 /* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */
 /* FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]} */
 
-/* Condition = CondTerm {"||" CondTerm} */
-
-//Condition ::=
-//   (CondtitionOR) Condition OR CondTerm;
-//    | (ConditionSingleCondTerm) CondTerm;
-
-/* CondTerm = CondFact {"&&" CondFact} */
-
-//CondTerm ::=
-//    (CondTermAND) CondTerm AND CondFact
-//    | (CondTermSingleCondFact) CondFact;
-
-/* CondFact = Expr [Relop Expr] */
-
-// CondFact ::=
-//    (CondFactRelOp) Expr RelationalOperator Expr;
-
-/* Expr = ["‐"] Term {Addop Term} */
-
 MaybeNegative ::=
     (MaybeNegativeIsNegative) SUBTRACTION
     | (MaybeNegativeEpsilon) /* epsilon */;
-
-/* Term := Factor {Mulop Factor} */
-
-Term ::=
-    (TermList) Term MultiplicationOperator Factor
-    | (TermFactor) Factor;
 
 /*
 Statement = DesignatorStatement ";"
@@ -218,12 +216,110 @@ Statement = DesignatorStatement ";"
 | "{" {Statement} "}"
 */
 
+MaybeExpr ::=
+    (MaybeExprIsExpr) Expr
+    | (MaybeExprEpsilon) /* epsilon */;
+
+Statement ::=
+    (StatementMatchedStatement) MatchedStatement
+    | (StatementUnmatchedStatement) UnmatchedStatement;
+
+UnmatchedStatement ::=
+    (UnmatchedStatementIF) IF LEFT_PARENTHESES Condition RIGHT_PARENTHESES Statement
+    | (UnmatchedStatementELSE) IF Condition MatchedStatement ELSE UnmatchedStatement;
+
+/* TODO(acko): ForEach */
+
+MatchedStatement ::=
+    (MatchedStatementDesignatorStatement) DesignatorStatement SEMI_COLON
+    | (MatchedStatementWhile) WHILE LEFT_PARENTHESES Condition RIGHT_PARENTHESES Statement
+    | (MatchedStatementBreak) BREAK SEMI_COLON
+    | (MatchedStatementContinue) CONTINUE SEMI_COLON
+    | (MatchedStatementReturn) RETURN MaybeExpr SEMI_COLON
+    | (MatchedStatementRead) READ LEFT_PARENTHESES Designator RIGHT_PARENTHESES SEMI_COLON
+    | (MatchedStatementPrint) PRINT LEFT_PARENTHESES Expr MaybePrintNumConst SEMI_COLON
+    | (MatchedStatementForEach) FOR_EACH SEMI_COLON
+    | (MatchedStatementStatementList) LEFT_BRACE StatementList RIGHT_BRACE;
+
+StatementList ::=
+    (Statements) StatementList Statement
+    | (StatementListEpsilon) /* epsilon */;
+
+MaybePrintNumConst ::=
+    (MaybePrintNumCostIsPrintNumCost) COMMA CONST_NUMBER
+    | (MaybePrintNumCostEpsilon) /* epsilon */;
+
+/* TODO (acko): Need to follow up on requirements for B and C */
+
+DesignatorStatement ::=
+    (DesignatorStatementAssignment) Designator AssignmentOperator Expr
+    | (DesignatorStatementIncrement) Designator INCREMENT
+    | (DesignatorStatementDecrement) Designator DECREMENT;
+
+MaybeActPars ::=
+    (MaybeActParsIsActPars) ActPars
+    | (MaybeActParsEpsilon) /* epsilon */;
+
+ActPars ::=
+    (ActParsList) ActPars COMMA Expr
+    | (ActParsSingleExpr) Expr;
+
+/* Designator := ident [ "[" Expr "]" ] */
+
+Designator ::=
+    (DesignatorIdentifier) IDENTIFIER MaybeSubscript;
+
+MaybeSubscript ::=
+    (MaybeSubscriptIsSubscript) LEFT_BRACKET Expr RIGHT_BRACKET
+    | (MaybeSubscriptEpsilon) /* epsilon */;
+
+/* Condition = CondTerm {"||" CondTerm} */
+
+Condition ::=
+    (CondtitionOR) Condition OR CondTerm
+    | (ConditionSingleCondTerm) CondTerm;
+
+/* CondTerm = CondFact {"&&" CondFact} */
+
+CondTerm ::=
+    (CondTermAND) CondTerm AND CondFact
+    | (CondTermSingleCondFact) CondFact;
+
+/* CondFact = Expr [Relop Expr] */
+
+CondFact ::=
+    (CondFactRelOp) Expr RelationOperator Expr;
+
+/* Expr = ["‐"] Term {Addop Term} */
+
+Expr ::=
+    (ExprList) Expr AdditionOperator Term
+    | (ExprSingleTerm) MaybeNegative Term;
+
+/* Term := Factor {Mulop Factor} */
+
+Term ::=
+    (TermList) Term MultiplicationOperator Factor
+    | (TermFactor) Factor;
+
 /* TODO (acko): This needs to be upgraded to handle Expr and new and designator */
 
 /* Factor := numConst | charConst | "(" Expr ")" | boolConst | "new" Type "[" Expr "]"| Designator */
 
+/*
+    Factor = Designator ["(" [ActPars] ")"]
+    | numConst
+    | charConst
+    | boolConst
+    | "new" Type ( "[" Expr "]" | "" ([ActPars] ")" )
+    | "(" Expr ")".
+
+    TODO (acko): Do we need this optional ActPars?
+*/
+
 Factor ::=
-    (Factor) Constant;
+    (FactorConstant) Constant;
+    // TODO (acko) Why is this a conflict? | (FactorExpr) LEFT_PARENTHESES Expr RIGHT_PARENTHESES;
 
 /* Assignop = "=" */
 

@@ -1,25 +1,43 @@
 // generated with ast extension for cup
 // version 0.8
-// 22/11/2022 1:37:43
+// 22/11/2022 23:46:51
 
 
-package rs.ac.bg.etf.pp1.ast;
+package src.main.java.rs.ac.bg.etf.pp1.ast;
 
 public interface Visitor { 
 
-    public void visit(GlobalDeclarationList GlobalDeclarationList);
-    public void visit(Constant Constant);
+    public void visit(MethodField MethodField);
     public void visit(MaybeArray MaybeArray);
-    public void visit(VariableDeclarationList VariableDeclarationList);
-    public void visit(MultiplicationOperator MultiplicationOperator);
-    public void visit(MaybeNegative MaybeNegative);
     public void visit(VariableDeclarationListWithSeparator VariableDeclarationListWithSeparator);
-    public void visit(RelationOperator RelationOperator);
-    public void visit(AdditionOperator AdditionOperator);
     public void visit(GlobalDeclarataion GlobalDeclarataion);
-    public void visit(MethodDeclarationList MethodDeclarationList);
-    public void visit(Term Term);
+    public void visit(MatchedStatement MatchedStatement);
+    public void visit(Constant Constant);
     public void visit(ConstantDeclarationList ConstantDeclarationList);
+    public void visit(MaybePrintNumConst MaybePrintNumConst);
+    public void visit(VariableDeclarationList VariableDeclarationList);
+    public void visit(StatementList StatementList);
+    public void visit(MethodDeclarationList MethodDeclarationList);
+    public void visit(GlobalDeclarationList GlobalDeclarationList);
+    public void visit(MethodFieldList MethodFieldList);
+    public void visit(MaybeNegative MaybeNegative);
+    public void visit(MaybeExpr MaybeExpr);
+    public void visit(MaybeActPars MaybeActPars);
+    public void visit(Factor Factor);
+    public void visit(CondTerm CondTerm);
+    public void visit(MultiplicationOperator MultiplicationOperator);
+    public void visit(Designator Designator);
+    public void visit(Term Term);
+    public void visit(Condition Condition);
+    public void visit(Expr Expr);
+    public void visit(ActPars ActPars);
+    public void visit(DesignatorStatement DesignatorStatement);
+    public void visit(UnmatchedStatement UnmatchedStatement);
+    public void visit(AdditionOperator AdditionOperator);
+    public void visit(Statement Statement);
+    public void visit(CondFact CondFact);
+    public void visit(RelationOperator RelationOperator);
+    public void visit(MaybeSubscript MaybeSubscript);
     public void visit(MultiplicationOperatorModulo MultiplicationOperatorModulo);
     public void visit(MultiplicationOperatorDivision MultiplicationOperatorDivision);
     public void visit(MultiplicationOperatorMultiplication MultiplicationOperatorMultiplication);
@@ -32,9 +50,45 @@ public interface Visitor {
     public void visit(RelationOperatorNotEquals RelationOperatorNotEquals);
     public void visit(RelationOperatorquals RelationOperatorquals);
     public void visit(AssignmentOperator AssignmentOperator);
-    public void visit(Factor Factor);
+    public void visit(FactorConstant FactorConstant);
     public void visit(TermFactor TermFactor);
     public void visit(TermList TermList);
+    public void visit(ExprSingleTerm ExprSingleTerm);
+    public void visit(ExprList ExprList);
+    public void visit(CondFactRelOp CondFactRelOp);
+    public void visit(CondTermSingleCondFact CondTermSingleCondFact);
+    public void visit(CondTermAND CondTermAND);
+    public void visit(ConditionSingleCondTerm ConditionSingleCondTerm);
+    public void visit(CondtitionOR CondtitionOR);
+    public void visit(MaybeSubscriptEpsilon MaybeSubscriptEpsilon);
+    public void visit(MaybeSubscriptIsSubscript MaybeSubscriptIsSubscript);
+    public void visit(DesignatorIdentifier DesignatorIdentifier);
+    public void visit(ActParsSingleExpr ActParsSingleExpr);
+    public void visit(ActParsList ActParsList);
+    public void visit(MaybeActParsEpsilon MaybeActParsEpsilon);
+    public void visit(MaybeActParsIsActPars MaybeActParsIsActPars);
+    public void visit(DesignatorStatementDecrement DesignatorStatementDecrement);
+    public void visit(DesignatorStatementIncrement DesignatorStatementIncrement);
+    public void visit(DesignatorStatementAssignment DesignatorStatementAssignment);
+    public void visit(MaybePrintNumCostEpsilon MaybePrintNumCostEpsilon);
+    public void visit(MaybePrintNumCostIsPrintNumCost MaybePrintNumCostIsPrintNumCost);
+    public void visit(StatementListEpsilon StatementListEpsilon);
+    public void visit(Statements Statements);
+    public void visit(MatchedStatementStatementList MatchedStatementStatementList);
+    public void visit(MatchedStatementForEach MatchedStatementForEach);
+    public void visit(MatchedStatementPrint MatchedStatementPrint);
+    public void visit(MatchedStatementRead MatchedStatementRead);
+    public void visit(MatchedStatementReturn MatchedStatementReturn);
+    public void visit(MatchedStatementContinue MatchedStatementContinue);
+    public void visit(MatchedStatementBreak MatchedStatementBreak);
+    public void visit(MatchedStatementWhile MatchedStatementWhile);
+    public void visit(MatchedStatementDesignatorStatement MatchedStatementDesignatorStatement);
+    public void visit(UnmatchedStatementELSE UnmatchedStatementELSE);
+    public void visit(UnmatchedStatementIF UnmatchedStatementIF);
+    public void visit(StatementUnmatchedStatement StatementUnmatchedStatement);
+    public void visit(StatementMatchedStatement StatementMatchedStatement);
+    public void visit(MaybeExprEpsilon MaybeExprEpsilon);
+    public void visit(MaybeExprIsExpr MaybeExprIsExpr);
     public void visit(MaybeNegativeEpsilon MaybeNegativeEpsilon);
     public void visit(MaybeNegativeIsNegative MaybeNegativeIsNegative);
     public void visit(VariableTypeName VariableTypeName);
@@ -42,10 +96,12 @@ public interface Visitor {
     public void visit(ConstantCharacter ConstantCharacter);
     public void visit(ConstantNumber ConstantNumber);
     public void visit(ConstantDeclaration ConstantDeclaration);
-    public void visit(StatementList StatementList);
     public void visit(FormalParameters FormalParameters);
     public void visit(MethodTypeName MethodTypeName);
     public void visit(Type Type);
+    public void visit(MethodFieldComma MethodFieldComma);
+    public void visit(MethodFieldListEpsilon MethodFieldListEpsilon);
+    public void visit(MethodFieldListMulti MethodFieldListMulti);
     public void visit(MethodDeclaration MethodDeclaration);
     public void visit(MethodDeclarationEpsilon MethodDeclarationEpsilon);
     public void visit(MethodDeclarations MethodDeclarations);

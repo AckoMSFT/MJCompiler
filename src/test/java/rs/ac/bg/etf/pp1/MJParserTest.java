@@ -14,7 +14,7 @@ public class MJParserTest {
     static Logger logger = LogManager.getLogger(MJParserTest.class);
 
     public static void main(String[] args) throws Exception {
-        File sourceCode = new File("src/test/resources/acko.mj");
+        File sourceCode = new File("src/test/resources/program.mj");
         if (!sourceCode.exists()) {
             logger.error("Source code file [" + sourceCode.getAbsolutePath() + "] not found!");
             return;

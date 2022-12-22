@@ -1,9 +1,9 @@
 // generated with ast extension for cup
 // version 0.8
-// 22/11/2022 1:37:43
+// 22/11/2022 23:46:51
 
 
-package rs.ac.bg.etf.pp1.ast;
+package src.main.java.rs.ac.bg.etf.pp1.ast;
 
 public class MethodDeclaration implements SyntaxNode {
 
@@ -11,16 +11,16 @@ public class MethodDeclaration implements SyntaxNode {
     private int line;
     private MethodTypeName MethodTypeName;
     private FormalParameters FormalParameters;
-    private VariableDeclarationList VariableDeclarationList;
+    private MethodFieldList MethodFieldList;
     private StatementList StatementList;
 
-    public MethodDeclaration (MethodTypeName MethodTypeName, FormalParameters FormalParameters, VariableDeclarationList VariableDeclarationList, StatementList StatementList) {
+    public MethodDeclaration (MethodTypeName MethodTypeName, FormalParameters FormalParameters, MethodFieldList MethodFieldList, StatementList StatementList) {
         this.MethodTypeName=MethodTypeName;
         if(MethodTypeName!=null) MethodTypeName.setParent(this);
         this.FormalParameters=FormalParameters;
         if(FormalParameters!=null) FormalParameters.setParent(this);
-        this.VariableDeclarationList=VariableDeclarationList;
-        if(VariableDeclarationList!=null) VariableDeclarationList.setParent(this);
+        this.MethodFieldList=MethodFieldList;
+        if(MethodFieldList!=null) MethodFieldList.setParent(this);
         this.StatementList=StatementList;
         if(StatementList!=null) StatementList.setParent(this);
     }
@@ -41,12 +41,12 @@ public class MethodDeclaration implements SyntaxNode {
         this.FormalParameters=FormalParameters;
     }
 
-    public VariableDeclarationList getVariableDeclarationList() {
-        return VariableDeclarationList;
+    public MethodFieldList getMethodFieldList() {
+        return MethodFieldList;
     }
 
-    public void setVariableDeclarationList(VariableDeclarationList VariableDeclarationList) {
-        this.VariableDeclarationList=VariableDeclarationList;
+    public void setMethodFieldList(MethodFieldList MethodFieldList) {
+        this.MethodFieldList=MethodFieldList;
     }
 
     public StatementList getStatementList() {
@@ -80,7 +80,7 @@ public class MethodDeclaration implements SyntaxNode {
     public void childrenAccept(Visitor visitor) {
         if(MethodTypeName!=null) MethodTypeName.accept(visitor);
         if(FormalParameters!=null) FormalParameters.accept(visitor);
-        if(VariableDeclarationList!=null) VariableDeclarationList.accept(visitor);
+        if(MethodFieldList!=null) MethodFieldList.accept(visitor);
         if(StatementList!=null) StatementList.accept(visitor);
     }
 
@@ -88,14 +88,14 @@ public class MethodDeclaration implements SyntaxNode {
         accept(visitor);
         if(MethodTypeName!=null) MethodTypeName.traverseTopDown(visitor);
         if(FormalParameters!=null) FormalParameters.traverseTopDown(visitor);
-        if(VariableDeclarationList!=null) VariableDeclarationList.traverseTopDown(visitor);
+        if(MethodFieldList!=null) MethodFieldList.traverseTopDown(visitor);
         if(StatementList!=null) StatementList.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
         if(MethodTypeName!=null) MethodTypeName.traverseBottomUp(visitor);
         if(FormalParameters!=null) FormalParameters.traverseBottomUp(visitor);
-        if(VariableDeclarationList!=null) VariableDeclarationList.traverseBottomUp(visitor);
+        if(MethodFieldList!=null) MethodFieldList.traverseBottomUp(visitor);
         if(StatementList!=null) StatementList.traverseBottomUp(visitor);
         accept(visitor);
     }
@@ -117,8 +117,8 @@ public class MethodDeclaration implements SyntaxNode {
             buffer.append(tab+"  null");
         buffer.append("\n");
 
-        if(VariableDeclarationList!=null)
-            buffer.append(VariableDeclarationList.toString("  "+tab));
+        if(MethodFieldList!=null)
+            buffer.append(MethodFieldList.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

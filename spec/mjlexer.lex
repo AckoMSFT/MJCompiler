@@ -55,6 +55,7 @@ import org.apache.logging.log4j.Logger;
 "then" { return new_symbol(sym.THEN, yytext()); }
 "static" { return new_symbol(sym.STATIC, yytext()); }
 "const" { return new_symbol(sym.CONST, yytext()); }
+"return" { return new_symbol(sym.RETURN, yytext()); }
 
 /* Constants */
 

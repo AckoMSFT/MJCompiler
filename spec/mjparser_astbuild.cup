@@ -68,6 +68,8 @@ terminal THEN, STATIC;
 
 /* TODO (acko): enum, do, this, return, void, this, THEN??? STATIC??? */
 
+terminal RETURN;
+
 /* Constants */
 terminal CONST_BOOLEAN;
 
@@ -96,7 +98,6 @@ nonterminal Type Type;
 nonterminal MethodDeclaration MethodDeclaration;
 nonterminal MethodTypeName MethodTypeName;
 nonterminal FormalParameters FormalParameters;
-nonterminal StatementList StatementList;
 
 nonterminal ConstantDeclaration ConstantDeclaration;
 nonterminal VariableTypeName VariableTypeName;
@@ -110,6 +111,29 @@ nonterminal VariableDeclaration VariableDeclaration;
 nonterminal VariableDeclarationListWithSeparator VariableDeclarationListWithSeparator;
 
 nonterminal MaybeNegative MaybeNegative;
+
+nonterminal Statement Statement;
+nonterminal MatchedStatement MatchedStatement;
+nonterminal UnmatchedStatement UnmatchedStatement;
+nonterminal Condition Condition;
+nonterminal CondTerm CondTerm;
+nonterminal CondFact CondFact;
+nonterminal Expr Expr;
+nonterminal MaybeExpr MaybeExpr;
+
+nonterminal MaybePrintNumConst MaybePrintNumConst;
+nonterminal Designator Designator;
+nonterminal StatementList StatementList;
+
+nonterminal DesignatorStatement DesignatorStatement;
+
+nonterminal ActPars ActPars;
+nonterminal MaybeActPars MaybeActPars;
+
+nonterminal MethodField MethodField;
+nonterminal MethodFieldList MethodFieldList;
+
+nonterminal MaybeSubscript MaybeSubscript;
 
 /*  "program" ident { ConstDecl | VarDecl | ClassDecl } "{" {MethodDecl} "}" */
 
@@ -163,7 +187,16 @@ MethodDeclarationList ::=
 
 MethodDeclaration ::=
     (MethodDeclaration) MethodTypeName:M1 LEFT_PARENTHESES FormalParameters:F2 RIGHT_PARENTHESES
-        VariableDeclarationList:V3 LEFT_BRACE StatementList:S4 RIGHT_BRACE {: RESULT=new MethodDeclaration(M1, F2, V3, S4); RESULT.setLine(M1left); :};
+        MethodFieldList:M3 LEFT_BRACE StatementList:S4 RIGHT_BRACE {: RESULT=new MethodDeclaration(M1, F2, M3, S4); RESULT.setLine(M1left); :};
+
+/* TODO (acko): Think of a better name for method fields... */
+
+MethodFieldList ::=
+    (MethodFieldListMulti) MethodField:M1 MethodFieldList:M2 {: RESULT=new MethodFieldListMulti(M1, M2); RESULT.setLine(M1left); :}
+    | (MethodFieldListEpsilon) {: RESULT=new MethodFieldListEpsilon(); :} /* Epsilon */;
+
+MethodField ::=
+    (MethodFieldComma) Type:T1 VariableDeclaration:V2 SEMI_COLON {: RESULT=new MethodFieldComma(T1, V2); RESULT.setLine(T1left); :};
 
 /* Type = ident */
 Type ::=
@@ -175,7 +208,6 @@ MethodTypeName ::=
 /* TODO(acko): Fix me please. */
 
 FormalParameters ::= (FormalParameters) LAMBDA {: RESULT=new FormalParameters(); :};
-StatementList ::= (StatementList) MULTIPLICATION {: RESULT=new StatementList(); :};
 
 /* ConstDecl = "const" Type ident "=" (numConst | charConst | boolConst) ";" */
 
@@ -193,34 +225,9 @@ VariableTypeName ::=
 /* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */
 /* FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]} */
 
-/* Condition = CondTerm {"||" CondTerm} */
-
-//Condition ::=
-//   (CondtitionOR) Condition OR CondTerm;
-//    | (ConditionSingleCondTerm) CondTerm;
-
-/* CondTerm = CondFact {"&&" CondFact} */
-
-//CondTerm ::=
-//    (CondTermAND) CondTerm AND CondFact
-//    | (CondTermSingleCondFact) CondFact;
-
-/* CondFact = Expr [Relop Expr] */
-
-// CondFact ::=
-//    (CondFactRelOp) Expr RelationalOperator Expr;
-
-/* Expr = ["â€?"] Term {Addop Term} */
-
 MaybeNegative ::=
     (MaybeNegativeIsNegative) SUBTRACTION {: RESULT=new MaybeNegativeIsNegative(); :}
     | (MaybeNegativeEpsilon) {: RESULT=new MaybeNegativeEpsilon(); :} /* epsilon */;
-
-/* Term := Factor {Mulop Factor} */
-
-Term ::=
-    (TermList) Term:T1 MultiplicationOperator:M2 Factor:F3 {: RESULT=new TermList(T1, M2, F3); RESULT.setLine(T1left); :}
-    | (TermFactor) Factor:F1 {: RESULT=new TermFactor(F1); RESULT.setLine(F1left); :};
 
 /*
 Statement = DesignatorStatement ";"
@@ -235,12 +242,110 @@ Statement = DesignatorStatement ";"
 | "{" {Statement} "}"
 */
 
+MaybeExpr ::=
+    (MaybeExprIsExpr) Expr:E1 {: RESULT=new MaybeExprIsExpr(E1); RESULT.setLine(E1left); :}
+    | (MaybeExprEpsilon) {: RESULT=new MaybeExprEpsilon(); :} /* epsilon */;
+
+Statement ::=
+    (StatementMatchedStatement) MatchedStatement:M1 {: RESULT=new StatementMatchedStatement(M1); RESULT.setLine(M1left); :}
+    | (StatementUnmatchedStatement) UnmatchedStatement:U1 {: RESULT=new StatementUnmatchedStatement(U1); RESULT.setLine(U1left); :};
+
+UnmatchedStatement ::=
+    (UnmatchedStatementIF) IF LEFT_PARENTHESES Condition:C1 RIGHT_PARENTHESES Statement:S2 {: RESULT=new UnmatchedStatementIF(C1, S2); RESULT.setLine(C1left); :}
+    | (UnmatchedStatementELSE) IF Condition:C1 MatchedStatement:M2 ELSE UnmatchedStatement:U3 {: RESULT=new UnmatchedStatementELSE(C1, M2, U3); RESULT.setLine(C1left); :};
+
+/* TODO(acko): ForEach */
+
+MatchedStatement ::=
+    (MatchedStatementDesignatorStatement) DesignatorStatement:D1 SEMI_COLON {: RESULT=new MatchedStatementDesignatorStatement(D1); RESULT.setLine(D1left); :}
+    | (MatchedStatementWhile) WHILE LEFT_PARENTHESES Condition:C1 RIGHT_PARENTHESES Statement:S2 {: RESULT=new MatchedStatementWhile(C1, S2); RESULT.setLine(C1left); :}
+    | (MatchedStatementBreak) BREAK SEMI_COLON {: RESULT=new MatchedStatementBreak(); :}
+    | (MatchedStatementContinue) CONTINUE SEMI_COLON {: RESULT=new MatchedStatementContinue(); :}
+    | (MatchedStatementReturn) RETURN MaybeExpr:M1 SEMI_COLON {: RESULT=new MatchedStatementReturn(M1); RESULT.setLine(M1left); :}
+    | (MatchedStatementRead) READ LEFT_PARENTHESES Designator:D1 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new MatchedStatementRead(D1); RESULT.setLine(D1left); :}
+    | (MatchedStatementPrint) PRINT LEFT_PARENTHESES Expr:E1 MaybePrintNumConst:M2 SEMI_COLON {: RESULT=new MatchedStatementPrint(E1, M2); RESULT.setLine(E1left); :}
+    | (MatchedStatementForEach) FOR_EACH SEMI_COLON {: RESULT=new MatchedStatementForEach(); :}
+    | (MatchedStatementStatementList) LEFT_BRACE StatementList:S1 RIGHT_BRACE {: RESULT=new MatchedStatementStatementList(S1); RESULT.setLine(S1left); :};
+
+StatementList ::=
+    (Statements) StatementList:S1 Statement:S2 {: RESULT=new Statements(S1, S2); RESULT.setLine(S1left); :}
+    | (StatementListEpsilon) {: RESULT=new StatementListEpsilon(); :} /* epsilon */;
+
+MaybePrintNumConst ::=
+    (MaybePrintNumCostIsPrintNumCost) COMMA CONST_NUMBER:C1 {: RESULT=new MaybePrintNumCostIsPrintNumCost(C1); RESULT.setLine(C1left); :}
+    | (MaybePrintNumCostEpsilon) {: RESULT=new MaybePrintNumCostEpsilon(); :} /* epsilon */;
+
+/* TODO (acko): Need to follow up on requirements for B and C */
+
+DesignatorStatement ::=
+    (DesignatorStatementAssignment) Designator:D1 AssignmentOperator:A2 Expr:E3 {: RESULT=new DesignatorStatementAssignment(D1, A2, E3); RESULT.setLine(D1left); :}
+    | (DesignatorStatementIncrement) Designator:D1 INCREMENT {: RESULT=new DesignatorStatementIncrement(D1); RESULT.setLine(D1left); :}
+    | (DesignatorStatementDecrement) Designator:D1 DECREMENT {: RESULT=new DesignatorStatementDecrement(D1); RESULT.setLine(D1left); :};
+
+MaybeActPars ::=
+    (MaybeActParsIsActPars) ActPars:A1 {: RESULT=new MaybeActParsIsActPars(A1); RESULT.setLine(A1left); :}
+    | (MaybeActParsEpsilon) {: RESULT=new MaybeActParsEpsilon(); :} /* epsilon */;
+
+ActPars ::=
+    (ActParsList) ActPars:A1 COMMA Expr:E2 {: RESULT=new ActParsList(A1, E2); RESULT.setLine(A1left); :}
+    | (ActParsSingleExpr) Expr:E1 {: RESULT=new ActParsSingleExpr(E1); RESULT.setLine(E1left); :};
+
+/* Designator := ident [ "[" Expr "]" ] */
+
+Designator ::=
+    (DesignatorIdentifier) IDENTIFIER:I1 MaybeSubscript:M2 {: RESULT=new DesignatorIdentifier(I1, M2); RESULT.setLine(I1left); :};
+
+MaybeSubscript ::=
+    (MaybeSubscriptIsSubscript) LEFT_BRACKET Expr:E1 RIGHT_BRACKET {: RESULT=new MaybeSubscriptIsSubscript(E1); RESULT.setLine(E1left); :}
+    | (MaybeSubscriptEpsilon) {: RESULT=new MaybeSubscriptEpsilon(); :} /* epsilon */;
+
+/* Condition = CondTerm {"||" CondTerm} */
+
+Condition ::=
+    (CondtitionOR) Condition:C1 OR CondTerm:C2 {: RESULT=new CondtitionOR(C1, C2); RESULT.setLine(C1left); :}
+    | (ConditionSingleCondTerm) CondTerm:C1 {: RESULT=new ConditionSingleCondTerm(C1); RESULT.setLine(C1left); :};
+
+/* CondTerm = CondFact {"&&" CondFact} */
+
+CondTerm ::=
+    (CondTermAND) CondTerm:C1 AND CondFact:C2 {: RESULT=new CondTermAND(C1, C2); RESULT.setLine(C1left); :}
+    | (CondTermSingleCondFact) CondFact:C1 {: RESULT=new CondTermSingleCondFact(C1); RESULT.setLine(C1left); :};
+
+/* CondFact = Expr [Relop Expr] */
+
+CondFact ::=
+    (CondFactRelOp) Expr:E1 RelationOperator:R2 Expr:E3 {: RESULT=new CondFactRelOp(E1, R2, E3); RESULT.setLine(E1left); :};
+
+/* Expr = ["â€?"] Term {Addop Term} */
+
+Expr ::=
+    (ExprList) Expr:E1 AdditionOperator:A2 Term:T3 {: RESULT=new ExprList(E1, A2, T3); RESULT.setLine(E1left); :}
+    | (ExprSingleTerm) MaybeNegative:M1 Term:T2 {: RESULT=new ExprSingleTerm(M1, T2); RESULT.setLine(M1left); :};
+
+/* Term := Factor {Mulop Factor} */
+
+Term ::=
+    (TermList) Term:T1 MultiplicationOperator:M2 Factor:F3 {: RESULT=new TermList(T1, M2, F3); RESULT.setLine(T1left); :}
+    | (TermFactor) Factor:F1 {: RESULT=new TermFactor(F1); RESULT.setLine(F1left); :};
+
 /* TODO (acko): This needs to be upgraded to handle Expr and new and designator */
 
 /* Factor := numConst | charConst | "(" Expr ")" | boolConst | "new" Type "[" Expr "]"| Designator */
 
+/*
+    Factor = Designator ["(" [ActPars] ")"]
+    | numConst
+    | charConst
+    | boolConst
+    | "new" Type ( "[" Expr "]" | "" ([ActPars] ")" )
+    | "(" Expr ")".
+
+    TODO (acko): Do we need this optional ActPars?
+*/
+
 Factor ::=
-    (Factor) Constant:C1 {: RESULT=new Factor(C1); RESULT.setLine(C1left); :};
+    (FactorConstant) Constant:C1 {: RESULT=new FactorConstant(C1); RESULT.setLine(C1left); :};
+    // TODO (acko) Why is this a conflict? | (FactorExpr) LEFT_PARENTHESES Expr RIGHT_PARENTHESES;
 
 /* Assignop = "=" */
 
