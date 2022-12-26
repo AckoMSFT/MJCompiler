@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 22:57:51
+// 26/11/2022 23:27:11
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -14,8 +14,10 @@ public interface Visitor {
     public void visit(Sign Sign);
     public void visit(RelationalOperator RelationalOperator);
     public void visit(GlobalDeclaration GlobalDeclaration);
+    public void visit(MaybeClassMethodList MaybeClassMethodList);
     public void visit(StatementList StatementList);
     public void visit(MethodDeclarationList MethodDeclarationList);
+    public void visit(MaybeExtendedClass MaybeExtendedClass);
     public void visit(GlobalDeclarationList GlobalDeclarationList);
     public void visit(Factor Factor);
     public void visit(MaybeActPars MaybeActPars);
@@ -23,10 +25,12 @@ public interface Visitor {
     public void visit(MultiplicationOperator MultiplicationOperator);
     public void visit(Designator Designator);
     public void visit(MaybeFormPars MaybeFormPars);
+    public void visit(ClassVarDeclList ClassVarDeclList);
     public void visit(Term Term);
     public void visit(LocalVariableDeclarationList LocalVariableDeclarationList);
     public void visit(Condition Condition);
     public void visit(DesignatorAccessList DesignatorAccessList);
+    public void visit(ConstructorDeclList ConstructorDeclList);
     public void visit(MaybeReturnValue MaybeReturnValue);
     public void visit(MaybeElseStatement MaybeElseStatement);
     public void visit(Expr Expr);
@@ -125,6 +129,18 @@ public interface Visitor {
     public void visit(FormalParameter FormalParameter);
     public void visit(FormParsSingle FormParsSingle);
     public void visit(FormParsMulti FormParsMulti);
+    public void visit(ConstructorDecl ConstructorDecl);
+    public void visit(MaybeExtendedClassEpsilon MaybeExtendedClassEpsilon);
+    public void visit(MaybeExtendedClassIsExtendedClass MaybeExtendedClassIsExtendedClass);
+    public void visit(ExtendedClass ExtendedClass);
+    public void visit(ClassVarDeclEpsilon ClassVarDeclEpsilon);
+    public void visit(ClassVarDeclMulti ClassVarDeclMulti);
+    public void visit(ConstructorDeclListEpsilon ConstructorDeclListEpsilon);
+    public void visit(ConstructorDeclListMulti ConstructorDeclListMulti);
+    public void visit(ClassMethodList ClassMethodList);
+    public void visit(MaybeClassMethodListEpsilon MaybeClassMethodListEpsilon);
+    public void visit(MaybeClassMethodListIsClassMethodList MaybeClassMethodListIsClassMethodList);
+    public void visit(ClassDecl ClassDecl);
     public void visit(LocalVariableDeclaration LocalVariableDeclaration);
     public void visit(LocalVariableDeclarationSingle LocalVariableDeclarationSingle);
     public void visit(LocalVariableDeclarationListMulti LocalVariableDeclarationListMulti);
@@ -145,6 +161,7 @@ public interface Visitor {
     public void visit(ConstDeclarationListSingle ConstDeclarationListSingle);
     public void visit(ConstDeclarationListMulti ConstDeclarationListMulti);
     public void visit(ConstDecl ConstDecl);
+    public void visit(GlobalDeclarationClassDecl GlobalDeclarationClassDecl);
     public void visit(GlobalDeclarationVarDecl GlobalDeclarationVarDecl);
     public void visit(GlobalDeclarationConstDecl GlobalDeclarationConstDecl);
     public void visit(GlobalDeclarationListEpsilon GlobalDeclarationListEpsilon);

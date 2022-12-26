@@ -94,7 +94,7 @@ import org.apache.logging.log4j.Logger;
 <COMMENT> "\r\n" {yybegin(YYINITIAL);}
 
 [0-9]+ { return new_symbol(sym.CONST_NUMBER, new Integer(yytext())); }
-([a-z]|[A-Z])[a-zA-Z0-9]*  { return new_symbol(sym.IDENTIFIER, yytext()); }
+([a-zA-Z])[a-zA-Z0-9_]*  { return new_symbol(sym.IDENTIFIER, yytext()); }
 
 "'"[ -~]"'"		{ return new_symbol(sym.CONST_CHARACTER, new Character(yytext().charAt(1))); }
 

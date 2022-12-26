@@ -94,6 +94,10 @@ nonterminal VarDecl, VariableDeclarationList, VariableDeclaration;
 /* Local variables */
 nonterminal LocalVarDeclList, LocalVarDecl, LocalVariableDeclarationList, LocalVariableDeclaration;
 
+/* Classes */
+nonterminal ClassDecl, ConstructorDecl, ExtendedClass, MaybeExtendedClass;
+nonterminal ClassVarDeclList, MaybeClassMethodList, ClassMethodList, ConstructorDeclList;
+
 /* Operators */
 nonterminal AssignmentOperator, AdditionOperator, MultiplicationOperator, RelationalOperator;
 
@@ -122,7 +126,7 @@ precedence left ELSE;
 */
 
 Program ::=
-    (Program) PROGRAM IDENTIFIER SEMI_COLON GlobalDeclarationList LEFT_BRACE MethodDeclarationList RIGHT_BRACE;
+    (Program) PROGRAM IDENTIFIER GlobalDeclarationList LEFT_BRACE MethodDeclarationList RIGHT_BRACE;
 
 GlobalDeclarationList ::=
     (GlobalDeclarationListMulti) GlobalDeclarationList GlobalDeclaration
@@ -130,7 +134,8 @@ GlobalDeclarationList ::=
 
 GlobalDeclaration ::=
     (GlobalDeclarationConstDecl) ConstDecl
-    | (GlobalDeclarationVarDecl) VarDecl;
+    | (GlobalDeclarationVarDecl) VarDecl
+    | (GlobalDeclarationClassDecl) ClassDecl;
 
 /* ConstDecl = "const" Type ident"="(numConst | charConst | boolConst) {, ident "=" (numConst | charConst | boolConst)} ";" */
 
@@ -193,6 +198,48 @@ LocalVariableDeclarationList ::=
 
 LocalVariableDeclaration ::=
     (LocalVariableDeclaration) IDENTIFIER MaybeArray;
+
+/* nonterminals used: C */
+
+/* ClassDecl = "class" ident ["extends" Type] "{" {VarDecl} ["{" {ConstructorDecl} {MethodDecl} "}"] "}" */
+
+ClassDecl ::=
+    (ClassDecl) CLASS IDENTIFIER MaybeExtendedClass LEFT_BRACE ClassVarDeclList MaybeClassMethodList RIGHT_BRACE;
+
+/* MaybeClassMethodList := "{" {ConstructorDecl} {MethodDecl} "}"] */
+MaybeClassMethodList ::=
+    (MaybeClassMethodListIsClassMethodList) LEFT_BRACE ClassMethodList RIGHT_BRACE
+    | (MaybeClassMethodListEpsilon) /* epsilon */;
+
+/* ClassMethodList := {ConstructorDecl} {MethodDecl} */
+ClassMethodList ::=
+    (ClassMethodList) MethodDeclarationList;
+
+/* ConstructorDeclList := {ConstructorDecl} */
+
+ConstructorDeclList ::=
+    (ConstructorDeclListMulti) ConstructorDeclList ConstructorDecl
+    | (ConstructorDeclListEpsilon) /* epsilon */;
+
+/* ClassVarDeclList := {VarDecl} */
+
+ClassVarDeclList ::=
+    (ClassVarDeclMulti) ClassVarDeclList VarDecl
+    | (ClassVarDeclEpsilon) /* epsilon */;
+
+/* ExtendedClass := "extends" Type */
+ExtendedClass ::=
+    (ExtendedClass) EXTENDS Type;
+
+/* MaybeExtendedClass := ["extends" Type] */
+MaybeExtendedClass ::=
+    (MaybeExtendedClassIsExtendedClass) ExtendedClass
+    | (MaybeExtendedClassEpsilon) /* epsilon */;
+
+/* ConstructorDecl = ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}. * za C nivo */
+
+ConstructorDecl ::=
+    (ConstructorDecl) IDENTIFIER LEFT_PARENTHESES MaybeFormPars RIGHT_PARENTHESES;
 
 /*
     FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]}

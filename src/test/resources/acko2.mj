@@ -1,9 +1,10 @@
-program a;
+program a
 const int a = 5, b = -76, c = +7;
 const char bbb = 'c';
 const boolean acko = true;
 int a, b, c, d, e, f[], g[];
 {
+void main() {
     if(i % 2 == 0) {
      break;
      }
@@ -39,4 +40,5 @@ int a, b, c, d, e, f[], g[];
 
     //print((pet * a / 2 - jedan) * bodovi - (3 % 2 + 3 * 2 - 3));
     //print(5+(3+(2)));
+    }
 }

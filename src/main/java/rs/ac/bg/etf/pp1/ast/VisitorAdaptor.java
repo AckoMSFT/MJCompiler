@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 22:57:51
+// 26/11/2022 23:27:11
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -14,8 +14,10 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(Sign Sign) { }
     public void visit(RelationalOperator RelationalOperator) { }
     public void visit(GlobalDeclaration GlobalDeclaration) { }
+    public void visit(MaybeClassMethodList MaybeClassMethodList) { }
     public void visit(StatementList StatementList) { }
     public void visit(MethodDeclarationList MethodDeclarationList) { }
+    public void visit(MaybeExtendedClass MaybeExtendedClass) { }
     public void visit(GlobalDeclarationList GlobalDeclarationList) { }
     public void visit(Factor Factor) { }
     public void visit(MaybeActPars MaybeActPars) { }
@@ -23,10 +25,12 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(MultiplicationOperator MultiplicationOperator) { }
     public void visit(Designator Designator) { }
     public void visit(MaybeFormPars MaybeFormPars) { }
+    public void visit(ClassVarDeclList ClassVarDeclList) { }
     public void visit(Term Term) { }
     public void visit(LocalVariableDeclarationList LocalVariableDeclarationList) { }
     public void visit(Condition Condition) { }
     public void visit(DesignatorAccessList DesignatorAccessList) { }
+    public void visit(ConstructorDeclList ConstructorDeclList) { }
     public void visit(MaybeReturnValue MaybeReturnValue) { }
     public void visit(MaybeElseStatement MaybeElseStatement) { }
     public void visit(Expr Expr) { }
@@ -125,6 +129,18 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(FormalParameter FormalParameter) { visit(); }
     public void visit(FormParsSingle FormParsSingle) { visit(); }
     public void visit(FormParsMulti FormParsMulti) { visit(); }
+    public void visit(ConstructorDecl ConstructorDecl) { visit(); }
+    public void visit(MaybeExtendedClassEpsilon MaybeExtendedClassEpsilon) { visit(); }
+    public void visit(MaybeExtendedClassIsExtendedClass MaybeExtendedClassIsExtendedClass) { visit(); }
+    public void visit(ExtendedClass ExtendedClass) { visit(); }
+    public void visit(ClassVarDeclEpsilon ClassVarDeclEpsilon) { visit(); }
+    public void visit(ClassVarDeclMulti ClassVarDeclMulti) { visit(); }
+    public void visit(ConstructorDeclListEpsilon ConstructorDeclListEpsilon) { visit(); }
+    public void visit(ConstructorDeclListMulti ConstructorDeclListMulti) { visit(); }
+    public void visit(ClassMethodList ClassMethodList) { visit(); }
+    public void visit(MaybeClassMethodListEpsilon MaybeClassMethodListEpsilon) { visit(); }
+    public void visit(MaybeClassMethodListIsClassMethodList MaybeClassMethodListIsClassMethodList) { visit(); }
+    public void visit(ClassDecl ClassDecl) { visit(); }
     public void visit(LocalVariableDeclaration LocalVariableDeclaration) { visit(); }
     public void visit(LocalVariableDeclarationSingle LocalVariableDeclarationSingle) { visit(); }
     public void visit(LocalVariableDeclarationListMulti LocalVariableDeclarationListMulti) { visit(); }
@@ -145,6 +161,7 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(ConstDeclarationListSingle ConstDeclarationListSingle) { visit(); }
     public void visit(ConstDeclarationListMulti ConstDeclarationListMulti) { visit(); }
     public void visit(ConstDecl ConstDecl) { visit(); }
+    public void visit(GlobalDeclarationClassDecl GlobalDeclarationClassDecl) { visit(); }
     public void visit(GlobalDeclarationVarDecl GlobalDeclarationVarDecl) { visit(); }
     public void visit(GlobalDeclarationConstDecl GlobalDeclarationConstDecl) { visit(); }
     public void visit(GlobalDeclarationListEpsilon GlobalDeclarationListEpsilon) { visit(); }

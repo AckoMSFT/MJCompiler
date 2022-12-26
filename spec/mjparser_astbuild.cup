@@ -111,6 +111,16 @@ nonterminal LocalVarDecl LocalVarDecl;
 nonterminal LocalVariableDeclarationList LocalVariableDeclarationList;
 nonterminal LocalVariableDeclaration LocalVariableDeclaration;
 
+/* Classes */
+nonterminal ClassDecl ClassDecl;
+nonterminal ConstructorDecl ConstructorDecl;
+nonterminal ExtendedClass ExtendedClass;
+nonterminal MaybeExtendedClass MaybeExtendedClass;
+nonterminal ClassVarDeclList ClassVarDeclList;
+nonterminal MaybeClassMethodList MaybeClassMethodList;
+nonterminal ClassMethodList ClassMethodList;
+nonterminal ConstructorDeclList ConstructorDeclList;
+
 /* Operators */
 nonterminal AssignmentOperator AssignmentOperator;
 nonterminal AdditionOperator AdditionOperator;
@@ -160,7 +170,7 @@ precedence left ELSE;
 */
 
 Program ::=
-    (Program) PROGRAM IDENTIFIER:I1 SEMI_COLON GlobalDeclarationList:G2 LEFT_BRACE MethodDeclarationList:M3 RIGHT_BRACE {: RESULT=new Program(I1, G2, M3); RESULT.setLine(I1left); :};
+    (Program) PROGRAM IDENTIFIER:I1 GlobalDeclarationList:G2 LEFT_BRACE MethodDeclarationList:M3 RIGHT_BRACE {: RESULT=new Program(I1, G2, M3); RESULT.setLine(I1left); :};
 
 GlobalDeclarationList ::=
     (GlobalDeclarationListMulti) GlobalDeclarationList:G1 GlobalDeclaration:G2 {: RESULT=new GlobalDeclarationListMulti(G1, G2); RESULT.setLine(G1left); :}
@@ -168,7 +178,8 @@ GlobalDeclarationList ::=
 
 GlobalDeclaration ::=
     (GlobalDeclarationConstDecl) ConstDecl:C1 {: RESULT=new GlobalDeclarationConstDecl(C1); RESULT.setLine(C1left); :}
-    | (GlobalDeclarationVarDecl) VarDecl:V1 {: RESULT=new GlobalDeclarationVarDecl(V1); RESULT.setLine(V1left); :};
+    | (GlobalDeclarationVarDecl) VarDecl:V1 {: RESULT=new GlobalDeclarationVarDecl(V1); RESULT.setLine(V1left); :}
+    | (GlobalDeclarationClassDecl) ClassDecl:C1 {: RESULT=new GlobalDeclarationClassDecl(C1); RESULT.setLine(C1left); :};
 
 /* ConstDecl = "const" Type ident"="(numConst | charConst | boolConst) {, ident "=" (numConst | charConst | boolConst)} ";" */
 
@@ -231,6 +242,48 @@ LocalVariableDeclarationList ::=
 
 LocalVariableDeclaration ::=
     (LocalVariableDeclaration) IDENTIFIER:I1 MaybeArray:M2 {: RESULT=new LocalVariableDeclaration(I1, M2); RESULT.setLine(I1left); :};
+
+/* nonterminals used: C */
+
+/* ClassDecl = "class" ident ["extends" Type] "{" {VarDecl} ["{" {ConstructorDecl} {MethodDecl} "}"] "}" */
+
+ClassDecl ::=
+    (ClassDecl) CLASS IDENTIFIER:I1 MaybeExtendedClass:M2 LEFT_BRACE ClassVarDeclList:C3 MaybeClassMethodList:M4 RIGHT_BRACE {: RESULT=new ClassDecl(I1, M2, C3, M4); RESULT.setLine(I1left); :};
+
+/* MaybeClassMethodList := "{" {ConstructorDecl} {MethodDecl} "}"] */
+MaybeClassMethodList ::=
+    (MaybeClassMethodListIsClassMethodList) LEFT_BRACE ClassMethodList:C1 RIGHT_BRACE {: RESULT=new MaybeClassMethodListIsClassMethodList(C1); RESULT.setLine(C1left); :}
+    | (MaybeClassMethodListEpsilon) {: RESULT=new MaybeClassMethodListEpsilon(); :} /* epsilon */;
+
+/* ClassMethodList := {ConstructorDecl} {MethodDecl} */
+ClassMethodList ::=
+    (ClassMethodList) MethodDeclarationList:M1 {: RESULT=new ClassMethodList(M1); RESULT.setLine(M1left); :};
+
+/* ConstructorDeclList := {ConstructorDecl} */
+
+ConstructorDeclList ::=
+    (ConstructorDeclListMulti) ConstructorDeclList:C1 ConstructorDecl:C2 {: RESULT=new ConstructorDeclListMulti(C1, C2); RESULT.setLine(C1left); :}
+    | (ConstructorDeclListEpsilon) {: RESULT=new ConstructorDeclListEpsilon(); :} /* epsilon */;
+
+/* ClassVarDeclList := {VarDecl} */
+
+ClassVarDeclList ::=
+    (ClassVarDeclMulti) ClassVarDeclList:C1 VarDecl:V2 {: RESULT=new ClassVarDeclMulti(C1, V2); RESULT.setLine(C1left); :}
+    | (ClassVarDeclEpsilon) {: RESULT=new ClassVarDeclEpsilon(); :} /* epsilon */;
+
+/* ExtendedClass := "extends" Type */
+ExtendedClass ::=
+    (ExtendedClass) EXTENDS Type:T1 {: RESULT=new ExtendedClass(T1); RESULT.setLine(T1left); :};
+
+/* MaybeExtendedClass := ["extends" Type] */
+MaybeExtendedClass ::=
+    (MaybeExtendedClassIsExtendedClass) ExtendedClass:E1 {: RESULT=new MaybeExtendedClassIsExtendedClass(E1); RESULT.setLine(E1left); :}
+    | (MaybeExtendedClassEpsilon) {: RESULT=new MaybeExtendedClassEpsilon(); :} /* epsilon */;
+
+/* ConstructorDecl = ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}. * za C nivo */
+
+ConstructorDecl ::=
+    (ConstructorDecl) IDENTIFIER:I1 LEFT_PARENTHESES MaybeFormPars:M2 RIGHT_PARENTHESES {: RESULT=new ConstructorDecl(I1, M2); RESULT.setLine(I1left); :};
 
 /*
     FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]}

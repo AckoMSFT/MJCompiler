@@ -1,15 +1,15 @@
 program acko123
 
-class
-int var, bar , zooo[];
+class foo
+{
+}
 
-const int foo = 5, acko = 18, yyy = 42;
-const bool bar = false;
-const char c = '+';
+class bar extends foo
+{
+}
 
 {
     void main ()
     {
-            while (5 >= 3 && 1 >= 2) break;
     }
 }

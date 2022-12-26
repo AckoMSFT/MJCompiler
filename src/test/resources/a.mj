@@ -1,4 +1,4 @@
-program a;
+program a
 int a, b, c, d, e, f[], g[];
 {
 void main(int b, int c[], boolean acko) Predmet predmeti[]; int i; Sfera s1, s2, s3; Kvadar k1, k2, k3; int t;
