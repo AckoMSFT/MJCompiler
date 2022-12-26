@@ -8,7 +8,7 @@ const bool bar = false;
 const char c = '+';
 
 {
-    void main (=>) ackoooo
+    void main ()
     {
             while (5 >= 3 && 1 >= 2) break;
     }

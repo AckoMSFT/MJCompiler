@@ -10,8 +10,6 @@ import org.apache.logging.log4j.Logger;
 parser code {:
     Logger logger = LogManager.getLogger(MJParser.class);
 
-    // slede redefinisani metodi za prijavu gresaka radi izmene teksta poruke
-
     boolean errorDetected = false;
 
     public void report_fatal_error(String message, Object info) throws java.lang.Exception {
@@ -50,7 +48,7 @@ scan with {:
     return symbol;
 :}
 
-nonterminal Program, ProgramName;
+//nonterminal Program, ProgramName;
 
 terminal String IDENTIFIER;
 terminal Integer CONST_NUMBER;
@@ -82,227 +80,91 @@ terminal DOT, COMMA, SEMI_COLON;
 terminal ASSIGNMENT;
 terminal EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL_THAN, LESS_OR_EQUAL_THAN;
 
-nonterminal GlobalDeclarationList, GlobalDeclarataion;
-nonterminal ConstantDeclarationList, VariableDeclarationList, ClassDeclarationList, MethodDeclarationList;
-nonterminal AssignmentOperator, RelationOperator, AdditionOperator, MultiplicationOperator;
+//nonterminal GlobalDeclarationList, GlobalDeclarataion;
+//nonterminal ConstantDeclarationList, VariableDeclarationList, ClassDeclarationList, MethodDeclarationList;
+//nonterminal AssignmentOperator, RelationOperator, AdditionOperator, MultiplicationOperator;
 
-nonterminal Type, MethodDeclaration, MethodTypeName, FormalParameters;
+//nonterminal Type, MethodDeclaration, MethodTypeName, FormalParameters;
 
-nonterminal ConstantDeclaration, VariableTypeName, Constant, Factor;
+/* ========================================================================== */
 
-nonterminal Term;
 
-nonterminal MaybeArray, VariableDeclaration, VariableDeclarationListWithSeparator;
+/* Program */
+nonterminal Program, GlobalDeclarationList, GlobalDeclaration, MethodDeclarationList, MethodDeclaration;
 
-nonterminal MaybeNegative;
+/* Common */
+nonterminal Type, Sign, MaybeArray;
 
-nonterminal Statement, MatchedStatement, UnmatchedStatement;
-nonterminal Condition, CondTerm, CondFact, Expr, MaybeExpr;
+/* Constants */
+nonterminal ConstDecl, ConstDeclarationList, ConstAssignment, Constant;
 
-nonterminal MaybePrintNumConst, Designator, StatementList;
+/* Variables */
+nonterminal VarDecl, VariableDeclarationList, VariableDeclaration;
 
-nonterminal DesignatorStatement;
+/* Operators */
+nonterminal AssignmentOperator, AdditionOperator, MultiplicationOperator, RelationalOperator;
 
-nonterminal ActPars, MaybeActPars;
+/* TODO (acko): Rewrite this */
+nonterminal Statement, Expr, Factor, Term, Designator, ConstFactor;
 
-nonterminal MethodField, MethodFieldList;
+/*
+    Program = "program" ident {ConstDecl | VarDecl | ClassDecl} "{" {MethodDecl} "}".
 
-nonterminal MaybeSubscript;
-
-/*  "program" ident { ConstDecl | VarDecl | ClassDecl } "{" {MethodDecl} "}" */
+    Introduce a new nonterminal GlobalDeclaration = ConstDecl | VarDecl | ClassDecl
+*/
 
 Program ::=
-    (Program) PROGRAM ProgramName GlobalDeclarationList
-        LEFT_BRACE MethodDeclarationList RIGHT_BRACE;
-
-ProgramName ::=
-    (ProgramName) IDENTIFIER:programName;
+    (Program) PROGRAM IDENTIFIER SEMI_COLON GlobalDeclarationList LEFT_BRACE MethodDeclarationList RIGHT_BRACE;
 
 GlobalDeclarationList ::=
-    (GlobalDeclarations) GlobalDeclarationList GlobalDeclarataion
-    | (GlobalDeclarationEpsilon) /* epsilon */;
+    (GlobalDeclarationListMulti) GlobalDeclarationList GlobalDeclaration
+    | (GlobalDeclarationListEpsilon) /* epsilon */;
 
-GlobalDeclarataion ::=
-    (GlobalDeclarationConstantDeclarationList) CONST Type ConstantDeclarationList SEMI_COLON
-    | (GlobalDeclarationVariableDeclarationList) Type VariableDeclarationList SEMI_COLON
-    | (GlobalDeclarationClassDeclarationList) ClassDeclarationList;
+GlobalDeclaration ::=
+    (GlobalDeclarationConstDecl) ConstDecl
+    | (GlobalDeclarationVarDecl) VarDecl;
 
-ConstantDeclarationList ::=
-    (ConstantDeclarations) ConstantDeclarationList COMMA ConstantDeclaration
-    | (ConstantDeclarationListSingle) ConstantDeclaration;
+/* ConstDecl = "const" Type ident"="(numConst | charConst | boolConst) {, ident "=" (numConst | charConst | boolConst)} ";" */
 
-/* VarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
+ConstDecl ::=
+    (ConstDecl) CONST Type ConstDeclarationList SEMI_COLON;
 
-VariableDeclarationList ::=
-    (VariableDeclarations) VariableDeclarationListWithSeparator VariableDeclaration
-     | (VariableDeclerationListSingle) VariableDeclaration;
+ConstDeclarationList ::=
+    (ConstDeclarationListMulti) ConstDeclarationList COMMA ConstAssignment
+    | (ConstDeclarationListSingle) ConstAssignment;
 
-VariableDeclarationListWithSeparator ::=
-    (VariableDeclarationListWithSeparatorNoError) VariableDeclarationList COMMA
-    | (VariableDeclarationListWithSeparatorError) error COMMA:l {: parser.report_error("Syntax error while declaring variable on line " + lleft, null); :};
-
-/* TODO (acko): How do I recover here? */
-
-VariableDeclaration ::=
-    (VariableDeclaration) IDENTIFIER:variableName MaybeArray;
-
-MaybeArray ::=
-    (MaybeArrayIsArray) LEFT_BRACKET RIGHT_BRACKET
-    | (MaybeArrayEpsilon) /* epsilon */;
-
-/* TODO(acko): Fix me please. */
-
-ClassDeclarationList ::=
-    (ClassDeclarationList) CLASS /* epsilon */;
-
-MethodDeclarationList ::=
-    (MethodDeclarations) MethodDeclarationList MethodDeclaration
-    | (MethodDeclarationEpsilon) /* epsilon */;
-
-MethodDeclaration ::=
-    (MethodDeclaration) MethodTypeName LEFT_PARENTHESES FormalParameters RIGHT_PARENTHESES
-        MethodFieldList LEFT_BRACE StatementList RIGHT_BRACE;
-
-/* TODO (acko): Think of a better name for method fields... */
-
-MethodFieldList ::=
-    (MethodFieldListMulti) MethodField MethodFieldList
-    | (MethodFieldListEpsilon) /* Epsilon */;
-
-MethodField ::=
-    (MethodFieldComma) Type VariableDeclaration SEMI_COLON;
-
-/* Type = ident */
-Type ::=
-    (Type) IDENTIFIER:typeName;
-
-MethodTypeName ::=
-    (MethodTypeName) Type:returnType IDENTIFIER:methodName;
-
-/* TODO(acko): Fix me please. */
-
-FormalParameters ::= (FormalParameters) LAMBDA;
-
-/* ConstDecl = "const" Type ident "=" (numConst | charConst | boolConst) ";" */
-
-ConstantDeclaration ::=
-    (ConstantDeclaration) IDENTIFIER:variable ASSIGNMENT Constant;
+ConstAssignment ::=
+    (ConstAssignment) IDENTIFIER AssignmentOperator Constant;
 
 Constant ::=
-    (ConstantNumber) CONST_NUMBER
+    (ConstantNumber) Sign CONST_NUMBER
     | (ConstantCharacter) CONST_CHARACTER
     | (ConstantBoolean) CONST_BOOLEAN;
 
-VariableTypeName ::=
-    (VariableTypeName) Type:variableType IDENTIFIER:variable;
+/* VarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
 
-/* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */
-/* FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]} */
+VarDecl ::=
+    Type VariableDeclarationList SEMI_COLON;
 
-MaybeNegative ::=
-    (MaybeNegativeIsNegative) SUBTRACTION
-    | (MaybeNegativeEpsilon) /* epsilon */;
+VariableDeclarationList ::=
+    (VariableDeclarationListMulti) VariableDeclarationList COMMA VariableDeclaration
+    | (VariableDeclarationSingle) VariableDeclaration;
+
+VariableDeclaration ::=
+    (VariableDeclaration) IDENTIFIER MaybeArray;
+
+MethodDeclarationList ::=
+    (MethodDeclarationListMulti) MethodDeclarationList MethodDeclaration
+    | (MethodDeclarationListEpsilon) /* epsilon */;
+
+MethodDeclaration ::= Statement;
 
 /*
-Statement = DesignatorStatement ";"
-| "if" "(" Condition ")" Statement ["else" Statement]
-| "while" "(" Condition ")" Statement
-| "break" ";"
-| "continue" ";"
-| "return" [Expr] ";"
-| "read" "(" Designator ")" ";"
-| "print" "(" Expr ["," numConst] ")" ";"
-| Designator "." "foreach" "(" ident "=>" Statement ")" ";" * za B i C nivo
-| "{" {Statement} "}"
+    ClassDecl = "class" ident ["extends" Type] "{" {VarDecl} ["{" {ConstructorDecl} {MethodDecl} "}"] "}"
+    ConstructorDecl = ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}. * za C nivo'
+
+    TODO (acko): Add ClassDecl/ConstructorDecl
 */
-
-MaybeExpr ::=
-    (MaybeExprIsExpr) Expr
-    | (MaybeExprEpsilon) /* epsilon */;
-
-Statement ::=
-    (StatementMatchedStatement) MatchedStatement
-    | (StatementUnmatchedStatement) UnmatchedStatement;
-
-UnmatchedStatement ::=
-    (UnmatchedStatementIF) IF LEFT_PARENTHESES Condition RIGHT_PARENTHESES Statement
-    | (UnmatchedStatementELSE) IF Condition MatchedStatement ELSE UnmatchedStatement;
-
-/* TODO(acko): ForEach */
-
-MatchedStatement ::=
-    (MatchedStatementDesignatorStatement) DesignatorStatement SEMI_COLON
-    | (MatchedStatementWhile) WHILE LEFT_PARENTHESES Condition RIGHT_PARENTHESES Statement
-    | (MatchedStatementBreak) BREAK SEMI_COLON
-    | (MatchedStatementContinue) CONTINUE SEMI_COLON
-    | (MatchedStatementReturn) RETURN MaybeExpr SEMI_COLON
-    | (MatchedStatementRead) READ LEFT_PARENTHESES Designator RIGHT_PARENTHESES SEMI_COLON
-    | (MatchedStatementPrint) PRINT LEFT_PARENTHESES Expr MaybePrintNumConst SEMI_COLON
-    | (MatchedStatementForEach) FOR_EACH SEMI_COLON
-    | (MatchedStatementStatementList) LEFT_BRACE StatementList RIGHT_BRACE;
-
-StatementList ::=
-    (Statements) StatementList Statement
-    | (StatementListEpsilon) /* epsilon */;
-
-MaybePrintNumConst ::=
-    (MaybePrintNumCostIsPrintNumCost) COMMA CONST_NUMBER
-    | (MaybePrintNumCostEpsilon) /* epsilon */;
-
-/* TODO (acko): Need to follow up on requirements for B and C */
-
-DesignatorStatement ::=
-    (DesignatorStatementAssignment) Designator AssignmentOperator Expr
-    | (DesignatorStatementIncrement) Designator INCREMENT
-    | (DesignatorStatementDecrement) Designator DECREMENT;
-
-MaybeActPars ::=
-    (MaybeActParsIsActPars) ActPars
-    | (MaybeActParsEpsilon) /* epsilon */;
-
-ActPars ::=
-    (ActParsList) ActPars COMMA Expr
-    | (ActParsSingleExpr) Expr;
-
-/* Designator := ident [ "[" Expr "]" ] */
-
-Designator ::=
-    (DesignatorIdentifier) IDENTIFIER MaybeSubscript;
-
-MaybeSubscript ::=
-    (MaybeSubscriptIsSubscript) LEFT_BRACKET Expr RIGHT_BRACKET
-    | (MaybeSubscriptEpsilon) /* epsilon */;
-
-/* Condition = CondTerm {"||" CondTerm} */
-
-Condition ::=
-    (CondtitionOR) Condition OR CondTerm
-    | (ConditionSingleCondTerm) CondTerm;
-
-/* CondTerm = CondFact {"&&" CondFact} */
-
-CondTerm ::=
-    (CondTermAND) CondTerm AND CondFact
-    | (CondTermSingleCondFact) CondFact;
-
-/* CondFact = Expr [Relop Expr] */
-
-CondFact ::=
-    (CondFactRelOp) Expr RelationOperator Expr;
-
-/* Expr = ["‐"] Term {Addop Term} */
-
-Expr ::=
-    (ExprList) Expr AdditionOperator Term
-    | (ExprSingleTerm) MaybeNegative Term;
-
-/* Term := Factor {Mulop Factor} */
-
-Term ::=
-    (TermList) Term MultiplicationOperator Factor
-    | (TermFactor) Factor;
-
-/* TODO (acko): This needs to be upgraded to handle Expr and new and designator */
 
 /* Factor := numConst | charConst | "(" Expr ")" | boolConst | "new" Type "[" Expr "]"| Designator */
 
@@ -313,38 +175,75 @@ Term ::=
     | boolConst
     | "new" Type ( "[" Expr "]" | "" ([ActPars] ")" )
     | "(" Expr ")".
-
-    TODO (acko): Do we need this optional ActPars?
 */
 
+/* TODO (acko): Rewrite this */
+Statement ::=
+    (StatementPrint) PRINT LEFT_PARENTHESES Expr RIGHT_PARENTHESES SEMI_COLON;
+
+Expr ::=
+    (ExprMulti) Expr AdditionOperator Term
+    | (ExprSingle) Sign Term;
+
+Term ::=
+    (TermMulti) Term MultiplicationOperator Factor
+    | (TermSingle) Factor;
+
 Factor ::=
-    (FactorConstant) Constant;
-    // TODO (acko) Why is this a conflict? | (FactorExpr) LEFT_PARENTHESES Expr RIGHT_PARENTHESES;
+    (FactorConstant) ConstFactor
+    | (FactorDesignator) Designator
+    | (FactorExpr) LEFT_PARENTHESES Expr RIGHT_PARENTHESES;
+
+ConstFactor ::=
+    CONST_NUMBER
+    | CONST_CHARACTER
+    | CONST_BOOLEAN;
+
+Designator ::=
+    (DesignatorIdentifier) IDENTIFIER;
 
 /* Assignop = "=" */
 
 AssignmentOperator ::=
     (AssignmentOperator) ASSIGNMENT;
 
-/* Relop = "==" | "!=" | ">" | ">=" | "<" | "<=" */
-
-RelationOperator ::=
-    (RelationOperatorquals) EQUALS
-    | (RelationOperatorNotEquals) NOT_EQUALS
-    | (RelationOperatorGreaterThan) GREATER_THAN
-    | (RelationOperatorGreaterOrEqualThan) GREATER_OR_EQUAL_THAN
-    | (RelationOperatorLessThan) LESS_THAN
-    | (RelationOperatorLessOrEqualThan) LESS_OR_EQUAL_THAN;
-
-/* Addop = "+" | "‐" */
+/* AddOp = "+" | "‐" */
 
 AdditionOperator ::=
     (AdditionOperatorAddition) ADDITION
     | (AdditionOperatorSubtraction) SUBTRACTION;
 
-/* Mulop = "*" | "/" | "%" */
+/* MulOp = "*" | "/" | "%" */
 
 MultiplicationOperator ::=
     (MultiplicationOperatorMultiplication) MULTIPLICATION
     | (MultiplicationOperatorDivision) DIVISION
     | (MultiplicationOperatorModulo) MODULO;
+
+/* RelOp = "==" | "!=" | ">" | ">=" | "<" | "<=" */
+
+RelationalOperator ::=
+    (RelationalOperatorEquals) EQUALS
+    | (RelationalOperatorNotEquals) NOT_EQUALS
+    | (RelationalOperatorGreaterThan) GREATER_THAN
+    | (RelationalOperatorGreaterOrEqualThan) GREATER_OR_EQUAL_THAN
+    | (RelationalOperatorLessThan) LESS_THAN
+    | (RelationalOperatorLessOrEqualThan) LESS_OR_EQUAL_THAN;
+
+/* Type = ident */
+
+Type ::=
+    (Type) IDENTIFIER;
+
+/* Sign = [ "+" | "-" ] */
+Sign ::=
+    (SignPositive) ADDITION
+    | (SignNegative) SUBTRACTION
+    | (SignEpsilon) /* epsilon */;
+
+/* MaybeArray = [ "[" "]" ] */
+
+MaybeArray ::=
+    (MaybeArrayIsArray) LEFT_BRACKET RIGHT_BRACKET
+    | (MaybeArrayEpsilon) /* epsilon */;
+

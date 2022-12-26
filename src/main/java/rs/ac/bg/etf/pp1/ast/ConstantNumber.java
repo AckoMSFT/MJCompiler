@@ -1,24 +1,35 @@
 // generated with ast extension for cup
 // version 0.8
-// 22/11/2022 23:46:51
+// 26/11/2022 2:26:45
 
 
-package src.main.java.rs.ac.bg.etf.pp1.ast;
+package rs.ac.bg.etf.pp1.ast;
 
 public class ConstantNumber extends Constant {
 
-    private Integer C1;
+    private Sign Sign;
+    private Integer C2;
 
-    public ConstantNumber (Integer C1) {
-        this.C1=C1;
+    public ConstantNumber (Sign Sign, Integer C2) {
+        this.Sign=Sign;
+        if(Sign!=null) Sign.setParent(this);
+        this.C2=C2;
     }
 
-    public Integer getC1() {
-        return C1;
+    public Sign getSign() {
+        return Sign;
     }
 
-    public void setC1(Integer C1) {
-        this.C1=C1;
+    public void setSign(Sign Sign) {
+        this.Sign=Sign;
+    }
+
+    public Integer getC2() {
+        return C2;
+    }
+
+    public void setC2(Integer C2) {
+        this.C2=C2;
     }
 
     public void accept(Visitor visitor) {
@@ -26,13 +37,16 @@ public class ConstantNumber extends Constant {
     }
 
     public void childrenAccept(Visitor visitor) {
+        if(Sign!=null) Sign.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
+        if(Sign!=null) Sign.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
+        if(Sign!=null) Sign.traverseBottomUp(visitor);
         accept(visitor);
     }
 
@@ -41,7 +55,13 @@ public class ConstantNumber extends Constant {
         buffer.append(tab);
         buffer.append("ConstantNumber(\n");
 
-        buffer.append(" "+tab+C1);
+        if(Sign!=null)
+            buffer.append(Sign.toString("  "+tab));
+        else
+            buffer.append(tab+"  null");
+        buffer.append("\n");
+
+        buffer.append(" "+tab+C2);
         buffer.append("\n");
 
         buffer.append(tab);

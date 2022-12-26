@@ -1,9 +1,9 @@
 // generated with ast extension for cup
 // version 0.8
-// 22/11/2022 23:46:51
+// 26/11/2022 2:26:45
 
 
-package src.main.java.rs.ac.bg.etf.pp1.ast;
+package rs.ac.bg.etf.pp1.ast;
 
 public abstract class Factor implements SyntaxNode {
 

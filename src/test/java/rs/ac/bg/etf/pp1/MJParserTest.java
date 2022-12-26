@@ -3,18 +3,47 @@ package rs.ac.bg.etf.pp1;
 import java_cup.runtime.Symbol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import rs.ac.bg.etf.pp1.ast.MethodTypeName;
 import rs.ac.bg.etf.pp1.ast.Program;
 import rs.etf.pp1.mj.runtime.Code;
 import rs.etf.pp1.symboltable.Tab;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MJParserTest {
     static Logger logger = LogManager.getLogger(MJParserTest.class);
 
-    public static void main(String[] args) throws Exception {
-        File sourceCode = new File("src/test/resources/program.mj");
+    public static List<String> findFiles(Path path, String fileExtension)
+            throws IOException {
+
+        if (!Files.isDirectory(path)) {
+            throw new IllegalArgumentException("Path must be a directory!");
+        }
+
+        List<String> result;
+
+        try (Stream<Path> walk = Files.walk(path)) {
+            result = walk
+                    .filter(p -> !Files.isDirectory(p))
+                    // this is a path, not string,
+                    // this only test if path end with a certain path
+                    //.filter(p -> p.endsWith(fileExtension))
+                    // convert path to string first
+                    .map(p -> p.toString().toLowerCase())
+                    .filter(f -> f.endsWith(fileExtension))
+                    .collect(Collectors.toList());
+        }
+
+        return result;
+    }
+
+    public static void ParseFile(String sourceCodePath) throws Exception {
+        File sourceCode = new File(sourceCodePath);
         if (!sourceCode.exists()) {
             logger.error("Source code file [" + sourceCode.getAbsolutePath() + "] not found!");
             return;
@@ -28,13 +57,15 @@ public class MJParserTest {
 
             Symbol s = mjParser.parse();  //pocetak parsiranja
 
+            logger.info(s.value);
+
             Program program = (Program) (s.value);
 
             logger.info(program.toString(""));
             logger.info("===================================");
 
             SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
-            program.traverseBottomUp(semanticAnalyzer);
+            //program.traverseBottomUp(semanticAnalyzer);
 
             logger.info("Declared #" + semanticAnalyzer.cntStaticVars + " static vars");
             logger.info("Declared #" + semanticAnalyzer.cntArrays + " arrays");
@@ -50,16 +81,19 @@ public class MJParserTest {
 
             Code.mainPc = codeGenerator.getMainPC();
 
+            logger.info("Successfully parsed: " + sourceCode.getAbsolutePath());
+
+
             //RuleVisitor v = new RuleVisitor();
             //program.traverseBottomUp(v);
             //Tab.init();
 
             //SemanticPass sp = new SemanticPass();
-           // program.traverseBottomUp(sp);
+            // program.traverseBottomUp(sp);
 
             //log.info("===================================");
 
-           // Tab.dump();
+            // Tab.dump();
 
          /*   if (!p.errorDetected && sp.passed()) {
                 log.info("Parsiranje uspesno zavrseno <3");
@@ -85,6 +119,14 @@ public class MJParserTest {
                 log.error("Parsiranje nije uspesno zavrseno -.-");
             }
             */
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        List<String> files = findFiles(Paths.get("src/test/resources"), "mj");
+        for (String file: files) {
+            ParseFile(file);
         }
     }
 }

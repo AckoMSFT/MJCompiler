@@ -1,6 +1,5 @@
 package rs.ac.bg.etf.pp1;
 
-import rs.ac.bg.etf.pp1.ast.MethodTypeName;
 import rs.ac.bg.etf.pp1.ast.VisitorAdaptor;
 import rs.etf.pp1.mj.runtime.Code;
 
@@ -11,7 +10,7 @@ public class CodeGenerator extends VisitorAdaptor {
         return mainPC;
     }
 
-    public void visit(MethodTypeName methodTypeName) {
+  /*  public void visit(MethodTypeName methodTypeName) {
         if ("main".equalsIgnoreCase(methodTypeName.getMethodName())) {
             mainPC = Code.pc;
         }
@@ -19,5 +18,5 @@ public class CodeGenerator extends VisitorAdaptor {
         Code.put(Code.enter);
         Code.put(0);
         Code.put(0);
-    }
+    } */
 }

@@ -1,7 +1,5 @@
 package rs.ac.bg.etf.pp1;
 
-import rs.ac.bg.etf.pp1.ast.ConstantDeclaration;
-import rs.ac.bg.etf.pp1.ast.MaybeArrayIsArray;
 import rs.ac.bg.etf.pp1.ast.VisitorAdaptor;
 
 public class SemanticAnalyzer extends VisitorAdaptor {
@@ -9,11 +7,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
     public int cntArrays = 0;
 
-    public void visit(ConstantDeclaration constantDeclaration) {
+ /*   public void visit(ConstantDeclaration constantDeclaration) {
         cntStaticVars++;
     }
 
     public void visit(MaybeArrayIsArray maybeArrayIsArray) {
         cntArrays++;
-    }
+    }*/
 }

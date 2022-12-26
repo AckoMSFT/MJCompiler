@@ -10,8 +10,6 @@ import org.apache.logging.log4j.Logger;
 parser code {:
     Logger logger = LogManager.getLogger(MJParser.class);
 
-    // slede redefinisani metodi za prijavu gresaka radi izmene teksta poruke
-
     boolean errorDetected = false;
 
     public void report_fatal_error(String message, Object info) throws java.lang.Exception {
@@ -50,8 +48,7 @@ scan with {:
     return symbol;
 :}
 
-nonterminal Program Program;
-nonterminal ProgramName ProgramName;
+//nonterminal Program, ProgramName;
 
 terminal String IDENTIFIER;
 terminal Integer CONST_NUMBER;
@@ -83,252 +80,110 @@ terminal DOT, COMMA, SEMI_COLON;
 terminal ASSIGNMENT;
 terminal EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL_THAN, LESS_OR_EQUAL_THAN;
 
+//nonterminal GlobalDeclarationList, GlobalDeclarataion;
+//nonterminal ConstantDeclarationList, VariableDeclarationList, ClassDeclarationList, MethodDeclarationList;
+//nonterminal AssignmentOperator, RelationOperator, AdditionOperator, MultiplicationOperator;
+
+//nonterminal Type, MethodDeclaration, MethodTypeName, FormalParameters;
+
+/* ========================================================================== */
+
+
+/* Program */
+nonterminal Program Program;
 nonterminal GlobalDeclarationList GlobalDeclarationList;
-nonterminal GlobalDeclarataion GlobalDeclarataion;
-nonterminal ConstantDeclarationList ConstantDeclarationList;
-nonterminal VariableDeclarationList VariableDeclarationList;
-nonterminal ClassDeclarationList ClassDeclarationList;
+nonterminal GlobalDeclaration GlobalDeclaration;
 nonterminal MethodDeclarationList MethodDeclarationList;
+nonterminal MethodDeclaration MethodDeclaration;
+
+/* Common */
+nonterminal Type Type;
+nonterminal Sign Sign;
+nonterminal MaybeArray MaybeArray;
+
+/* Constants */
+nonterminal ConstDecl ConstDecl;
+nonterminal ConstDeclarationList ConstDeclarationList;
+nonterminal ConstAssignment ConstAssignment;
+nonterminal Constant Constant;
+
+/* Variables */
+nonterminal VarDecl VarDecl;
+nonterminal VariableDeclarationList VariableDeclarationList;
+nonterminal VariableDeclaration VariableDeclaration;
+
+/* Operators */
 nonterminal AssignmentOperator AssignmentOperator;
-nonterminal RelationOperator RelationOperator;
 nonterminal AdditionOperator AdditionOperator;
 nonterminal MultiplicationOperator MultiplicationOperator;
+nonterminal RelationalOperator RelationalOperator;
 
-nonterminal Type Type;
-nonterminal MethodDeclaration MethodDeclaration;
-nonterminal MethodTypeName MethodTypeName;
-nonterminal FormalParameters FormalParameters;
-
-nonterminal ConstantDeclaration ConstantDeclaration;
-nonterminal VariableTypeName VariableTypeName;
-nonterminal Constant Constant;
-nonterminal Factor Factor;
-
-nonterminal Term Term;
-
-nonterminal MaybeArray MaybeArray;
-nonterminal VariableDeclaration VariableDeclaration;
-nonterminal VariableDeclarationListWithSeparator VariableDeclarationListWithSeparator;
-
-nonterminal MaybeNegative MaybeNegative;
-
+/* TODO (acko): Rewrite this */
 nonterminal Statement Statement;
-nonterminal MatchedStatement MatchedStatement;
-nonterminal UnmatchedStatement UnmatchedStatement;
-nonterminal Condition Condition;
-nonterminal CondTerm CondTerm;
-nonterminal CondFact CondFact;
 nonterminal Expr Expr;
-nonterminal MaybeExpr MaybeExpr;
-
-nonterminal MaybePrintNumConst MaybePrintNumConst;
+nonterminal Factor Factor;
+nonterminal Term Term;
 nonterminal Designator Designator;
-nonterminal StatementList StatementList;
+nonterminal ConstFactor ConstFactor;
 
-nonterminal DesignatorStatement DesignatorStatement;
+/*
+    Program = "program" ident {ConstDecl | VarDecl | ClassDecl} "{" {MethodDecl} "}".
 
-nonterminal ActPars ActPars;
-nonterminal MaybeActPars MaybeActPars;
-
-nonterminal MethodField MethodField;
-nonterminal MethodFieldList MethodFieldList;
-
-nonterminal MaybeSubscript MaybeSubscript;
-
-/*  "program" ident { ConstDecl | VarDecl | ClassDecl } "{" {MethodDecl} "}" */
+    Introduce a new nonterminal GlobalDeclaration = ConstDecl | VarDecl | ClassDecl
+*/
 
 Program ::=
-    (Program) PROGRAM ProgramName:P1 GlobalDeclarationList:G2
-        LEFT_BRACE MethodDeclarationList:M3 RIGHT_BRACE {: RESULT=new Program(P1, G2, M3); RESULT.setLine(P1left); :};
-
-ProgramName ::=
-    (ProgramName) IDENTIFIER:programName {: RESULT=new ProgramName(programName); RESULT.setLine(programNameleft); :};
+    (Program) PROGRAM IDENTIFIER:I1 SEMI_COLON GlobalDeclarationList:G2 LEFT_BRACE MethodDeclarationList:M3 RIGHT_BRACE {: RESULT=new Program(I1, G2, M3); RESULT.setLine(I1left); :};
 
 GlobalDeclarationList ::=
-    (GlobalDeclarations) GlobalDeclarationList:G1 GlobalDeclarataion:G2 {: RESULT=new GlobalDeclarations(G1, G2); RESULT.setLine(G1left); :}
-    | (GlobalDeclarationEpsilon) {: RESULT=new GlobalDeclarationEpsilon(); :} /* epsilon */;
+    (GlobalDeclarationListMulti) GlobalDeclarationList:G1 GlobalDeclaration:G2 {: RESULT=new GlobalDeclarationListMulti(G1, G2); RESULT.setLine(G1left); :}
+    | (GlobalDeclarationListEpsilon) {: RESULT=new GlobalDeclarationListEpsilon(); :} /* epsilon */;
 
-GlobalDeclarataion ::=
-    (GlobalDeclarationConstantDeclarationList) CONST Type:T1 ConstantDeclarationList:C2 SEMI_COLON {: RESULT=new GlobalDeclarationConstantDeclarationList(T1, C2); RESULT.setLine(T1left); :}
-    | (GlobalDeclarationVariableDeclarationList) Type:T1 VariableDeclarationList:V2 SEMI_COLON {: RESULT=new GlobalDeclarationVariableDeclarationList(T1, V2); RESULT.setLine(T1left); :}
-    | (GlobalDeclarationClassDeclarationList) ClassDeclarationList:C1 {: RESULT=new GlobalDeclarationClassDeclarationList(C1); RESULT.setLine(C1left); :};
+GlobalDeclaration ::=
+    (GlobalDeclarationConstDecl) ConstDecl:C1 {: RESULT=new GlobalDeclarationConstDecl(C1); RESULT.setLine(C1left); :}
+    | (GlobalDeclarationVarDecl) VarDecl:V1 {: RESULT=new GlobalDeclarationVarDecl(V1); RESULT.setLine(V1left); :};
 
-ConstantDeclarationList ::=
-    (ConstantDeclarations) ConstantDeclarationList:C1 COMMA ConstantDeclaration:C2 {: RESULT=new ConstantDeclarations(C1, C2); RESULT.setLine(C1left); :}
-    | (ConstantDeclarationListSingle) ConstantDeclaration:C1 {: RESULT=new ConstantDeclarationListSingle(C1); RESULT.setLine(C1left); :};
+/* ConstDecl = "const" Type ident"="(numConst | charConst | boolConst) {, ident "=" (numConst | charConst | boolConst)} ";" */
 
-/* VarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
+ConstDecl ::=
+    (ConstDecl) CONST Type:T1 ConstDeclarationList:C2 SEMI_COLON {: RESULT=new ConstDecl(T1, C2); RESULT.setLine(T1left); :};
 
-VariableDeclarationList ::=
-    (VariableDeclarations) VariableDeclarationListWithSeparator:V1 VariableDeclaration:V2 {: RESULT=new VariableDeclarations(V1, V2); RESULT.setLine(V1left); :}
-     | (VariableDeclerationListSingle) VariableDeclaration:V1 {: RESULT=new VariableDeclerationListSingle(V1); RESULT.setLine(V1left); :};
+ConstDeclarationList ::=
+    (ConstDeclarationListMulti) ConstDeclarationList:C1 COMMA ConstAssignment:C2 {: RESULT=new ConstDeclarationListMulti(C1, C2); RESULT.setLine(C1left); :}
+    | (ConstDeclarationListSingle) ConstAssignment:C1 {: RESULT=new ConstDeclarationListSingle(C1); RESULT.setLine(C1left); :};
 
-VariableDeclarationListWithSeparator ::=
-    (VariableDeclarationListWithSeparatorNoError) VariableDeclarationList:V1 COMMA {: RESULT=new VariableDeclarationListWithSeparatorNoError(V1); RESULT.setLine(V1left); :}
-    | (VariableDeclarationListWithSeparatorError) error COMMA:l {: parser.report_error("Syntax error while declaring variable on line " + lleft, null); :} {: RESULT=new VariableDeclarationListWithSeparatorError(); :};
-
-/* TODO (acko): How do I recover here? */
-
-VariableDeclaration ::=
-    (VariableDeclaration) IDENTIFIER:variableName MaybeArray:M1 {: RESULT=new VariableDeclaration(variableName, M1); RESULT.setLine(variableNameleft); :};
-
-MaybeArray ::=
-    (MaybeArrayIsArray) LEFT_BRACKET RIGHT_BRACKET {: RESULT=new MaybeArrayIsArray(); :}
-    | (MaybeArrayEpsilon) {: RESULT=new MaybeArrayEpsilon(); :} /* epsilon */;
-
-/* TODO(acko): Fix me please. */
-
-ClassDeclarationList ::=
-    (ClassDeclarationList) CLASS {: RESULT=new ClassDeclarationList(); :} /* epsilon */;
-
-MethodDeclarationList ::=
-    (MethodDeclarations) MethodDeclarationList:M1 MethodDeclaration:M2 {: RESULT=new MethodDeclarations(M1, M2); RESULT.setLine(M1left); :}
-    | (MethodDeclarationEpsilon) {: RESULT=new MethodDeclarationEpsilon(); :} /* epsilon */;
-
-MethodDeclaration ::=
-    (MethodDeclaration) MethodTypeName:M1 LEFT_PARENTHESES FormalParameters:F2 RIGHT_PARENTHESES
-        MethodFieldList:M3 LEFT_BRACE StatementList:S4 RIGHT_BRACE {: RESULT=new MethodDeclaration(M1, F2, M3, S4); RESULT.setLine(M1left); :};
-
-/* TODO (acko): Think of a better name for method fields... */
-
-MethodFieldList ::=
-    (MethodFieldListMulti) MethodField:M1 MethodFieldList:M2 {: RESULT=new MethodFieldListMulti(M1, M2); RESULT.setLine(M1left); :}
-    | (MethodFieldListEpsilon) {: RESULT=new MethodFieldListEpsilon(); :} /* Epsilon */;
-
-MethodField ::=
-    (MethodFieldComma) Type:T1 VariableDeclaration:V2 SEMI_COLON {: RESULT=new MethodFieldComma(T1, V2); RESULT.setLine(T1left); :};
-
-/* Type = ident */
-Type ::=
-    (Type) IDENTIFIER:typeName {: RESULT=new Type(typeName); RESULT.setLine(typeNameleft); :};
-
-MethodTypeName ::=
-    (MethodTypeName) Type:returnType IDENTIFIER:methodName {: RESULT=new MethodTypeName(returnType, methodName); RESULT.setLine(returnTypeleft); :};
-
-/* TODO(acko): Fix me please. */
-
-FormalParameters ::= (FormalParameters) LAMBDA {: RESULT=new FormalParameters(); :};
-
-/* ConstDecl = "const" Type ident "=" (numConst | charConst | boolConst) ";" */
-
-ConstantDeclaration ::=
-    (ConstantDeclaration) IDENTIFIER:variable ASSIGNMENT Constant:C1 {: RESULT=new ConstantDeclaration(variable, C1); RESULT.setLine(variableleft); :};
+ConstAssignment ::=
+    (ConstAssignment) IDENTIFIER:I1 AssignmentOperator:A2 Constant:C3 {: RESULT=new ConstAssignment(I1, A2, C3); RESULT.setLine(I1left); :};
 
 Constant ::=
-    (ConstantNumber) CONST_NUMBER:C1 {: RESULT=new ConstantNumber(C1); RESULT.setLine(C1left); :}
+    (ConstantNumber) Sign:S1 CONST_NUMBER:C2 {: RESULT=new ConstantNumber(S1, C2); RESULT.setLine(S1left); :}
     | (ConstantCharacter) CONST_CHARACTER:C1 {: RESULT=new ConstantCharacter(C1); RESULT.setLine(C1left); :}
     | (ConstantBoolean) CONST_BOOLEAN {: RESULT=new ConstantBoolean(); :};
 
-VariableTypeName ::=
-    (VariableTypeName) Type:variableType IDENTIFIER:variable {: RESULT=new VariableTypeName(variableType, variable); RESULT.setLine(variableTypeleft); :};
+/* VarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
 
-/* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */
-/* FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]} */
+VarDecl ::=
+    Type:T1 VariableDeclarationList:V2 SEMI_COLON {: RESULT=new VarDeclDerived1(T1, V2); RESULT.setLine(T1left); :};
 
-MaybeNegative ::=
-    (MaybeNegativeIsNegative) SUBTRACTION {: RESULT=new MaybeNegativeIsNegative(); :}
-    | (MaybeNegativeEpsilon) {: RESULT=new MaybeNegativeEpsilon(); :} /* epsilon */;
+VariableDeclarationList ::=
+    (VariableDeclarationListMulti) VariableDeclarationList:V1 COMMA VariableDeclaration:V2 {: RESULT=new VariableDeclarationListMulti(V1, V2); RESULT.setLine(V1left); :}
+    | (VariableDeclarationSingle) VariableDeclaration:V1 {: RESULT=new VariableDeclarationSingle(V1); RESULT.setLine(V1left); :};
+
+VariableDeclaration ::=
+    (VariableDeclaration) IDENTIFIER:I1 MaybeArray:M2 {: RESULT=new VariableDeclaration(I1, M2); RESULT.setLine(I1left); :};
+
+MethodDeclarationList ::=
+    (MethodDeclarationListMulti) MethodDeclarationList:M1 MethodDeclaration:M2 {: RESULT=new MethodDeclarationListMulti(M1, M2); RESULT.setLine(M1left); :}
+    | (MethodDeclarationListEpsilon) {: RESULT=new MethodDeclarationListEpsilon(); :} /* epsilon */;
+
+MethodDeclaration ::= Statement:S1 {: RESULT=new MethodDeclarationDerived1(S1); RESULT.setLine(S1left); :};
 
 /*
-Statement = DesignatorStatement ";"
-| "if" "(" Condition ")" Statement ["else" Statement]
-| "while" "(" Condition ")" Statement
-| "break" ";"
-| "continue" ";"
-| "return" [Expr] ";"
-| "read" "(" Designator ")" ";"
-| "print" "(" Expr ["," numConst] ")" ";"
-| Designator "." "foreach" "(" ident "=>" Statement ")" ";" * za B i C nivo
-| "{" {Statement} "}"
+    ClassDecl = "class" ident ["extends" Type] "{" {VarDecl} ["{" {ConstructorDecl} {MethodDecl} "}"] "}"
+    ConstructorDecl = ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}. * za C nivo'
+
+    TODO (acko): Add ClassDecl/ConstructorDecl
 */
-
-MaybeExpr ::=
-    (MaybeExprIsExpr) Expr:E1 {: RESULT=new MaybeExprIsExpr(E1); RESULT.setLine(E1left); :}
-    | (MaybeExprEpsilon) {: RESULT=new MaybeExprEpsilon(); :} /* epsilon */;
-
-Statement ::=
-    (StatementMatchedStatement) MatchedStatement:M1 {: RESULT=new StatementMatchedStatement(M1); RESULT.setLine(M1left); :}
-    | (StatementUnmatchedStatement) UnmatchedStatement:U1 {: RESULT=new StatementUnmatchedStatement(U1); RESULT.setLine(U1left); :};
-
-UnmatchedStatement ::=
-    (UnmatchedStatementIF) IF LEFT_PARENTHESES Condition:C1 RIGHT_PARENTHESES Statement:S2 {: RESULT=new UnmatchedStatementIF(C1, S2); RESULT.setLine(C1left); :}
-    | (UnmatchedStatementELSE) IF Condition:C1 MatchedStatement:M2 ELSE UnmatchedStatement:U3 {: RESULT=new UnmatchedStatementELSE(C1, M2, U3); RESULT.setLine(C1left); :};
-
-/* TODO(acko): ForEach */
-
-MatchedStatement ::=
-    (MatchedStatementDesignatorStatement) DesignatorStatement:D1 SEMI_COLON {: RESULT=new MatchedStatementDesignatorStatement(D1); RESULT.setLine(D1left); :}
-    | (MatchedStatementWhile) WHILE LEFT_PARENTHESES Condition:C1 RIGHT_PARENTHESES Statement:S2 {: RESULT=new MatchedStatementWhile(C1, S2); RESULT.setLine(C1left); :}
-    | (MatchedStatementBreak) BREAK SEMI_COLON {: RESULT=new MatchedStatementBreak(); :}
-    | (MatchedStatementContinue) CONTINUE SEMI_COLON {: RESULT=new MatchedStatementContinue(); :}
-    | (MatchedStatementReturn) RETURN MaybeExpr:M1 SEMI_COLON {: RESULT=new MatchedStatementReturn(M1); RESULT.setLine(M1left); :}
-    | (MatchedStatementRead) READ LEFT_PARENTHESES Designator:D1 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new MatchedStatementRead(D1); RESULT.setLine(D1left); :}
-    | (MatchedStatementPrint) PRINT LEFT_PARENTHESES Expr:E1 MaybePrintNumConst:M2 SEMI_COLON {: RESULT=new MatchedStatementPrint(E1, M2); RESULT.setLine(E1left); :}
-    | (MatchedStatementForEach) FOR_EACH SEMI_COLON {: RESULT=new MatchedStatementForEach(); :}
-    | (MatchedStatementStatementList) LEFT_BRACE StatementList:S1 RIGHT_BRACE {: RESULT=new MatchedStatementStatementList(S1); RESULT.setLine(S1left); :};
-
-StatementList ::=
-    (Statements) StatementList:S1 Statement:S2 {: RESULT=new Statements(S1, S2); RESULT.setLine(S1left); :}
-    | (StatementListEpsilon) {: RESULT=new StatementListEpsilon(); :} /* epsilon */;
-
-MaybePrintNumConst ::=
-    (MaybePrintNumCostIsPrintNumCost) COMMA CONST_NUMBER:C1 {: RESULT=new MaybePrintNumCostIsPrintNumCost(C1); RESULT.setLine(C1left); :}
-    | (MaybePrintNumCostEpsilon) {: RESULT=new MaybePrintNumCostEpsilon(); :} /* epsilon */;
-
-/* TODO (acko): Need to follow up on requirements for B and C */
-
-DesignatorStatement ::=
-    (DesignatorStatementAssignment) Designator:D1 AssignmentOperator:A2 Expr:E3 {: RESULT=new DesignatorStatementAssignment(D1, A2, E3); RESULT.setLine(D1left); :}
-    | (DesignatorStatementIncrement) Designator:D1 INCREMENT {: RESULT=new DesignatorStatementIncrement(D1); RESULT.setLine(D1left); :}
-    | (DesignatorStatementDecrement) Designator:D1 DECREMENT {: RESULT=new DesignatorStatementDecrement(D1); RESULT.setLine(D1left); :};
-
-MaybeActPars ::=
-    (MaybeActParsIsActPars) ActPars:A1 {: RESULT=new MaybeActParsIsActPars(A1); RESULT.setLine(A1left); :}
-    | (MaybeActParsEpsilon) {: RESULT=new MaybeActParsEpsilon(); :} /* epsilon */;
-
-ActPars ::=
-    (ActParsList) ActPars:A1 COMMA Expr:E2 {: RESULT=new ActParsList(A1, E2); RESULT.setLine(A1left); :}
-    | (ActParsSingleExpr) Expr:E1 {: RESULT=new ActParsSingleExpr(E1); RESULT.setLine(E1left); :};
-
-/* Designator := ident [ "[" Expr "]" ] */
-
-Designator ::=
-    (DesignatorIdentifier) IDENTIFIER:I1 MaybeSubscript:M2 {: RESULT=new DesignatorIdentifier(I1, M2); RESULT.setLine(I1left); :};
-
-MaybeSubscript ::=
-    (MaybeSubscriptIsSubscript) LEFT_BRACKET Expr:E1 RIGHT_BRACKET {: RESULT=new MaybeSubscriptIsSubscript(E1); RESULT.setLine(E1left); :}
-    | (MaybeSubscriptEpsilon) {: RESULT=new MaybeSubscriptEpsilon(); :} /* epsilon */;
-
-/* Condition = CondTerm {"||" CondTerm} */
-
-Condition ::=
-    (CondtitionOR) Condition:C1 OR CondTerm:C2 {: RESULT=new CondtitionOR(C1, C2); RESULT.setLine(C1left); :}
-    | (ConditionSingleCondTerm) CondTerm:C1 {: RESULT=new ConditionSingleCondTerm(C1); RESULT.setLine(C1left); :};
-
-/* CondTerm = CondFact {"&&" CondFact} */
-
-CondTerm ::=
-    (CondTermAND) CondTerm:C1 AND CondFact:C2 {: RESULT=new CondTermAND(C1, C2); RESULT.setLine(C1left); :}
-    | (CondTermSingleCondFact) CondFact:C1 {: RESULT=new CondTermSingleCondFact(C1); RESULT.setLine(C1left); :};
-
-/* CondFact = Expr [Relop Expr] */
-
-CondFact ::=
-    (CondFactRelOp) Expr:E1 RelationOperator:R2 Expr:E3 {: RESULT=new CondFactRelOp(E1, R2, E3); RESULT.setLine(E1left); :};
-
-/* Expr = ["â€?"] Term {Addop Term} */
-
-Expr ::=
-    (ExprList) Expr:E1 AdditionOperator:A2 Term:T3 {: RESULT=new ExprList(E1, A2, T3); RESULT.setLine(E1left); :}
-    | (ExprSingleTerm) MaybeNegative:M1 Term:T2 {: RESULT=new ExprSingleTerm(M1, T2); RESULT.setLine(M1left); :};
-
-/* Term := Factor {Mulop Factor} */
-
-Term ::=
-    (TermList) Term:T1 MultiplicationOperator:M2 Factor:F3 {: RESULT=new TermList(T1, M2, F3); RESULT.setLine(T1left); :}
-    | (TermFactor) Factor:F1 {: RESULT=new TermFactor(F1); RESULT.setLine(F1left); :};
-
-/* TODO (acko): This needs to be upgraded to handle Expr and new and designator */
 
 /* Factor := numConst | charConst | "(" Expr ")" | boolConst | "new" Type "[" Expr "]"| Designator */
 
@@ -339,38 +194,75 @@ Term ::=
     | boolConst
     | "new" Type ( "[" Expr "]" | "" ([ActPars] ")" )
     | "(" Expr ")".
-
-    TODO (acko): Do we need this optional ActPars?
 */
 
+/* TODO (acko): Rewrite this */
+Statement ::=
+    (StatementPrint) PRINT LEFT_PARENTHESES Expr:E1 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new StatementPrint(E1); RESULT.setLine(E1left); :};
+
+Expr ::=
+    (ExprMulti) Expr:E1 AdditionOperator:A2 Term:T3 {: RESULT=new ExprMulti(E1, A2, T3); RESULT.setLine(E1left); :}
+    | (ExprSingle) Sign:S1 Term:T2 {: RESULT=new ExprSingle(S1, T2); RESULT.setLine(S1left); :};
+
+Term ::=
+    (TermMulti) Term:T1 MultiplicationOperator:M2 Factor:F3 {: RESULT=new TermMulti(T1, M2, F3); RESULT.setLine(T1left); :}
+    | (TermSingle) Factor:F1 {: RESULT=new TermSingle(F1); RESULT.setLine(F1left); :};
+
 Factor ::=
-    (FactorConstant) Constant:C1 {: RESULT=new FactorConstant(C1); RESULT.setLine(C1left); :};
-    // TODO (acko) Why is this a conflict? | (FactorExpr) LEFT_PARENTHESES Expr RIGHT_PARENTHESES;
+    (FactorConstant) ConstFactor:C1 {: RESULT=new FactorConstant(C1); RESULT.setLine(C1left); :}
+    | (FactorDesignator) Designator:D1 {: RESULT=new FactorDesignator(D1); RESULT.setLine(D1left); :}
+    | (FactorExpr) LEFT_PARENTHESES Expr:E1 RIGHT_PARENTHESES {: RESULT=new FactorExpr(E1); RESULT.setLine(E1left); :};
+
+ConstFactor ::=
+    CONST_NUMBER:C1 {: RESULT=new ConstFactorDerived1(C1); RESULT.setLine(C1left); :}
+    | CONST_CHARACTER:C1 {: RESULT=new ConstFactorDerived2(C1); RESULT.setLine(C1left); :}
+    | CONST_BOOLEAN {: RESULT=new ConstFactorDerived3(); :};
+
+Designator ::=
+    (DesignatorIdentifier) IDENTIFIER:I1 {: RESULT=new DesignatorIdentifier(I1); RESULT.setLine(I1left); :};
 
 /* Assignop = "=" */
 
 AssignmentOperator ::=
     (AssignmentOperator) ASSIGNMENT {: RESULT=new AssignmentOperator(); :};
 
-/* Relop = "==" | "!=" | ">" | ">=" | "<" | "<=" */
-
-RelationOperator ::=
-    (RelationOperatorquals) EQUALS {: RESULT=new RelationOperatorquals(); :}
-    | (RelationOperatorNotEquals) NOT_EQUALS {: RESULT=new RelationOperatorNotEquals(); :}
-    | (RelationOperatorGreaterThan) GREATER_THAN {: RESULT=new RelationOperatorGreaterThan(); :}
-    | (RelationOperatorGreaterOrEqualThan) GREATER_OR_EQUAL_THAN {: RESULT=new RelationOperatorGreaterOrEqualThan(); :}
-    | (RelationOperatorLessThan) LESS_THAN {: RESULT=new RelationOperatorLessThan(); :}
-    | (RelationOperatorLessOrEqualThan) LESS_OR_EQUAL_THAN {: RESULT=new RelationOperatorLessOrEqualThan(); :};
-
-/* Addop = "+" | "â€?" */
+/* AddOp = "+" | "â€?" */
 
 AdditionOperator ::=
     (AdditionOperatorAddition) ADDITION {: RESULT=new AdditionOperatorAddition(); :}
     | (AdditionOperatorSubtraction) SUBTRACTION {: RESULT=new AdditionOperatorSubtraction(); :};
 
-/* Mulop = "*" | "/" | "%" */
+/* MulOp = "*" | "/" | "%" */
 
 MultiplicationOperator ::=
     (MultiplicationOperatorMultiplication) MULTIPLICATION {: RESULT=new MultiplicationOperatorMultiplication(); :}
     | (MultiplicationOperatorDivision) DIVISION {: RESULT=new MultiplicationOperatorDivision(); :}
     | (MultiplicationOperatorModulo) MODULO {: RESULT=new MultiplicationOperatorModulo(); :};
+
+/* RelOp = "==" | "!=" | ">" | ">=" | "<" | "<=" */
+
+RelationalOperator ::=
+    (RelationalOperatorEquals) EQUALS {: RESULT=new RelationalOperatorEquals(); :}
+    | (RelationalOperatorNotEquals) NOT_EQUALS {: RESULT=new RelationalOperatorNotEquals(); :}
+    | (RelationalOperatorGreaterThan) GREATER_THAN {: RESULT=new RelationalOperatorGreaterThan(); :}
+    | (RelationalOperatorGreaterOrEqualThan) GREATER_OR_EQUAL_THAN {: RESULT=new RelationalOperatorGreaterOrEqualThan(); :}
+    | (RelationalOperatorLessThan) LESS_THAN {: RESULT=new RelationalOperatorLessThan(); :}
+    | (RelationalOperatorLessOrEqualThan) LESS_OR_EQUAL_THAN {: RESULT=new RelationalOperatorLessOrEqualThan(); :};
+
+/* Type = ident */
+
+Type ::=
+    (Type) IDENTIFIER:I1 {: RESULT=new Type(I1); RESULT.setLine(I1left); :};
+
+/* Sign = [ "+" | "-" ] */
+Sign ::=
+    (SignPositive) ADDITION {: RESULT=new SignPositive(); :}
+    | (SignNegative) SUBTRACTION {: RESULT=new SignNegative(); :}
+    | (SignEpsilon) {: RESULT=new SignEpsilon(); :} /* epsilon */;
+
+/* MaybeArray = [ "[" "]" ] */
+
+MaybeArray ::=
+    (MaybeArrayIsArray) LEFT_BRACKET RIGHT_BRACKET {: RESULT=new MaybeArrayIsArray(); :}
+    | (MaybeArrayEpsilon) {: RESULT=new MaybeArrayEpsilon(); :} /* epsilon */;
+

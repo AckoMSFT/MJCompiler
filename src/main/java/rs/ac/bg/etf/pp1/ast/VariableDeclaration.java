@@ -1,29 +1,29 @@
 // generated with ast extension for cup
 // version 0.8
-// 22/11/2022 23:46:51
+// 26/11/2022 2:26:45
 
 
-package src.main.java.rs.ac.bg.etf.pp1.ast;
+package rs.ac.bg.etf.pp1.ast;
 
 public class VariableDeclaration implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String variableName;
+    private String I1;
     private MaybeArray MaybeArray;
 
-    public VariableDeclaration (String variableName, MaybeArray MaybeArray) {
-        this.variableName=variableName;
+    public VariableDeclaration (String I1, MaybeArray MaybeArray) {
+        this.I1=I1;
         this.MaybeArray=MaybeArray;
         if(MaybeArray!=null) MaybeArray.setParent(this);
     }
 
-    public String getVariableName() {
-        return variableName;
+    public String getI1() {
+        return I1;
     }
 
-    public void setVariableName(String variableName) {
-        this.variableName=variableName;
+    public void setI1(String I1) {
+        this.I1=I1;
     }
 
     public MaybeArray getMaybeArray() {
@@ -73,7 +73,7 @@ public class VariableDeclaration implements SyntaxNode {
         buffer.append(tab);
         buffer.append("VariableDeclaration(\n");
 
-        buffer.append(" "+tab+variableName);
+        buffer.append(" "+tab+I1);
         buffer.append("\n");
 
         if(MaybeArray!=null)
