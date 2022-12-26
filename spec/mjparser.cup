@@ -91,19 +91,24 @@ nonterminal ConstDecl, ConstDeclarationList, ConstAssignment, Constant;
 /* Variables */
 nonterminal VarDecl, VariableDeclarationList, VariableDeclaration;
 
+/* Local variables */
+nonterminal LocalVarDeclList, LocalVarDecl, LocalVariableDeclarationList, LocalVariableDeclaration;
+
 /* Operators */
 nonterminal AssignmentOperator, AdditionOperator, MultiplicationOperator, RelationalOperator;
 
 /* Methods */
-
 nonterminal ActPars, MaybeActPars, FunctionInvocation;
+
+/* Formal parameter */
+nonterminal FormPars, MaybeFormPars, FormalParameter;
 
 /* Statements */
 nonterminal Statement, MaybeElseStatement, StatementList, Expr, Factor, Term, ConstFactor;
 nonterminal MaybePrintWidth, MaybeReturnValue;
 
 /* Designators */
-nonterminal Designator, DesignatorAccessList, DesignatorStatement, MemberAccess;
+nonterminal Designator, DesignatorAccessList, DesignatorStatement, MemberAccess, MaybeDesignator, DesignatorList;
 
 /* Conditions */
 nonterminal Condition, CondTerm, CondFact;
@@ -147,7 +152,7 @@ Constant ::=
 /* VarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
 
 VarDecl ::=
-    Type VariableDeclarationList SEMI_COLON;
+    (VarDecl) Type VariableDeclarationList SEMI_COLON;
 
 VariableDeclarationList ::=
     (VariableDeclarationListMulti) VariableDeclarationList COMMA VariableDeclaration
@@ -156,11 +161,59 @@ VariableDeclarationList ::=
 VariableDeclaration ::=
     (VariableDeclaration) IDENTIFIER MaybeArray;
 
+/* MethodDeclarationList := {MethodDeclaration} */
+
 MethodDeclarationList ::=
     (MethodDeclarationListMulti) MethodDeclarationList MethodDeclaration
     | (MethodDeclarationListEpsilon) /* epsilon */;
 
-MethodDeclaration ::= Statement;
+/* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */
+
+MethodDeclaration ::=
+    (MethodDeclaration) ReturnType IDENTIFIER LEFT_PARENTHESES MaybeFormPars RIGHT_PARENTHESES LocalVarDeclList LEFT_BRACE StatementList RIGHT_BRACE;
+
+/* LocalVarDeclList := {VarDecl} */
+
+LocalVarDeclList ::=
+    (LocalVarDeclListMulti) LocalVarDeclList LocalVarDecl
+    | (LocalVarDeclEpsilon) /* epsilon */;
+
+/* LocalVarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
+
+LocalVarDecl ::=
+    (LocalVarDecl) Type LocalVariableDeclarationList SEMI_COLON;
+
+/* LocalVariableDeclarationList := Type ident ["[" "]"] {"," ident ["[" "]"]} */
+
+LocalVariableDeclarationList ::=
+    (LocalVariableDeclarationListMulti) LocalVariableDeclarationList COMMA LocalVariableDeclaration
+    | (LocalVariableDeclarationSingle) LocalVariableDeclaration;
+
+/* LocalVariableDeclaration := ident ["[" "]"] */
+
+LocalVariableDeclaration ::=
+    (LocalVariableDeclaration) IDENTIFIER MaybeArray;
+
+/*
+    FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]}
+
+    FormPars = FormalParameter { "," FormalParameter }
+*/
+
+FormPars ::=
+    (FormParsMulti) FormPars COMMA FormalParameter
+    | (FormParsSingle) FormalParameter;
+
+/* FormalParameter := Type ident ["[" "]"] */
+
+FormalParameter ::=
+    (FormalParameter) Type IDENTIFIER MaybeArray;
+
+/* MaybeFormPars := [FormPars] */
+
+MaybeFormPars ::=
+    (MaybeFormParsIsFormPars) FormPars
+    | (MaybeFormParsEpsilon) /* epsilon */;
 
 /*
     ClassDecl = "class" ident ["extends" Type] "{" {VarDecl} ["{" {ConstructorDecl} {MethodDecl} "}"] "}"
@@ -328,7 +381,16 @@ DesignatorStatement ::=
     (DesignatorStatementAssignment) Designator AssignmentOperator Expr
     | (DesignatorStatementFunctionInvocation) Designator FunctionInvocation
     | (DesignatorStatementIncrement) Designator INCREMENT
-    | (DesignatorStatementDecrement) Designator DECREMENT;
+    | (DesignatorStatementDecrement) Designator DECREMENT
+    | (DesignatorStatementUnpack) LEFT_BRACKET DesignatorList RIGHT_BRACKET AssignmentOperator Designator;
+
+MaybeDesignator ::=
+    (MaybeDesignatorIsDesignator) Designator
+    | (MaybeDesignatorEpsilon) /* epsilon */;
+
+DesignatorList ::=
+    (DeisgnatorListMulti) DesignatorList COMMA MaybeDesignator
+    | (DesignatorListSingle) MaybeDesignator;
 
 /* Assignop = "=" */
 

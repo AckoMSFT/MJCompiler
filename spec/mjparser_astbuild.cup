@@ -105,6 +105,12 @@ nonterminal VarDecl VarDecl;
 nonterminal VariableDeclarationList VariableDeclarationList;
 nonterminal VariableDeclaration VariableDeclaration;
 
+/* Local variables */
+nonterminal LocalVarDeclList LocalVarDeclList;
+nonterminal LocalVarDecl LocalVarDecl;
+nonterminal LocalVariableDeclarationList LocalVariableDeclarationList;
+nonterminal LocalVariableDeclaration LocalVariableDeclaration;
+
 /* Operators */
 nonterminal AssignmentOperator AssignmentOperator;
 nonterminal AdditionOperator AdditionOperator;
@@ -112,10 +118,14 @@ nonterminal MultiplicationOperator MultiplicationOperator;
 nonterminal RelationalOperator RelationalOperator;
 
 /* Methods */
-
 nonterminal ActPars ActPars;
 nonterminal MaybeActPars MaybeActPars;
 nonterminal FunctionInvocation FunctionInvocation;
+
+/* Formal parameter */
+nonterminal FormPars FormPars;
+nonterminal MaybeFormPars MaybeFormPars;
+nonterminal FormalParameter FormalParameter;
 
 /* Statements */
 nonterminal Statement Statement;
@@ -133,6 +143,8 @@ nonterminal Designator Designator;
 nonterminal DesignatorAccessList DesignatorAccessList;
 nonterminal DesignatorStatement DesignatorStatement;
 nonterminal MemberAccess MemberAccess;
+nonterminal MaybeDesignator MaybeDesignator;
+nonterminal DesignatorList DesignatorList;
 
 /* Conditions */
 nonterminal Condition Condition;
@@ -178,7 +190,7 @@ Constant ::=
 /* VarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
 
 VarDecl ::=
-    Type:T1 VariableDeclarationList:V2 SEMI_COLON {: RESULT=new VarDeclDerived1(T1, V2); RESULT.setLine(T1left); :};
+    (VarDecl) Type:T1 VariableDeclarationList:V2 SEMI_COLON {: RESULT=new VarDecl(T1, V2); RESULT.setLine(T1left); :};
 
 VariableDeclarationList ::=
     (VariableDeclarationListMulti) VariableDeclarationList:V1 COMMA VariableDeclaration:V2 {: RESULT=new VariableDeclarationListMulti(V1, V2); RESULT.setLine(V1left); :}
@@ -187,11 +199,59 @@ VariableDeclarationList ::=
 VariableDeclaration ::=
     (VariableDeclaration) IDENTIFIER:I1 MaybeArray:M2 {: RESULT=new VariableDeclaration(I1, M2); RESULT.setLine(I1left); :};
 
+/* MethodDeclarationList := {MethodDeclaration} */
+
 MethodDeclarationList ::=
     (MethodDeclarationListMulti) MethodDeclarationList:M1 MethodDeclaration:M2 {: RESULT=new MethodDeclarationListMulti(M1, M2); RESULT.setLine(M1left); :}
     | (MethodDeclarationListEpsilon) {: RESULT=new MethodDeclarationListEpsilon(); :} /* epsilon */;
 
-MethodDeclaration ::= Statement:S1 {: RESULT=new MethodDeclarationDerived1(S1); RESULT.setLine(S1left); :};
+/* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */
+
+MethodDeclaration ::=
+    (MethodDeclaration) ReturnType:R1 IDENTIFIER:I2 LEFT_PARENTHESES MaybeFormPars:M3 RIGHT_PARENTHESES LocalVarDeclList:L4 LEFT_BRACE StatementList:S5 RIGHT_BRACE {: RESULT=new MethodDeclaration(R1, I2, M3, L4, S5); RESULT.setLine(R1left); :};
+
+/* LocalVarDeclList := {VarDecl} */
+
+LocalVarDeclList ::=
+    (LocalVarDeclListMulti) LocalVarDeclList:L1 LocalVarDecl:L2 {: RESULT=new LocalVarDeclListMulti(L1, L2); RESULT.setLine(L1left); :}
+    | (LocalVarDeclEpsilon) {: RESULT=new LocalVarDeclEpsilon(); :} /* epsilon */;
+
+/* LocalVarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
+
+LocalVarDecl ::=
+    (LocalVarDecl) Type:T1 LocalVariableDeclarationList:L2 SEMI_COLON {: RESULT=new LocalVarDecl(T1, L2); RESULT.setLine(T1left); :};
+
+/* LocalVariableDeclarationList := Type ident ["[" "]"] {"," ident ["[" "]"]} */
+
+LocalVariableDeclarationList ::=
+    (LocalVariableDeclarationListMulti) LocalVariableDeclarationList:L1 COMMA LocalVariableDeclaration:L2 {: RESULT=new LocalVariableDeclarationListMulti(L1, L2); RESULT.setLine(L1left); :}
+    | (LocalVariableDeclarationSingle) LocalVariableDeclaration:L1 {: RESULT=new LocalVariableDeclarationSingle(L1); RESULT.setLine(L1left); :};
+
+/* LocalVariableDeclaration := ident ["[" "]"] */
+
+LocalVariableDeclaration ::=
+    (LocalVariableDeclaration) IDENTIFIER:I1 MaybeArray:M2 {: RESULT=new LocalVariableDeclaration(I1, M2); RESULT.setLine(I1left); :};
+
+/*
+    FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]}
+
+    FormPars = FormalParameter { "," FormalParameter }
+*/
+
+FormPars ::=
+    (FormParsMulti) FormPars:F1 COMMA FormalParameter:F2 {: RESULT=new FormParsMulti(F1, F2); RESULT.setLine(F1left); :}
+    | (FormParsSingle) FormalParameter:F1 {: RESULT=new FormParsSingle(F1); RESULT.setLine(F1left); :};
+
+/* FormalParameter := Type ident ["[" "]"] */
+
+FormalParameter ::=
+    (FormalParameter) Type:T1 IDENTIFIER:I2 MaybeArray:M3 {: RESULT=new FormalParameter(T1, I2, M3); RESULT.setLine(T1left); :};
+
+/* MaybeFormPars := [FormPars] */
+
+MaybeFormPars ::=
+    (MaybeFormParsIsFormPars) FormPars:F1 {: RESULT=new MaybeFormParsIsFormPars(F1); RESULT.setLine(F1left); :}
+    | (MaybeFormParsEpsilon) {: RESULT=new MaybeFormParsEpsilon(); :} /* epsilon */;
 
 /*
     ClassDecl = "class" ident ["extends" Type] "{" {VarDecl} ["{" {ConstructorDecl} {MethodDecl} "}"] "}"
@@ -359,7 +419,16 @@ DesignatorStatement ::=
     (DesignatorStatementAssignment) Designator:D1 AssignmentOperator:A2 Expr:E3 {: RESULT=new DesignatorStatementAssignment(D1, A2, E3); RESULT.setLine(D1left); :}
     | (DesignatorStatementFunctionInvocation) Designator:D1 FunctionInvocation:F2 {: RESULT=new DesignatorStatementFunctionInvocation(D1, F2); RESULT.setLine(D1left); :}
     | (DesignatorStatementIncrement) Designator:D1 INCREMENT {: RESULT=new DesignatorStatementIncrement(D1); RESULT.setLine(D1left); :}
-    | (DesignatorStatementDecrement) Designator:D1 DECREMENT {: RESULT=new DesignatorStatementDecrement(D1); RESULT.setLine(D1left); :};
+    | (DesignatorStatementDecrement) Designator:D1 DECREMENT {: RESULT=new DesignatorStatementDecrement(D1); RESULT.setLine(D1left); :}
+    | (DesignatorStatementUnpack) LEFT_BRACKET DesignatorList:D1 RIGHT_BRACKET AssignmentOperator:A2 Designator:D3 {: RESULT=new DesignatorStatementUnpack(D1, A2, D3); RESULT.setLine(D1left); :};
+
+MaybeDesignator ::=
+    (MaybeDesignatorIsDesignator) Designator:D1 {: RESULT=new MaybeDesignatorIsDesignator(D1); RESULT.setLine(D1left); :}
+    | (MaybeDesignatorEpsilon) {: RESULT=new MaybeDesignatorEpsilon(); :} /* epsilon */;
+
+DesignatorList ::=
+    (DeisgnatorListMulti) DesignatorList:D1 COMMA MaybeDesignator:M2 {: RESULT=new DeisgnatorListMulti(D1, M2); RESULT.setLine(D1left); :}
+    | (DesignatorListSingle) MaybeDesignator:M1 {: RESULT=new DesignatorListSingle(M1); RESULT.setLine(M1left); :};
 
 /* Assignop = "=" */
 

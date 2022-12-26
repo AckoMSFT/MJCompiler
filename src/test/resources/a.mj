@@ -1,42 +1,11 @@
 program a;
-const int a = 5, b = -76, c = +7;
-const char bbb = 'c';
-const boolean acko = true;
 int a, b, c, d, e, f[], g[];
 {
-    if(i % 2 == 0) {
-     break;
-     }
-     else { continue;
-
-     print(5);
-     print(5+2);
-     print(5+2,8);
-     while(2>1) continue;
-     while(3>2) {
-     }
-
-     return 5;
-     return;
-
-     read(acko);
-
-     a.b[5].c[3+2].d[i%2+0].e['c'].f[-17].g++;
-
-     return new a[15];
-
-     return a();
-     return a;
-     return a(5,8);
-
-     a.foreach(x=>print(x););
-     a.b.c['c'].foreach(y=>print(y+1););
-
-     return new a(5,8,12+2+d);
-
-     a(5);
+void main(int b, int c[], boolean acko) Predmet predmeti[]; int i; Sfera s1, s2, s3; Kvadar k1, k2, k3; int t;
+{
+    f = new int[3];
+    [a, b, c] = f;
+    [, , ,] = f;
+    [a, , c.d[5]] = f.a['c'].b;
     }
-
-    //print((pet * a / 2 - jedan) * bodovi - (3 % 2 + 3 * 2 - 3));
-    //print(5+(3+(2)));
 }
