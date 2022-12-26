@@ -1,36 +1,52 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 2:26:45
+// 26/11/2022 22:32:14
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public abstract class VisitorAdaptor implements Visitor { 
 
-    public void visit(Designator Designator) { }
-    public void visit(GlobalDeclarationList GlobalDeclarationList) { }
-    public void visit(ConstFactor ConstFactor) { }
-    public void visit(Factor Factor) { }
-    public void visit(GlobalDeclaration GlobalDeclaration) { }
-    public void visit(Sign Sign) { }
-    public void visit(Constant Constant) { }
-    public void visit(ConstDeclarationList ConstDeclarationList) { }
+    public void visit(ReturnType ReturnType) { }
     public void visit(MaybeArray MaybeArray) { }
+    public void visit(Constant Constant) { }
     public void visit(VariableDeclarationList VariableDeclarationList) { }
-    public void visit(MultiplicationOperator MultiplicationOperator) { }
-    public void visit(Expr Expr) { }
-    public void visit(RelationalOperator RelationalOperator) { }
-    public void visit(VarDecl VarDecl) { }
-    public void visit(AdditionOperator AdditionOperator) { }
+    public void visit(Sign Sign) { }
     public void visit(MethodDeclaration MethodDeclaration) { }
-    public void visit(Statement Statement) { }
+    public void visit(RelationalOperator RelationalOperator) { }
+    public void visit(GlobalDeclaration GlobalDeclaration) { }
+    public void visit(StatementList StatementList) { }
     public void visit(MethodDeclarationList MethodDeclarationList) { }
+    public void visit(GlobalDeclarationList GlobalDeclarationList) { }
+    public void visit(MaybeActPars MaybeActPars) { }
+    public void visit(Factor Factor) { }
+    public void visit(CondTerm CondTerm) { }
+    public void visit(MultiplicationOperator MultiplicationOperator) { }
+    public void visit(Designator Designator) { }
     public void visit(Term Term) { }
+    public void visit(Condition Condition) { }
+    public void visit(DesignatorAccessList DesignatorAccessList) { }
+    public void visit(MaybeReturnValue MaybeReturnValue) { }
+    public void visit(MaybeElseStatement MaybeElseStatement) { }
+    public void visit(Expr Expr) { }
+    public void visit(ActPars ActPars) { }
+    public void visit(DesignatorStatement DesignatorStatement) { }
+    public void visit(AdditionOperator AdditionOperator) { }
+    public void visit(Statement Statement) { }
+    public void visit(ConstFactor ConstFactor) { }
+    public void visit(VarDecl VarDecl) { }
+    public void visit(CondFact CondFact) { }
+    public void visit(MaybePrintWidth MaybePrintWidth) { }
+    public void visit(ConstDeclarationList ConstDeclarationList) { }
+    public void visit(ArrayElement ArrayElement) { visit(); }
+    public void visit(MemberElement MemberElement) { visit(); }
     public void visit(MaybeArrayEpsilon MaybeArrayEpsilon) { visit(); }
     public void visit(MaybeArrayIsArray MaybeArrayIsArray) { visit(); }
     public void visit(SignEpsilon SignEpsilon) { visit(); }
     public void visit(SignNegative SignNegative) { visit(); }
     public void visit(SignPositive SignPositive) { visit(); }
+    public void visit(ReturnTypeVoid ReturnTypeVoid) { visit(); }
+    public void visit(ReturnTypeNonVoid ReturnTypeNonVoid) { visit(); }
     public void visit(Type Type) { visit(); }
     public void visit(RelationalOperatorLessOrEqualThan RelationalOperatorLessOrEqualThan) { visit(); }
     public void visit(RelationalOperatorLessThan RelationalOperatorLessThan) { visit(); }
@@ -44,18 +60,57 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(AdditionOperatorSubtraction AdditionOperatorSubtraction) { visit(); }
     public void visit(AdditionOperatorAddition AdditionOperatorAddition) { visit(); }
     public void visit(AssignmentOperator AssignmentOperator) { visit(); }
+    public void visit(DesignatorStatementDecrement DesignatorStatementDecrement) { visit(); }
+    public void visit(DesignatorStatementIncrement DesignatorStatementIncrement) { visit(); }
+    public void visit(DesignatorStatementFunctionInvocation DesignatorStatementFunctionInvocation) { visit(); }
+    public void visit(DesignatorStatementAssignment DesignatorStatementAssignment) { visit(); }
+    public void visit(DesignatorAccessListEpsilon DesignatorAccessListEpsilon) { visit(); }
+    public void visit(DesignatorAccessListElement DesignatorAccessListElement) { visit(); }
+    public void visit(DesignatorAccessListMember DesignatorAccessListMember) { visit(); }
     public void visit(DesignatorIdentifier DesignatorIdentifier) { visit(); }
-    public void visit(ConstFactorDerived3 ConstFactorDerived3) { visit(); }
-    public void visit(ConstFactorDerived2 ConstFactorDerived2) { visit(); }
-    public void visit(ConstFactorDerived1 ConstFactorDerived1) { visit(); }
+    public void visit(ConstFactorBoolean ConstFactorBoolean) { visit(); }
+    public void visit(ConstFactorCharacter ConstFactorCharacter) { visit(); }
+    public void visit(ConstFactorNumber ConstFactorNumber) { visit(); }
     public void visit(FactorExpr FactorExpr) { visit(); }
-    public void visit(FactorDesignator FactorDesignator) { visit(); }
+    public void visit(FactorNewClass FactorNewClass) { visit(); }
+    public void visit(FactorNewArray FactorNewArray) { visit(); }
     public void visit(FactorConstant FactorConstant) { visit(); }
+    public void visit(FactorFunctionInvocation FactorFunctionInvocation) { visit(); }
+    public void visit(FactorDesignator FactorDesignator) { visit(); }
+    public void visit(FunctionInvocation FunctionInvocation) { visit(); }
+    public void visit(MaybeActParsEpsilon MaybeActParsEpsilon) { visit(); }
+    public void visit(MaybeActParsIsActPars MaybeActParsIsActPars) { visit(); }
+    public void visit(ActParsSingle ActParsSingle) { visit(); }
+    public void visit(ActParsMulti ActParsMulti) { visit(); }
     public void visit(TermSingle TermSingle) { visit(); }
     public void visit(TermMulti TermMulti) { visit(); }
     public void visit(ExprSingle ExprSingle) { visit(); }
     public void visit(ExprMulti ExprMulti) { visit(); }
+    public void visit(CondFactSingle CondFactSingle) { visit(); }
+    public void visit(CondFactMulti CondFactMulti) { visit(); }
+    public void visit(CondTermSingle CondTermSingle) { visit(); }
+    public void visit(CondTermMulti CondTermMulti) { visit(); }
+    public void visit(ConditionSingle ConditionSingle) { visit(); }
+    public void visit(ConditionMulti ConditionMulti) { visit(); }
+    public void visit(StatementListEpsilon StatementListEpsilon) { visit(); }
+    public void visit(StatementListMulti StatementListMulti) { visit(); }
+    public void visit(MaybeElseStatementEpsilon MaybeElseStatementEpsilon) { visit(); }
+    public void visit(MaybeElseStatementIsElseStatement MaybeElseStatementIsElseStatement) { visit(); }
+    public void visit(MaybePrintWidthEpsilon MaybePrintWidthEpsilon) { visit(); }
+    public void visit(MaybePrintWidthIsPrintWidth MaybePrintWidthIsPrintWidth) { visit(); }
+    public void visit(MaybeReturnValueEpsilon MaybeReturnValueEpsilon) { visit(); }
+    public void visit(MaybeReturnValueIsReturnValue MaybeReturnValueIsReturnValue) { visit(); }
+    public void visit(StatementBlock StatementBlock) { visit(); }
+    public void visit(StatementForEach StatementForEach) { visit(); }
     public void visit(StatementPrint StatementPrint) { visit(); }
+    public void visit(StatementReturn StatementReturn) { visit(); }
+    public void visit(StatementRead StatementRead) { visit(); }
+    public void visit(StatementContinue StatementContinue) { visit(); }
+    public void visit(StatementBreak StatementBreak) { visit(); }
+    public void visit(StatementWhile StatementWhile) { visit(); }
+    public void visit(StatementIfElse StatementIfElse) { visit(); }
+    public void visit(StatementDesignator StatementDesignator) { visit(); }
+    public void visit(MemberAccess MemberAccess) { visit(); }
     public void visit(MethodDeclarationDerived1 MethodDeclarationDerived1) { visit(); }
     public void visit(MethodDeclarationListEpsilon MethodDeclarationListEpsilon) { visit(); }
     public void visit(MethodDeclarationListMulti MethodDeclarationListMulti) { visit(); }

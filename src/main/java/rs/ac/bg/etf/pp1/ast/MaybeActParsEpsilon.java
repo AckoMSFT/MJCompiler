@@ -1,24 +1,13 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 2:26:45
+// 26/11/2022 22:32:14
 
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ConstFactorDerived2 extends ConstFactor {
+public class MaybeActParsEpsilon extends MaybeActPars {
 
-    private Character C1;
-
-    public ConstFactorDerived2 (Character C1) {
-        this.C1=C1;
-    }
-
-    public Character getC1() {
-        return C1;
-    }
-
-    public void setC1(Character C1) {
-        this.C1=C1;
+    public MaybeActParsEpsilon () {
     }
 
     public void accept(Visitor visitor) {
@@ -39,13 +28,10 @@ public class ConstFactorDerived2 extends ConstFactor {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("ConstFactorDerived2(\n");
-
-        buffer.append(" "+tab+C1);
-        buffer.append("\n");
+        buffer.append("MaybeActParsEpsilon(\n");
 
         buffer.append(tab);
-        buffer.append(") [ConstFactorDerived2]");
+        buffer.append(") [MaybeActParsEpsilon]");
         return buffer.toString();
     }
 }

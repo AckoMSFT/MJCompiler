@@ -48,7 +48,7 @@ scan with {:
     return symbol;
 :}
 
-//nonterminal Program, ProgramName;
+/* Terminals */
 
 terminal String IDENTIFIER;
 terminal Integer CONST_NUMBER;
@@ -60,12 +60,9 @@ terminal Character CONST_CHARACTER;
         return, void, extends, continue, this, foreach
 */
 terminal PROGRAM, BREAK, CLASS, ELSE, CONST, IF, WHILE, NEW, PRINT, READ;
-terminal EXTENDS, CONTINUE, FOR_EACH;
-terminal THEN, STATIC;
+terminal RETURN, VOID, EXTENDS, CONTINUE, FOR_EACH;
 
 /* TODO (acko): enum, do, this, return, void, this, THEN??? STATIC??? */
-
-terminal RETURN;
 
 /* Constants */
 terminal CONST_BOOLEAN;
@@ -80,20 +77,13 @@ terminal DOT, COMMA, SEMI_COLON;
 terminal ASSIGNMENT;
 terminal EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL_THAN, LESS_OR_EQUAL_THAN;
 
-//nonterminal GlobalDeclarationList, GlobalDeclarataion;
-//nonterminal ConstantDeclarationList, VariableDeclarationList, ClassDeclarationList, MethodDeclarationList;
-//nonterminal AssignmentOperator, RelationOperator, AdditionOperator, MultiplicationOperator;
-
-//nonterminal Type, MethodDeclaration, MethodTypeName, FormalParameters;
-
-/* ========================================================================== */
-
+/* NonTerminals */
 
 /* Program */
 nonterminal Program, GlobalDeclarationList, GlobalDeclaration, MethodDeclarationList, MethodDeclaration;
 
 /* Common */
-nonterminal Type, Sign, MaybeArray;
+nonterminal Type, ReturnType, Sign, MaybeArray, MemberElement, ArrayElement;
 
 /* Constants */
 nonterminal ConstDecl, ConstDeclarationList, ConstAssignment, Constant;
@@ -104,8 +94,21 @@ nonterminal VarDecl, VariableDeclarationList, VariableDeclaration;
 /* Operators */
 nonterminal AssignmentOperator, AdditionOperator, MultiplicationOperator, RelationalOperator;
 
-/* TODO (acko): Rewrite this */
-nonterminal Statement, Expr, Factor, Term, Designator, ConstFactor;
+/* Methods */
+
+nonterminal ActPars, MaybeActPars, FunctionInvocation;
+
+/* Statements */
+nonterminal Statement, MaybeElseStatement, StatementList, Expr, Factor, Term, ConstFactor;
+nonterminal MaybePrintWidth, MaybeReturnValue;
+
+/* Designators */
+nonterminal Designator, DesignatorAccessList, DesignatorStatement, MemberAccess;
+
+/* Conditions */
+nonterminal Condition, CondTerm, CondFact;
+
+precedence left ELSE;
 
 /*
     Program = "program" ident {ConstDecl | VarDecl | ClassDecl} "{" {MethodDecl} "}".
@@ -166,6 +169,113 @@ MethodDeclaration ::= Statement;
     TODO (acko): Add ClassDecl/ConstructorDecl
 */
 
+/*
+    Statement = DesignatorStatement ";"
+    | "if" "(" Condition ")" Statement ["else" Statement]
+    | "while" "(" Condition ")" Statement
+    | "break" ";"
+    | "continue" ";"
+    | "return" [Expr] ";"
+    | "read" "(" Designator ")" ";"
+    | "print" "(" Expr ["," numConst] ")" ";"
+    | Designator "." "foreach" "(" ident "=>" Statement ")" ";" * za B i C nivo
+    | "{" {Statement} "}".
+*/
+
+/*
+    Shift/Reduce conflict found in state #73
+      between Designator ::= IDENTIFIER DesignatorAccessList (*)
+      and     MemberElement ::= (*) DOT IDENTIFIER
+      under symbol DOT
+      Resolved in favor of shifting.
+
+    Need to introduce a new non-terminal MemberAccess for IDENTIFIER DesignatorAccessList DOT
+*/
+
+/* MemberAccess := ident DesignatorAccessList "." */
+
+MemberAccess ::=
+    (MemberAccess) IDENTIFIER DesignatorAccessList DOT;
+
+Statement ::=
+    (StatementDesignator) DesignatorStatement SEMI_COLON
+    | (StatementIfElse) IF LEFT_PARENTHESES Condition RIGHT_PARENTHESES Statement MaybeElseStatement
+    | (StatementWhile) WHILE LEFT_PARENTHESES Condition RIGHT_PARENTHESES Statement
+    | (StatementBreak) BREAK SEMI_COLON
+    | (StatementContinue) CONTINUE SEMI_COLON
+    | (StatementRead) READ LEFT_PARENTHESES Designator RIGHT_PARENTHESES SEMI_COLON
+    | (StatementReturn) RETURN MaybeReturnValue SEMI_COLON
+    | (StatementPrint) PRINT LEFT_PARENTHESES Expr MaybePrintWidth RIGHT_PARENTHESES SEMI_COLON
+    | (StatementForEach) MemberAccess FOR_EACH LEFT_PARENTHESES IDENTIFIER LAMBDA Statement RIGHT_PARENTHESES SEMI_COLON
+    | (StatementBlock) LEFT_BRACE StatementList RIGHT_BRACE;
+
+/* MaybeReturnValue = [Expr] */
+
+MaybeReturnValue ::=
+    (MaybeReturnValueIsReturnValue) Expr
+    | (MaybeReturnValueEpsilon) /* epsilon */;
+
+/* MaybePrintWidth = ["," numConst] */
+
+MaybePrintWidth ::=
+    (MaybePrintWidthIsPrintWidth) COMMA CONST_NUMBER
+    | (MaybePrintWidthEpsilon) /* epsilon */;
+
+MaybeElseStatement ::=
+    (MaybeElseStatementIsElseStatement) ELSE Statement
+    | (MaybeElseStatementEpsilon) /* epsilon */;
+
+/* StatementList = {Statement} */
+StatementList ::=
+    (StatementListMulti) StatementList Statement
+    | (StatementListEpsilon) /* epsilon */;
+
+/* Condition = CondTerm {"||" CondTerm} */
+
+Condition ::=
+    (ConditionMulti) Condition OR CondTerm
+    | (ConditionSingle) CondTerm;
+
+/* CondTerm = CondFact {"&&" CondFact} */
+
+CondTerm ::=
+    (CondTermMulti) CondTerm AND CondFact
+    | (CondTermSingle) CondFact;
+
+/* CondFact = Expr [Relop Expr] */
+
+CondFact ::=
+    (CondFactMulti) Expr RelationalOperator Expr
+    | (CondFactSingle) Expr;
+
+/* Expr = ["‐"] Term {Addop Term} */
+
+Expr ::=
+    (ExprMulti) Expr AdditionOperator Term
+    | (ExprSingle) Sign Term;
+
+/* Term := Factor {Mulop Factor} */
+
+Term ::=
+    (TermMulti) Term MultiplicationOperator Factor
+    | (TermSingle) Factor;
+
+/* ActPars := Expr {"," Expr } */
+
+ActPars ::=
+    (ActParsMulti) ActPars COMMA Expr
+    | (ActParsSingle) Expr;
+
+/* MaybeActPars := [ActPars] */
+
+MaybeActPars ::=
+    (MaybeActParsIsActPars) ActPars
+    | (MaybeActParsEpsilon) /* epsilon */;
+
+FunctionInvocation ::=
+    (FunctionInvocation) LEFT_PARENTHESES MaybeActPars RIGHT_PARENTHESES;
+
+
 /* Factor := numConst | charConst | "(" Expr ")" | boolConst | "new" Type "[" Expr "]"| Designator */
 
 /*
@@ -173,34 +283,52 @@ MethodDeclaration ::= Statement;
     | numConst
     | charConst
     | boolConst
-    | "new" Type ( "[" Expr "]" | "" ([ActPars] ")" )
+    | | "new" Type ( "[" Expr "]" | "(" [ActPars] ")" )
     | "(" Expr ")".
 */
 
-/* TODO (acko): Rewrite this */
-Statement ::=
-    (StatementPrint) PRINT LEFT_PARENTHESES Expr RIGHT_PARENTHESES SEMI_COLON;
-
-Expr ::=
-    (ExprMulti) Expr AdditionOperator Term
-    | (ExprSingle) Sign Term;
-
-Term ::=
-    (TermMulti) Term MultiplicationOperator Factor
-    | (TermSingle) Factor;
-
 Factor ::=
-    (FactorConstant) ConstFactor
-    | (FactorDesignator) Designator
+    (FactorDesignator) Designator
+    | (FactorFunctionInvocation) Designator FunctionInvocation
+    | (FactorConstant) ConstFactor
+    | (FactorNewArray) NEW Type ArrayElement
+    | (FactorNewClass) NEW Type FunctionInvocation
     | (FactorExpr) LEFT_PARENTHESES Expr RIGHT_PARENTHESES;
 
+/*
+        ConstFactor = numConst
+        | charConst
+        | boolConst
+*/
+
 ConstFactor ::=
-    CONST_NUMBER
-    | CONST_CHARACTER
-    | CONST_BOOLEAN;
+    (ConstFactorNumber) CONST_NUMBER
+    | (ConstFactorCharacter) CONST_CHARACTER
+    | (ConstFactorBoolean) CONST_BOOLEAN;
+
+/* Designator = ident {"." ident | "[" Expr "]"} */
 
 Designator ::=
-    (DesignatorIdentifier) IDENTIFIER;
+    (DesignatorIdentifier) IDENTIFIER DesignatorAccessList;
+
+/* DesignatorAccessList = {"." ident | "[" Expr "]"} */
+
+DesignatorAccessList ::=
+    (DesignatorAccessListMember) DesignatorAccessList MemberElement
+    | (DesignatorAccessListElement) DesignatorAccessList ArrayElement
+    | (DesignatorAccessListEpsilon) /* epsilon */;
+
+/*
+    DesignatorStatement =
+        Designator (Assignop Expr | "(" [ActPars] ")" | "++" | "‐‐")
+        | "[" [Designator] {"," [Designator]}"]" "=" Designator
+*/
+
+DesignatorStatement ::=
+    (DesignatorStatementAssignment) Designator AssignmentOperator Expr
+    | (DesignatorStatementFunctionInvocation) Designator FunctionInvocation
+    | (DesignatorStatementIncrement) Designator INCREMENT
+    | (DesignatorStatementDecrement) Designator DECREMENT;
 
 /* Assignop = "=" */
 
@@ -235,6 +363,12 @@ RelationalOperator ::=
 Type ::=
     (Type) IDENTIFIER;
 
+/* ReturnType = Type | "void" */
+
+ReturnType ::=
+    (ReturnTypeNonVoid) Type
+    | (ReturnTypeVoid) VOID;
+
 /* Sign = [ "+" | "-" ] */
 Sign ::=
     (SignPositive) ADDITION
@@ -246,4 +380,15 @@ Sign ::=
 MaybeArray ::=
     (MaybeArrayIsArray) LEFT_BRACKET RIGHT_BRACKET
     | (MaybeArrayEpsilon) /* epsilon */;
+
+/* MemberElement := "." ident */
+
+MemberElement ::=
+    (MemberElement) DOT IDENTIFIER;
+
+/* ArrayElement := "[" Expr "]" */
+
+ArrayElement ::=
+    (ArrayElement) LEFT_BRACKET Expr RIGHT_BRACKET;
+
 

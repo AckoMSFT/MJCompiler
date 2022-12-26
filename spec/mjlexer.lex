@@ -52,10 +52,9 @@ import org.apache.logging.log4j.Logger;
 "new" { return new_symbol(sym.NEW, yytext()); }
 "if" { return new_symbol(sym.IF, yytext()); }
 "else" { return new_symbol(sym.ELSE, yytext()); }
-"then" { return new_symbol(sym.THEN, yytext()); }
-"static" { return new_symbol(sym.STATIC, yytext()); }
 "const" { return new_symbol(sym.CONST, yytext()); }
 "return" { return new_symbol(sym.RETURN, yytext()); }
+"void" { return new_symbol(sym.VOID, yytext()); }
 
 /* Constants */
 
