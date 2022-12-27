@@ -11,18 +11,30 @@ parser code {:
     Logger logger = LogManager.getLogger(MJParser.class);
 
     boolean errorDetected = false;
+    int errorLine, errorColumn;
 
     public void report_fatal_error(String message, Object info) throws java.lang.Exception {
         done_parsing();
         report_error(message, info);
     }
 
+    @Override
     public void syntax_error(Symbol curr_token) {
-        report_error("Syntax error while parsing", curr_token);
+        report_error("Syntax error while parsing: ", curr_token);
+
+        errorLine = curr_token.left;
+        errorColumn = curr_token.right;
     }
 
+    @Override
     public void unrecovered_syntax_error(Symbol curr_token) throws java.lang.Exception {
-        report_fatal_error("Could not recover from syntax error", curr_token);
+        report_fatal_error("YOU SHALL NOT PASS! Could not recover from syntax error", curr_token);
+    }
+
+    public void log_error_recovery() {
+        StringBuilder msg = new StringBuilder();
+        msg.append("Performed error recovery on line ").append(errorLine).append(" and column ").append(errorColumn).append(". The parsing must go on!");
+        logger.warn(msg.toString());
     }
 
     public void report_error(String message, Object info) {
@@ -93,6 +105,7 @@ nonterminal Sign Sign;
 nonterminal MaybeArray MaybeArray;
 nonterminal MemberElement MemberElement;
 nonterminal ArrayElement ArrayElement;
+nonterminal AssignmentOperation AssignmentOperation;
 
 /* Constants */
 nonterminal ConstDecl ConstDecl;
@@ -103,7 +116,7 @@ nonterminal Constant Constant;
 /* Variables */
 nonterminal VarDecl VarDecl;
 nonterminal VariableDeclarationList VariableDeclarationList;
-nonterminal VariableDeclaration VariableDeclaration;
+nonterminal VarDeclaration VarDeclaration;
 
 /* Local variables */
 nonterminal LocalVarDeclList LocalVarDeclList;
@@ -135,7 +148,7 @@ nonterminal FunctionInvocation FunctionInvocation;
 /* Formal parameter */
 nonterminal FormPars FormPars;
 nonterminal MaybeFormPars MaybeFormPars;
-nonterminal FormalParameter FormalParameter;
+nonterminal FormalParam FormalParam;
 
 /* Statements */
 nonterminal Statement Statement;
@@ -157,6 +170,7 @@ nonterminal MaybeDesignator MaybeDesignator;
 nonterminal DesignatorList DesignatorList;
 
 /* Conditions */
+nonterminal ConditionErrorRecovery ConditionErrorRecovery;
 nonterminal Condition Condition;
 nonterminal CondTerm CondTerm;
 nonterminal CondFact CondFact;
@@ -201,14 +215,16 @@ Constant ::=
 /* VarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
 
 VarDecl ::=
-    (VarDecl) Type:T1 VariableDeclarationList:V2 SEMI_COLON {: RESULT=new VarDecl(T1, V2); RESULT.setLine(T1left); :};
+    (VarDeclList) Type:T1 VariableDeclarationList:V2 SEMI_COLON {: RESULT=new VarDeclList(T1, V2); RESULT.setLine(T1left); :}
+    | (VarDeclError) error {: parser.log_error_recovery(); :} {: RESULT=new VarDeclError(); :};
 
 VariableDeclarationList ::=
-    (VariableDeclarationListMulti) VariableDeclarationList:V1 COMMA VariableDeclaration:V2 {: RESULT=new VariableDeclarationListMulti(V1, V2); RESULT.setLine(V1left); :}
-    | (VariableDeclarationSingle) VariableDeclaration:V1 {: RESULT=new VariableDeclarationSingle(V1); RESULT.setLine(V1left); :};
+    (VariableDeclarationListMulti) VariableDeclarationList:V1 COMMA VarDeclaration:V2 {: RESULT=new VariableDeclarationListMulti(V1, V2); RESULT.setLine(V1left); :}
+    | (VariableDeclarationSingle) VarDeclaration:V1 {: RESULT=new VariableDeclarationSingle(V1); RESULT.setLine(V1left); :};
 
-VariableDeclaration ::=
-    (VariableDeclaration) IDENTIFIER:I1 MaybeArray:M2 {: RESULT=new VariableDeclaration(I1, M2); RESULT.setLine(I1left); :};
+VarDeclaration ::=
+    (VariableDeclaration) IDENTIFIER:I1 MaybeArray:M2 {: RESULT=new VariableDeclaration(I1, M2); RESULT.setLine(I1left); :}
+    | (VariableDeclarationError) error {: parser.log_error_recovery(); :} {: RESULT=new VariableDeclarationError(); :};
 
 /* MethodDeclarationList := {MethodDeclaration} */
 
@@ -255,6 +271,8 @@ MaybeClassMethodList ::=
     (MaybeClassMethodListIsClassMethodList) LEFT_BRACE ClassMethodList:C1 RIGHT_BRACE {: RESULT=new MaybeClassMethodListIsClassMethodList(C1); RESULT.setLine(C1left); :}
     | (MaybeClassMethodListEpsilon) {: RESULT=new MaybeClassMethodListEpsilon(); :} /* epsilon */;
 
+/* TODO (acko): Fix conflict in ConstructorDecl */
+
 /* ClassMethodList := {ConstructorDecl} {MethodDecl} */
 ClassMethodList ::=
     (ClassMethodList) MethodDeclarationList:M1 {: RESULT=new ClassMethodList(M1); RESULT.setLine(M1left); :};
@@ -288,17 +306,18 @@ ConstructorDecl ::=
 /*
     FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]}
 
-    FormPars = FormalParameter { "," FormalParameter }
+    FormPars = FormalParam { "," FormalParam }
 */
 
 FormPars ::=
-    (FormParsMulti) FormPars:F1 COMMA FormalParameter:F2 {: RESULT=new FormParsMulti(F1, F2); RESULT.setLine(F1left); :}
-    | (FormParsSingle) FormalParameter:F1 {: RESULT=new FormParsSingle(F1); RESULT.setLine(F1left); :};
+    (FormParsMulti) FormPars:F1 COMMA FormalParam:F2 {: RESULT=new FormParsMulti(F1, F2); RESULT.setLine(F1left); :}
+    | (FormParsSingle) FormalParam:F1 {: RESULT=new FormParsSingle(F1); RESULT.setLine(F1left); :};
 
-/* FormalParameter := Type ident ["[" "]"] */
+/* FormalParam := Type ident ["[" "]"] */
 
-FormalParameter ::=
-    (FormalParameter) Type:T1 IDENTIFIER:I2 MaybeArray:M3 {: RESULT=new FormalParameter(T1, I2, M3); RESULT.setLine(T1left); :};
+FormalParam ::=
+    (FormalParameter) Type:T1 IDENTIFIER:I2 MaybeArray:M3 {: RESULT=new FormalParameter(T1, I2, M3); RESULT.setLine(T1left); :}
+    | (FormalParameterError) error {: parser.log_error_recovery(); :} {: RESULT=new FormalParameterError(); :};
 
 /* MaybeFormPars := [FormPars] */
 
@@ -343,7 +362,7 @@ MemberAccess ::=
 
 Statement ::=
     (StatementDesignator) DesignatorStatement:D1 SEMI_COLON {: RESULT=new StatementDesignator(D1); RESULT.setLine(D1left); :}
-    | (StatementIfElse) IF LEFT_PARENTHESES Condition:C1 RIGHT_PARENTHESES Statement:S2 MaybeElseStatement:M3 {: RESULT=new StatementIfElse(C1, S2, M3); RESULT.setLine(C1left); :}
+    | (StatementIfElse) IF LEFT_PARENTHESES ConditionErrorRecovery:C1 Statement:S2 MaybeElseStatement:M3 {: RESULT=new StatementIfElse(C1, S2, M3); RESULT.setLine(C1left); :}
     | (StatementWhile) WHILE LEFT_PARENTHESES Condition:C1 RIGHT_PARENTHESES Statement:S2 {: RESULT=new StatementWhile(C1, S2); RESULT.setLine(C1left); :}
     | (StatementBreak) BREAK SEMI_COLON {: RESULT=new StatementBreak(); :}
     | (StatementContinue) CONTINUE SEMI_COLON {: RESULT=new StatementContinue(); :}
@@ -352,6 +371,10 @@ Statement ::=
     | (StatementPrint) PRINT LEFT_PARENTHESES Expr:E1 MaybePrintWidth:M2 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new StatementPrint(E1, M2); RESULT.setLine(E1left); :}
     | (StatementForEach) MemberAccess:M1 FOR_EACH LEFT_PARENTHESES IDENTIFIER:I2 LAMBDA Statement:S3 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new StatementForEach(M1, I2, S3); RESULT.setLine(M1left); :}
     | (StatementBlock) LEFT_BRACE StatementList:S1 RIGHT_BRACE {: RESULT=new StatementBlock(S1); RESULT.setLine(S1left); :};
+
+ConditionErrorRecovery ::=
+    (ConditionErrorRecoveryCondition) Condition:C1 RIGHT_PARENTHESES {: RESULT=new ConditionErrorRecoveryCondition(C1); RESULT.setLine(C1left); :}
+    | (ConditionErrorRecoveryError) error RIGHT_PARENTHESES {: parser.log_error_recovery(); :} {: RESULT=new ConditionErrorRecoveryError(); :};
 
 /* MaybeReturnValue = [Expr] */
 
@@ -469,7 +492,7 @@ DesignatorAccessList ::=
 */
 
 DesignatorStatement ::=
-    (DesignatorStatementAssignment) Designator:D1 AssignmentOperator:A2 Expr:E3 {: RESULT=new DesignatorStatementAssignment(D1, A2, E3); RESULT.setLine(D1left); :}
+    (DesignatorStatementAssignment) Designator:D1 AssignmentOperation:A2 {: RESULT=new DesignatorStatementAssignment(D1, A2); RESULT.setLine(D1left); :}
     | (DesignatorStatementFunctionInvocation) Designator:D1 FunctionInvocation:F2 {: RESULT=new DesignatorStatementFunctionInvocation(D1, F2); RESULT.setLine(D1left); :}
     | (DesignatorStatementIncrement) Designator:D1 INCREMENT {: RESULT=new DesignatorStatementIncrement(D1); RESULT.setLine(D1left); :}
     | (DesignatorStatementDecrement) Designator:D1 DECREMENT {: RESULT=new DesignatorStatementDecrement(D1); RESULT.setLine(D1left); :}
@@ -543,5 +566,15 @@ MemberElement ::=
 
 ArrayElement ::=
     (ArrayElement) LEFT_BRACKET Expr:E1 RIGHT_BRACKET {: RESULT=new ArrayElement(E1); RESULT.setLine(E1left); :};
+
+/*
+    AssignmentOperation := "=" Expr | error
+
+    Handling error recovery until character ";" for assignment operation in DesignatorStatement.
+*/
+
+AssignmentOperation ::=
+    (AssignmentOperationExpr) AssignmentOperator:A1 Expr:E2 {: RESULT=new AssignmentOperationExpr(A1, E2); RESULT.setLine(A1left); :}
+    | (AssignmentOperationError) error {: parser.log_error_recovery(); :} {: RESULT=new AssignmentOperationError(); :};
 
 

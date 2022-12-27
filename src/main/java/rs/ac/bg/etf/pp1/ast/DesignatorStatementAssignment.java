@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 23:27:11
+// 27/11/2022 1:4:11
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -8,16 +8,13 @@ package rs.ac.bg.etf.pp1.ast;
 public class DesignatorStatementAssignment extends DesignatorStatement {
 
     private Designator Designator;
-    private AssignmentOperator AssignmentOperator;
-    private Expr Expr;
+    private AssignmentOperation AssignmentOperation;
 
-    public DesignatorStatementAssignment (Designator Designator, AssignmentOperator AssignmentOperator, Expr Expr) {
+    public DesignatorStatementAssignment (Designator Designator, AssignmentOperation AssignmentOperation) {
         this.Designator=Designator;
         if(Designator!=null) Designator.setParent(this);
-        this.AssignmentOperator=AssignmentOperator;
-        if(AssignmentOperator!=null) AssignmentOperator.setParent(this);
-        this.Expr=Expr;
-        if(Expr!=null) Expr.setParent(this);
+        this.AssignmentOperation=AssignmentOperation;
+        if(AssignmentOperation!=null) AssignmentOperation.setParent(this);
     }
 
     public Designator getDesignator() {
@@ -28,20 +25,12 @@ public class DesignatorStatementAssignment extends DesignatorStatement {
         this.Designator=Designator;
     }
 
-    public AssignmentOperator getAssignmentOperator() {
-        return AssignmentOperator;
+    public AssignmentOperation getAssignmentOperation() {
+        return AssignmentOperation;
     }
 
-    public void setAssignmentOperator(AssignmentOperator AssignmentOperator) {
-        this.AssignmentOperator=AssignmentOperator;
-    }
-
-    public Expr getExpr() {
-        return Expr;
-    }
-
-    public void setExpr(Expr Expr) {
-        this.Expr=Expr;
+    public void setAssignmentOperation(AssignmentOperation AssignmentOperation) {
+        this.AssignmentOperation=AssignmentOperation;
     }
 
     public void accept(Visitor visitor) {
@@ -50,21 +39,18 @@ public class DesignatorStatementAssignment extends DesignatorStatement {
 
     public void childrenAccept(Visitor visitor) {
         if(Designator!=null) Designator.accept(visitor);
-        if(AssignmentOperator!=null) AssignmentOperator.accept(visitor);
-        if(Expr!=null) Expr.accept(visitor);
+        if(AssignmentOperation!=null) AssignmentOperation.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
         if(Designator!=null) Designator.traverseTopDown(visitor);
-        if(AssignmentOperator!=null) AssignmentOperator.traverseTopDown(visitor);
-        if(Expr!=null) Expr.traverseTopDown(visitor);
+        if(AssignmentOperation!=null) AssignmentOperation.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
         if(Designator!=null) Designator.traverseBottomUp(visitor);
-        if(AssignmentOperator!=null) AssignmentOperator.traverseBottomUp(visitor);
-        if(Expr!=null) Expr.traverseBottomUp(visitor);
+        if(AssignmentOperation!=null) AssignmentOperation.traverseBottomUp(visitor);
         accept(visitor);
     }
 
@@ -79,14 +65,8 @@ public class DesignatorStatementAssignment extends DesignatorStatement {
             buffer.append(tab+"  null");
         buffer.append("\n");
 
-        if(AssignmentOperator!=null)
-            buffer.append(AssignmentOperator.toString("  "+tab));
-        else
-            buffer.append(tab+"  null");
-        buffer.append("\n");
-
-        if(Expr!=null)
-            buffer.append(Expr.toString("  "+tab));
+        if(AssignmentOperation!=null)
+            buffer.append(AssignmentOperation.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

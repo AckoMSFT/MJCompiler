@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 23:27:11
+// 27/11/2022 1:4:10
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -8,13 +8,13 @@ package rs.ac.bg.etf.pp1.ast;
 public class FormParsMulti extends FormPars {
 
     private FormPars FormPars;
-    private FormalParameter FormalParameter;
+    private FormalParam FormalParam;
 
-    public FormParsMulti (FormPars FormPars, FormalParameter FormalParameter) {
+    public FormParsMulti (FormPars FormPars, FormalParam FormalParam) {
         this.FormPars=FormPars;
         if(FormPars!=null) FormPars.setParent(this);
-        this.FormalParameter=FormalParameter;
-        if(FormalParameter!=null) FormalParameter.setParent(this);
+        this.FormalParam=FormalParam;
+        if(FormalParam!=null) FormalParam.setParent(this);
     }
 
     public FormPars getFormPars() {
@@ -25,12 +25,12 @@ public class FormParsMulti extends FormPars {
         this.FormPars=FormPars;
     }
 
-    public FormalParameter getFormalParameter() {
-        return FormalParameter;
+    public FormalParam getFormalParam() {
+        return FormalParam;
     }
 
-    public void setFormalParameter(FormalParameter FormalParameter) {
-        this.FormalParameter=FormalParameter;
+    public void setFormalParam(FormalParam FormalParam) {
+        this.FormalParam=FormalParam;
     }
 
     public void accept(Visitor visitor) {
@@ -39,18 +39,18 @@ public class FormParsMulti extends FormPars {
 
     public void childrenAccept(Visitor visitor) {
         if(FormPars!=null) FormPars.accept(visitor);
-        if(FormalParameter!=null) FormalParameter.accept(visitor);
+        if(FormalParam!=null) FormalParam.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
         if(FormPars!=null) FormPars.traverseTopDown(visitor);
-        if(FormalParameter!=null) FormalParameter.traverseTopDown(visitor);
+        if(FormalParam!=null) FormalParam.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
         if(FormPars!=null) FormPars.traverseBottomUp(visitor);
-        if(FormalParameter!=null) FormalParameter.traverseBottomUp(visitor);
+        if(FormalParam!=null) FormalParam.traverseBottomUp(visitor);
         accept(visitor);
     }
 
@@ -65,8 +65,8 @@ public class FormParsMulti extends FormPars {
             buffer.append(tab+"  null");
         buffer.append("\n");
 
-        if(FormalParameter!=null)
-            buffer.append(FormalParameter.toString("  "+tab));
+        if(FormalParam!=null)
+            buffer.append(FormalParam.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

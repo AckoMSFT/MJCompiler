@@ -11,18 +11,30 @@ parser code {:
     Logger logger = LogManager.getLogger(MJParser.class);
 
     boolean errorDetected = false;
+    int errorLine, errorColumn;
 
     public void report_fatal_error(String message, Object info) throws java.lang.Exception {
         done_parsing();
         report_error(message, info);
     }
 
+    @Override
     public void syntax_error(Symbol curr_token) {
-        report_error("Syntax error while parsing", curr_token);
+        report_error("Syntax error while parsing: ", curr_token);
+
+        errorLine = curr_token.left;
+        errorColumn = curr_token.right;
     }
 
+    @Override
     public void unrecovered_syntax_error(Symbol curr_token) throws java.lang.Exception {
-        report_fatal_error("Could not recover from syntax error", curr_token);
+        report_fatal_error("YOU SHALL NOT PASS! Could not recover from syntax error", curr_token);
+    }
+
+    public void log_error_recovery() {
+        StringBuilder msg = new StringBuilder();
+        msg.append("Performed error recovery on line ").append(errorLine).append(" and column ").append(errorColumn).append(". The parsing must go on!");
+        logger.warn(msg.toString());
     }
 
     public void report_error(String message, Object info) {
@@ -83,13 +95,13 @@ terminal EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL_THAN, LES
 nonterminal Program, GlobalDeclarationList, GlobalDeclaration, MethodDeclarationList, MethodDeclaration;
 
 /* Common */
-nonterminal Type, ReturnType, Sign, MaybeArray, MemberElement, ArrayElement;
+nonterminal Type, ReturnType, Sign, MaybeArray, MemberElement, ArrayElement, AssignmentOperation;
 
 /* Constants */
 nonterminal ConstDecl, ConstDeclarationList, ConstAssignment, Constant;
 
 /* Variables */
-nonterminal VarDecl, VariableDeclarationList, VariableDeclaration;
+nonterminal VarDecl, VariableDeclarationList, VarDeclaration;
 
 /* Local variables */
 nonterminal LocalVarDeclList, LocalVarDecl, LocalVariableDeclarationList, LocalVariableDeclaration;
@@ -105,7 +117,7 @@ nonterminal AssignmentOperator, AdditionOperator, MultiplicationOperator, Relati
 nonterminal ActPars, MaybeActPars, FunctionInvocation;
 
 /* Formal parameter */
-nonterminal FormPars, MaybeFormPars, FormalParameter;
+nonterminal FormPars, MaybeFormPars, FormalParam;
 
 /* Statements */
 nonterminal Statement, MaybeElseStatement, StatementList, Expr, Factor, Term, ConstFactor;
@@ -115,7 +127,7 @@ nonterminal MaybePrintWidth, MaybeReturnValue;
 nonterminal Designator, DesignatorAccessList, DesignatorStatement, MemberAccess, MaybeDesignator, DesignatorList;
 
 /* Conditions */
-nonterminal Condition, CondTerm, CondFact;
+nonterminal ConditionErrorRecovery, Condition, CondTerm, CondFact;
 
 precedence left ELSE;
 
@@ -157,14 +169,16 @@ Constant ::=
 /* VarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
 
 VarDecl ::=
-    (VarDecl) Type VariableDeclarationList SEMI_COLON;
+    (VarDeclList) Type VariableDeclarationList SEMI_COLON
+    | (VarDeclError) error {: parser.log_error_recovery(); :};
 
 VariableDeclarationList ::=
-    (VariableDeclarationListMulti) VariableDeclarationList COMMA VariableDeclaration
-    | (VariableDeclarationSingle) VariableDeclaration;
+    (VariableDeclarationListMulti) VariableDeclarationList COMMA VarDeclaration
+    | (VariableDeclarationSingle) VarDeclaration;
 
-VariableDeclaration ::=
-    (VariableDeclaration) IDENTIFIER MaybeArray;
+VarDeclaration ::=
+    (VariableDeclaration) IDENTIFIER MaybeArray
+    | (VariableDeclarationError) error {: parser.log_error_recovery(); :};
 
 /* MethodDeclarationList := {MethodDeclaration} */
 
@@ -211,6 +225,8 @@ MaybeClassMethodList ::=
     (MaybeClassMethodListIsClassMethodList) LEFT_BRACE ClassMethodList RIGHT_BRACE
     | (MaybeClassMethodListEpsilon) /* epsilon */;
 
+/* TODO (acko): Fix conflict in ConstructorDecl */
+
 /* ClassMethodList := {ConstructorDecl} {MethodDecl} */
 ClassMethodList ::=
     (ClassMethodList) MethodDeclarationList;
@@ -244,17 +260,18 @@ ConstructorDecl ::=
 /*
     FormPars = Type ident ["[" "]"] {"," Type ident ["[" "]"]}
 
-    FormPars = FormalParameter { "," FormalParameter }
+    FormPars = FormalParam { "," FormalParam }
 */
 
 FormPars ::=
-    (FormParsMulti) FormPars COMMA FormalParameter
-    | (FormParsSingle) FormalParameter;
+    (FormParsMulti) FormPars COMMA FormalParam
+    | (FormParsSingle) FormalParam;
 
-/* FormalParameter := Type ident ["[" "]"] */
+/* FormalParam := Type ident ["[" "]"] */
 
-FormalParameter ::=
-    (FormalParameter) Type IDENTIFIER MaybeArray;
+FormalParam ::=
+    (FormalParameter) Type IDENTIFIER MaybeArray
+    | (FormalParameterError) error {: parser.log_error_recovery(); :};
 
 /* MaybeFormPars := [FormPars] */
 
@@ -299,7 +316,7 @@ MemberAccess ::=
 
 Statement ::=
     (StatementDesignator) DesignatorStatement SEMI_COLON
-    | (StatementIfElse) IF LEFT_PARENTHESES Condition RIGHT_PARENTHESES Statement MaybeElseStatement
+    | (StatementIfElse) IF LEFT_PARENTHESES ConditionErrorRecovery Statement MaybeElseStatement
     | (StatementWhile) WHILE LEFT_PARENTHESES Condition RIGHT_PARENTHESES Statement
     | (StatementBreak) BREAK SEMI_COLON
     | (StatementContinue) CONTINUE SEMI_COLON
@@ -308,6 +325,10 @@ Statement ::=
     | (StatementPrint) PRINT LEFT_PARENTHESES Expr MaybePrintWidth RIGHT_PARENTHESES SEMI_COLON
     | (StatementForEach) MemberAccess FOR_EACH LEFT_PARENTHESES IDENTIFIER LAMBDA Statement RIGHT_PARENTHESES SEMI_COLON
     | (StatementBlock) LEFT_BRACE StatementList RIGHT_BRACE;
+
+ConditionErrorRecovery ::=
+    (ConditionErrorRecoveryCondition) Condition RIGHT_PARENTHESES
+    | (ConditionErrorRecoveryError) error RIGHT_PARENTHESES {: parser.log_error_recovery(); :};
 
 /* MaybeReturnValue = [Expr] */
 
@@ -425,7 +446,7 @@ DesignatorAccessList ::=
 */
 
 DesignatorStatement ::=
-    (DesignatorStatementAssignment) Designator AssignmentOperator Expr
+    (DesignatorStatementAssignment) Designator AssignmentOperation
     | (DesignatorStatementFunctionInvocation) Designator FunctionInvocation
     | (DesignatorStatementIncrement) Designator INCREMENT
     | (DesignatorStatementDecrement) Designator DECREMENT
@@ -499,5 +520,15 @@ MemberElement ::=
 
 ArrayElement ::=
     (ArrayElement) LEFT_BRACKET Expr RIGHT_BRACKET;
+
+/*
+    AssignmentOperation := "=" Expr | error
+
+    Handling error recovery until character ";" for assignment operation in DesignatorStatement.
+*/
+
+AssignmentOperation ::=
+    (AssignmentOperationExpr) AssignmentOperator Expr
+    | (AssignmentOperationError) error {: parser.log_error_recovery(); :};
 
 

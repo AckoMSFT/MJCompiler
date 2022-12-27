@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 23:27:11
+// 27/11/2022 1:4:10
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -8,13 +8,13 @@ package rs.ac.bg.etf.pp1.ast;
 public class VariableDeclarationListMulti extends VariableDeclarationList {
 
     private VariableDeclarationList VariableDeclarationList;
-    private VariableDeclaration VariableDeclaration;
+    private VarDeclaration VarDeclaration;
 
-    public VariableDeclarationListMulti (VariableDeclarationList VariableDeclarationList, VariableDeclaration VariableDeclaration) {
+    public VariableDeclarationListMulti (VariableDeclarationList VariableDeclarationList, VarDeclaration VarDeclaration) {
         this.VariableDeclarationList=VariableDeclarationList;
         if(VariableDeclarationList!=null) VariableDeclarationList.setParent(this);
-        this.VariableDeclaration=VariableDeclaration;
-        if(VariableDeclaration!=null) VariableDeclaration.setParent(this);
+        this.VarDeclaration=VarDeclaration;
+        if(VarDeclaration!=null) VarDeclaration.setParent(this);
     }
 
     public VariableDeclarationList getVariableDeclarationList() {
@@ -25,12 +25,12 @@ public class VariableDeclarationListMulti extends VariableDeclarationList {
         this.VariableDeclarationList=VariableDeclarationList;
     }
 
-    public VariableDeclaration getVariableDeclaration() {
-        return VariableDeclaration;
+    public VarDeclaration getVarDeclaration() {
+        return VarDeclaration;
     }
 
-    public void setVariableDeclaration(VariableDeclaration VariableDeclaration) {
-        this.VariableDeclaration=VariableDeclaration;
+    public void setVarDeclaration(VarDeclaration VarDeclaration) {
+        this.VarDeclaration=VarDeclaration;
     }
 
     public void accept(Visitor visitor) {
@@ -39,18 +39,18 @@ public class VariableDeclarationListMulti extends VariableDeclarationList {
 
     public void childrenAccept(Visitor visitor) {
         if(VariableDeclarationList!=null) VariableDeclarationList.accept(visitor);
-        if(VariableDeclaration!=null) VariableDeclaration.accept(visitor);
+        if(VarDeclaration!=null) VarDeclaration.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
         if(VariableDeclarationList!=null) VariableDeclarationList.traverseTopDown(visitor);
-        if(VariableDeclaration!=null) VariableDeclaration.traverseTopDown(visitor);
+        if(VarDeclaration!=null) VarDeclaration.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
         if(VariableDeclarationList!=null) VariableDeclarationList.traverseBottomUp(visitor);
-        if(VariableDeclaration!=null) VariableDeclaration.traverseBottomUp(visitor);
+        if(VarDeclaration!=null) VarDeclaration.traverseBottomUp(visitor);
         accept(visitor);
     }
 
@@ -65,8 +65,8 @@ public class VariableDeclarationListMulti extends VariableDeclarationList {
             buffer.append(tab+"  null");
         buffer.append("\n");
 
-        if(VariableDeclaration!=null)
-            buffer.append(VariableDeclaration.toString("  "+tab));
+        if(VarDeclaration!=null)
+            buffer.append(VarDeclaration.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

@@ -1,14 +1,12 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 23:27:11
+// 27/11/2022 1:4:10
 
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class FormalParameter implements SyntaxNode {
+public class FormalParameter extends FormalParam {
 
-    private SyntaxNode parent;
-    private int line;
     private Type Type;
     private String I2;
     private MaybeArray MaybeArray;
@@ -43,22 +41,6 @@ public class FormalParameter implements SyntaxNode {
 
     public void setMaybeArray(MaybeArray MaybeArray) {
         this.MaybeArray=MaybeArray;
-    }
-
-    public SyntaxNode getParent() {
-        return parent;
-    }
-
-    public void setParent(SyntaxNode parent) {
-        this.parent=parent;
-    }
-
-    public int getLine() {
-        return line;
-    }
-
-    public void setLine(int line) {
-        this.line=line;
     }
 
     public void accept(Visitor visitor) {

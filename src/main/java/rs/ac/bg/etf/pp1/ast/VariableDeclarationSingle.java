@@ -1,25 +1,25 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 23:27:11
+// 27/11/2022 1:4:10
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class VariableDeclarationSingle extends VariableDeclarationList {
 
-    private VariableDeclaration VariableDeclaration;
+    private VarDeclaration VarDeclaration;
 
-    public VariableDeclarationSingle (VariableDeclaration VariableDeclaration) {
-        this.VariableDeclaration=VariableDeclaration;
-        if(VariableDeclaration!=null) VariableDeclaration.setParent(this);
+    public VariableDeclarationSingle (VarDeclaration VarDeclaration) {
+        this.VarDeclaration=VarDeclaration;
+        if(VarDeclaration!=null) VarDeclaration.setParent(this);
     }
 
-    public VariableDeclaration getVariableDeclaration() {
-        return VariableDeclaration;
+    public VarDeclaration getVarDeclaration() {
+        return VarDeclaration;
     }
 
-    public void setVariableDeclaration(VariableDeclaration VariableDeclaration) {
-        this.VariableDeclaration=VariableDeclaration;
+    public void setVarDeclaration(VarDeclaration VarDeclaration) {
+        this.VarDeclaration=VarDeclaration;
     }
 
     public void accept(Visitor visitor) {
@@ -27,16 +27,16 @@ public class VariableDeclarationSingle extends VariableDeclarationList {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(VariableDeclaration!=null) VariableDeclaration.accept(visitor);
+        if(VarDeclaration!=null) VarDeclaration.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(VariableDeclaration!=null) VariableDeclaration.traverseTopDown(visitor);
+        if(VarDeclaration!=null) VarDeclaration.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(VariableDeclaration!=null) VariableDeclaration.traverseBottomUp(visitor);
+        if(VarDeclaration!=null) VarDeclaration.traverseBottomUp(visitor);
         accept(visitor);
     }
 
@@ -45,8 +45,8 @@ public class VariableDeclarationSingle extends VariableDeclarationList {
         buffer.append(tab);
         buffer.append("VariableDeclarationSingle(\n");
 
-        if(VariableDeclaration!=null)
-            buffer.append(VariableDeclaration.toString("  "+tab));
+        if(VarDeclaration!=null)
+            buffer.append(VarDeclaration.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

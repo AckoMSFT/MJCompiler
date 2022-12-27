@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 23:27:11
+// 27/11/2022 1:4:11
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -9,12 +9,14 @@ public interface Visitor {
 
     public void visit(ReturnType ReturnType);
     public void visit(MaybeArray MaybeArray);
+    public void visit(VarDeclaration VarDeclaration);
     public void visit(Constant Constant);
     public void visit(VariableDeclarationList VariableDeclarationList);
     public void visit(Sign Sign);
     public void visit(RelationalOperator RelationalOperator);
     public void visit(GlobalDeclaration GlobalDeclaration);
     public void visit(MaybeClassMethodList MaybeClassMethodList);
+    public void visit(ConditionErrorRecovery ConditionErrorRecovery);
     public void visit(StatementList StatementList);
     public void visit(MethodDeclarationList MethodDeclarationList);
     public void visit(MaybeExtendedClass MaybeExtendedClass);
@@ -31,7 +33,9 @@ public interface Visitor {
     public void visit(Condition Condition);
     public void visit(DesignatorAccessList DesignatorAccessList);
     public void visit(ConstructorDeclList ConstructorDeclList);
+    public void visit(FormalParam FormalParam);
     public void visit(MaybeReturnValue MaybeReturnValue);
+    public void visit(AssignmentOperation AssignmentOperation);
     public void visit(MaybeElseStatement MaybeElseStatement);
     public void visit(Expr Expr);
     public void visit(ActPars ActPars);
@@ -40,12 +44,15 @@ public interface Visitor {
     public void visit(AdditionOperator AdditionOperator);
     public void visit(ConstFactor ConstFactor);
     public void visit(Statement Statement);
+    public void visit(VarDecl VarDecl);
     public void visit(CondFact CondFact);
     public void visit(MaybePrintWidth MaybePrintWidth);
     public void visit(ConstDeclarationList ConstDeclarationList);
     public void visit(FormPars FormPars);
     public void visit(MaybeDesignator MaybeDesignator);
     public void visit(LocalVarDeclList LocalVarDeclList);
+    public void visit(AssignmentOperationError AssignmentOperationError);
+    public void visit(AssignmentOperationExpr AssignmentOperationExpr);
     public void visit(ArrayElement ArrayElement);
     public void visit(MemberElement MemberElement);
     public void visit(MaybeArrayEpsilon MaybeArrayEpsilon);
@@ -113,6 +120,8 @@ public interface Visitor {
     public void visit(MaybePrintWidthIsPrintWidth MaybePrintWidthIsPrintWidth);
     public void visit(MaybeReturnValueEpsilon MaybeReturnValueEpsilon);
     public void visit(MaybeReturnValueIsReturnValue MaybeReturnValueIsReturnValue);
+    public void visit(ConditionErrorRecoveryError ConditionErrorRecoveryError);
+    public void visit(ConditionErrorRecoveryCondition ConditionErrorRecoveryCondition);
     public void visit(StatementBlock StatementBlock);
     public void visit(StatementForEach StatementForEach);
     public void visit(StatementPrint StatementPrint);
@@ -126,6 +135,7 @@ public interface Visitor {
     public void visit(MemberAccess MemberAccess);
     public void visit(MaybeFormParsEpsilon MaybeFormParsEpsilon);
     public void visit(MaybeFormParsIsFormPars MaybeFormParsIsFormPars);
+    public void visit(FormalParameterError FormalParameterError);
     public void visit(FormalParameter FormalParameter);
     public void visit(FormParsSingle FormParsSingle);
     public void visit(FormParsMulti FormParsMulti);
@@ -150,10 +160,12 @@ public interface Visitor {
     public void visit(MethodDeclaration MethodDeclaration);
     public void visit(MethodDeclarationListEpsilon MethodDeclarationListEpsilon);
     public void visit(MethodDeclarationListMulti MethodDeclarationListMulti);
+    public void visit(VariableDeclarationError VariableDeclarationError);
     public void visit(VariableDeclaration VariableDeclaration);
     public void visit(VariableDeclarationSingle VariableDeclarationSingle);
     public void visit(VariableDeclarationListMulti VariableDeclarationListMulti);
-    public void visit(VarDecl VarDecl);
+    public void visit(VarDeclError VarDeclError);
+    public void visit(VarDeclList VarDeclList);
     public void visit(ConstantBoolean ConstantBoolean);
     public void visit(ConstantCharacter ConstantCharacter);
     public void visit(ConstantNumber ConstantNumber);

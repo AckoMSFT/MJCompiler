@@ -1,25 +1,25 @@
 // generated with ast extension for cup
 // version 0.8
-// 26/11/2022 23:27:11
+// 27/11/2022 1:4:10
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class FormParsSingle extends FormPars {
 
-    private FormalParameter FormalParameter;
+    private FormalParam FormalParam;
 
-    public FormParsSingle (FormalParameter FormalParameter) {
-        this.FormalParameter=FormalParameter;
-        if(FormalParameter!=null) FormalParameter.setParent(this);
+    public FormParsSingle (FormalParam FormalParam) {
+        this.FormalParam=FormalParam;
+        if(FormalParam!=null) FormalParam.setParent(this);
     }
 
-    public FormalParameter getFormalParameter() {
-        return FormalParameter;
+    public FormalParam getFormalParam() {
+        return FormalParam;
     }
 
-    public void setFormalParameter(FormalParameter FormalParameter) {
-        this.FormalParameter=FormalParameter;
+    public void setFormalParam(FormalParam FormalParam) {
+        this.FormalParam=FormalParam;
     }
 
     public void accept(Visitor visitor) {
@@ -27,16 +27,16 @@ public class FormParsSingle extends FormPars {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(FormalParameter!=null) FormalParameter.accept(visitor);
+        if(FormalParam!=null) FormalParam.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(FormalParameter!=null) FormalParameter.traverseTopDown(visitor);
+        if(FormalParam!=null) FormalParam.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(FormalParameter!=null) FormalParameter.traverseBottomUp(visitor);
+        if(FormalParam!=null) FormalParam.traverseBottomUp(visitor);
         accept(visitor);
     }
 
@@ -45,8 +45,8 @@ public class FormParsSingle extends FormPars {
         buffer.append(tab);
         buffer.append("FormParsSingle(\n");
 
-        if(FormalParameter!=null)
-            buffer.append(FormalParameter.toString("  "+tab));
+        if(FormalParam!=null)
+            buffer.append(FormalParam.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");
