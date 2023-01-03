@@ -1,24 +1,24 @@
 // generated with ast extension for cup
 // version 0.8
-// 3/0/2023 0:28:3
+// 3/0/2023 18:22:17
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class ConstFactorCharacter extends ConstFactor {
 
-    private Character C1;
+    private Character value;
 
-    public ConstFactorCharacter (Character C1) {
-        this.C1=C1;
+    public ConstFactorCharacter (Character value) {
+        this.value=value;
     }
 
-    public Character getC1() {
-        return C1;
+    public Character getValue() {
+        return value;
     }
 
-    public void setC1(Character C1) {
-        this.C1=C1;
+    public void setValue(Character value) {
+        this.value=value;
     }
 
     public void accept(Visitor visitor) {
@@ -41,7 +41,7 @@ public class ConstFactorCharacter extends ConstFactor {
         buffer.append(tab);
         buffer.append("ConstFactorCharacter(\n");
 
-        buffer.append(" "+tab+C1);
+        buffer.append(" "+tab+value);
         buffer.append("\n");
 
         buffer.append(tab);

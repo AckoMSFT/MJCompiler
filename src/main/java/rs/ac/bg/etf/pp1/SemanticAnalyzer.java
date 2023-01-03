@@ -1,13 +1,15 @@
 package rs.ac.bg.etf.pp1;
 
-import java_cup.runtime.Symbol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rs.ac.bg.etf.pp1.ast.*;
 import rs.ac.bg.etf.pp1.util.ErrorMessageGenerator;
 import rs.ac.bg.etf.pp1.util.ErrorMessageGenerator.MessageType;
+import rs.ac.bg.etf.pp1.util.OperatorHelper;
 import rs.etf.pp1.symboltable.Tab;
 import rs.etf.pp1.symboltable.concepts.*;
+
+import java.util.Arrays;
 
 public class SemanticAnalyzer extends VisitorAdaptor {
 
@@ -69,6 +71,21 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         localVarCount++;
         logInfo(syntaxNode, MessageType.GLOBAL_VARIABLE_DECLARATION, name, type);
     }
+
+    private void logTypeMismatchError(SyntaxNode syntaxNode, Struct actualType, Struct expectedType) {
+        String actualTypeName = SymbolTable.getTypeName(actualType);
+        String expectedTypeName = SymbolTable.getTypeName(expectedType);
+
+        logError(syntaxNode, MessageType.TYPE_MISMATCH, actualTypeName, expectedTypeName);
+    }
+
+    private void logIncompatibleTypesError(SyntaxNode syntaxNode, Struct lhsType, Struct rhsType) {
+        String lhsTypeName = SymbolTable.getTypeName(lhsType);
+        String rhsTypeName = SymbolTable.getTypeName(rhsType);
+
+        logError(syntaxNode, MessageType.INCOMPATIBLE_TYPES, lhsTypeName, rhsTypeName);
+    }
+
 
     private boolean checkIfSymbolIsInUse(SyntaxNode node, String symbolName) {
         return checkIfSymbolIsInUse(node, symbolName, false);
@@ -289,6 +306,256 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 //        returnFound = false;
         //      currentMethod = null;
     }
+
+    /****************************************** Factor ****************************************************************/
+
+    /*
+     Factor
+
+     Factor ::=
+     (FactorDesignator) Designator
+     | (FactorFunctionInvocation) Designator FunctionInvocation
+     | (FactorConstant) ConstFactor
+     | (FactorNewArray) NEW Type ArrayElement
+     | (FactorNewClass) NEW Type FunctionInvocation
+     | (FactorExpr) LEFT_PARENTHESES Expr RIGHT_PARENTHESES;
+    */
+
+    @Override
+    public void visit(FactorDesignator factorDesignator) {
+        logSyntaxNodeTraversal(factorDesignator);
+    }
+
+
+    @Override
+    public void visit(FactorFunctionInvocation factorFunctionInvocation) {
+        logSyntaxNodeTraversal(factorFunctionInvocation);
+    }
+
+    @Override
+    public void visit(FactorConstant factorConstant) {
+        logSyntaxNodeTraversal(factorConstant);
+
+        ConstFactor constFactor = factorConstant.getConstFactor();
+
+        String constFactorName = "";
+        Struct constFactorType = SymbolTable.noType;
+        int constFactorValue = 0;
+
+        if (constFactor instanceof ConstFactorNumber) {
+            ConstFactorNumber constFactorNumber = (ConstFactorNumber) constFactor;
+            constFactorName = String.valueOf(constFactorNumber.getValue());
+            constFactorType = SymbolTable.intType;
+            constFactorValue = constFactorNumber.getValue();
+        } else if (constFactor instanceof ConstFactorCharacter) {
+            ConstFactorCharacter constFactorCharacter = (ConstFactorCharacter) constFactor;
+            constFactorName = String.valueOf(constFactorCharacter.getValue());
+            constFactorType = SymbolTable.charType;
+            constFactorValue = constFactorCharacter.getValue();
+        } else if (constFactor instanceof ConstFactorBoolean) {
+            ConstFactorBoolean constFactorBoolean = (ConstFactorBoolean) constFactor;
+            constFactorName = String.valueOf(constFactorBoolean.getValue());
+            constFactorType = SymbolTable.boolType;
+            constFactorValue = constFactorBoolean.getValue() ? 1 : 0;
+        }
+
+        Obj constFactorObj = new Obj(Obj.Con, constFactorName, constFactorType, constFactorValue, 0);
+        factorConstant.obj = constFactorObj;
+    }
+
+    @Override
+    public void visit(FactorNewArray factorNewArray) {
+        logSyntaxNodeTraversal(factorNewArray);
+    }
+
+    @Override
+    public void visit(FactorNewClass factorNewClass) {
+        logSyntaxNodeTraversal(factorNewClass);
+    }
+
+    @Override
+    public void visit(FactorExpr factorExpr) {
+        logSyntaxNodeTraversal(factorExpr);
+
+        Expr expr = factorExpr.getExpr();
+        factorExpr.obj = expr.obj;
+    }
+
+    /***************************************** Factor *****************************************************************/
+
+    /**************************************** Condition ***************************************************************/
+
+    /*
+        Condition = CondTerm {"||" CondTerm}
+
+        Condition ::=
+            (ConditionMulti) Condition OR CondTerm
+            | (ConditionSingle) CondTerm;
+
+        CondTerm = CondFact {"&&" CondFact}
+
+        CondTerm ::=
+            (CondTermMulti) CondTerm AND CondFact
+            | (CondTermSingle) CondFact;
+
+        CondFact = Expr [Relop Expr]
+
+        CondFact ::=
+            (CondFactMulti) Expr RelationalOperator Expr
+            | (CondFactSingle) Expr;
+
+        Expr = ["-"] Term {Addop Term}
+
+        Expr ::=
+            (ExprMulti) Expr AdditionOperator Term
+            | (ExprSingle) Sign Term;
+
+        Term := Factor {Mulop Factor}
+
+        Term ::=
+            (TermMulti) Term MultiplicationOperator Factor
+            | (TermSingle) Factor;
+    */
+
+    @Override
+    public void visit(TermSingle termSingle) {
+        logSyntaxNodeTraversal(termSingle);
+
+        Factor factor = termSingle.getFactor();
+        termSingle.obj = factor.obj;
+    }
+
+    @Override
+    public void visit(TermMulti termMulti) {
+        logSyntaxNodeTraversal(termMulti);
+
+        termMulti.obj = SymbolTable.noObj;
+
+        Term lhsTerm = termMulti.getTerm();
+        Factor rhsFactor = termMulti.getFactor();
+
+        Obj lhsSymbol = lhsTerm.obj;
+        Obj rhsSymbol = rhsFactor.obj;
+
+        // TODO (acko): check if symbols are valid
+
+        Struct lhsType = lhsSymbol.getType();
+        Struct rhsType = rhsSymbol.getType();
+
+        if (!lhsType.equals(SymbolTable.intType)) {
+            logTypeMismatchError(termMulti, lhsType, SymbolTable.intType);
+            return;
+        }
+
+        if (!rhsType.equals(SymbolTable.intType)) {
+            logTypeMismatchError(termMulti, rhsType, SymbolTable.intType);
+            return;
+        }
+
+        MultiplicationOperator multiplicationOperator = termMulti.getMultiplicationOperator();
+        String operatorCode = OperatorHelper.getOperatorCode(multiplicationOperator);
+
+        String lhsName = lhsSymbol.getName();
+        String rhsName = rhsSymbol.getName();
+
+        String name = String.join(" ", Arrays.asList(lhsName, operatorCode, rhsName));
+
+        Obj termMultiObj = new Obj(Obj.Con, name, SymbolTable.intType);
+        termMulti.obj = termMultiObj;
+    }
+
+    @Override
+    public void visit(ExprSingle exprSingle) {
+        logSyntaxNodeTraversal(exprSingle);
+
+        Sign sign = exprSingle.getSign();
+        Term term = exprSingle.getTerm();
+
+        Obj exprSingleObj = term.obj;
+        if (sign instanceof SignNegative) {
+            // public Obj(int kind, String name, Struct type, int adr, int level) {
+            exprSingleObj = new Obj(Obj.Con, exprSingleObj.getName(), exprSingleObj.getType(), exprSingleObj.getAdr(), exprSingleObj.getLevel());
+        }
+
+        exprSingle.obj = exprSingleObj;
+    }
+
+    @Override
+    public void visit(ExprMulti exprMulti) {
+        logSyntaxNodeTraversal(exprMulti);
+
+        exprMulti.obj = SymbolTable.noObj;
+
+        Expr lhsExpr = exprMulti.getExpr();
+        Term rhsTerm = exprMulti.getTerm();
+
+        Obj lhsSymbol = lhsExpr.obj;
+        Obj rhsSymbol = rhsTerm.obj;
+
+        // TODO (acko): check if symbols are valid
+
+        Struct lhsType = lhsSymbol.getType();
+        Struct rhsType = rhsSymbol.getType();
+
+        if (!lhsType.equals(SymbolTable.intType)) {
+            logTypeMismatchError(exprMulti, lhsType, SymbolTable.intType);
+            return;
+        }
+
+        if (!rhsType.equals(SymbolTable.intType)) {
+            logTypeMismatchError(exprMulti, rhsType, SymbolTable.intType);
+            return;
+        }
+
+        AdditionOperator additionOperator = exprMulti.getAdditionOperator();
+        String operatorCode = OperatorHelper.getOperatorCode(additionOperator);
+
+        String lhsName = lhsSymbol.getName();
+        String rhsName = rhsSymbol.getName();
+
+        String name = String.join(" ", Arrays.asList(lhsName, operatorCode, rhsName));
+
+        Obj exprMultiObj = new Obj(Obj.Con, name, SymbolTable.intType);
+        exprMulti.obj = exprMultiObj;
+    }
+
+    @Override
+    public void visit(CondFactSingle condFactSingle) {
+        logSyntaxNodeTraversal(condFactSingle);
+
+        Expr expr = condFactSingle.getExpr();
+        Obj exprObj = expr.obj;
+        Struct exprType = exprObj.getType();
+
+        // Terminal fact must be of type bool in order for the whole condition to be of type bool.
+        if (!exprType.equals(SymbolTable.boolType)) {
+            logTypeMismatchError(condFactSingle, exprType, SymbolTable.boolType);
+        }
+    }
+
+    @Override
+    public void visit(CondFactMulti condFactMulti) {
+        logSyntaxNodeTraversal(condFactMulti);
+
+        Expr lhsExpr = condFactMulti.getExpr();
+        Expr rhsExpr = condFactMulti.getExpr1();
+
+        Obj lhsSymbol = lhsExpr.obj;
+        Obj rhsSymbol = rhsExpr.obj;
+
+        // TODO (acko): check if symbols are valid
+
+        Struct lhsType = lhsSymbol.getType();
+        Struct rhsType = rhsSymbol.getType();
+
+        if(!lhsType.compatibleWith(rhsType)) {
+            logIncompatibleTypesError(condFactMulti, lhsType, rhsType);
+        }
+
+        // TODO (acko): Handle arrays and classes?
+    }
+
+    /**************************************** Condition ***************************************************************/
 
     /** Statements **/
 

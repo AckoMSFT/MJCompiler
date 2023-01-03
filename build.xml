@@ -13,6 +13,7 @@
                 <exclude name="MicroJavaSymbol.java"/>
                 <exclude name="util/LexerUtils.java"/>
                 <exclude name="util/ErrorMessageGenerator.java"/>
+                <exclude name="util/OperatorHelper.java"/>
             </fileset>
         </delete>
 

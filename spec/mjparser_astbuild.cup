@@ -157,10 +157,8 @@ nonterminal FormalParam FormalParam;
 nonterminal Statement Statement;
 nonterminal MaybeElseStatement MaybeElseStatement;
 nonterminal StatementList StatementList;
-nonterminal Expr Expr;
-nonterminal Factor Factor;
-nonterminal Term Term;
 nonterminal ConstFactor ConstFactor;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Expr, Factor, Term;
 nonterminal MaybePrintWidth MaybePrintWidth;
 nonterminal MaybeReturnValue MaybeReturnValue;
 
@@ -174,9 +172,7 @@ nonterminal DesignatorList DesignatorList;
 
 /* Conditions */
 nonterminal ConditionErrorRecovery ConditionErrorRecovery;
-nonterminal Condition Condition;
-nonterminal CondTerm CondTerm;
-nonterminal CondFact CondFact;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Condition, CondTerm, CondFact;
 
 /* Objects */
 nonterminal rs.etf.pp1.symboltable.concepts.Obj ProgramName;
@@ -483,9 +479,9 @@ Factor ::=
 */
 
 ConstFactor ::=
-    (ConstFactorNumber) CONST_NUMBER:C1 {: RESULT=new ConstFactorNumber(C1); RESULT.setLine(C1left); :}
-    | (ConstFactorCharacter) CONST_CHARACTER:C1 {: RESULT=new ConstFactorCharacter(C1); RESULT.setLine(C1left); :}
-    | (ConstFactorBoolean) CONST_BOOLEAN:C1 {: RESULT=new ConstFactorBoolean(C1); RESULT.setLine(C1left); :};
+    (ConstFactorNumber) CONST_NUMBER:value {: RESULT=new ConstFactorNumber(value); RESULT.setLine(valueleft); :}
+    | (ConstFactorCharacter) CONST_CHARACTER:value {: RESULT=new ConstFactorCharacter(value); RESULT.setLine(valueleft); :}
+    | (ConstFactorBoolean) CONST_BOOLEAN:value {: RESULT=new ConstFactorBoolean(value); RESULT.setLine(valueleft); :};
 
 /* Designator = ident {"." ident | "[" Expr "]"} */
 

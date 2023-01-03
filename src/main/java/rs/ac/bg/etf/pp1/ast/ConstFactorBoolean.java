@@ -1,24 +1,24 @@
 // generated with ast extension for cup
 // version 0.8
-// 3/0/2023 0:28:3
+// 3/0/2023 18:22:17
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class ConstFactorBoolean extends ConstFactor {
 
-    private Boolean C1;
+    private Boolean value;
 
-    public ConstFactorBoolean (Boolean C1) {
-        this.C1=C1;
+    public ConstFactorBoolean (Boolean value) {
+        this.value=value;
     }
 
-    public Boolean getC1() {
-        return C1;
+    public Boolean getValue() {
+        return value;
     }
 
-    public void setC1(Boolean C1) {
-        this.C1=C1;
+    public void setValue(Boolean value) {
+        this.value=value;
     }
 
     public void accept(Visitor visitor) {
@@ -41,7 +41,7 @@ public class ConstFactorBoolean extends ConstFactor {
         buffer.append(tab);
         buffer.append("ConstFactorBoolean(\n");
 
-        buffer.append(" "+tab+C1);
+        buffer.append(" "+tab+value);
         buffer.append("\n");
 
         buffer.append(tab);

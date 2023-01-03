@@ -18,10 +18,12 @@ public class ErrorMessageGenerator {
         MAIN_METHOD_NOT_FOUND,
         MAIN_METHOD_RETURN_TYPE_MISMATCH,
         MAIN_METHOD_ARGUMENT_MISMATCH,
+        TYPE_MISMATCH,
+        INCOMPATIBLE_TYPES,
     }
 
     public static String generateMessage(MessageType messageType, Object... params) {
-        String name, type;
+        String name, type, actualType, expectedType, lhsType, rhsType;
         switch (messageType) {
             case SYNTAX_NODE_TRAVERSAL:
                 SyntaxNode syntaxNode = (SyntaxNode) params[0];
@@ -54,6 +56,14 @@ public class ErrorMessageGenerator {
                 return String.format("Program must have a main function with return type void. Declared function is of type %s.", type);
             case MAIN_METHOD_ARGUMENT_MISMATCH:
                 return String.format("Main function is declared with arguments, it shouldn't have any arguments.");
+            case TYPE_MISMATCH:
+                actualType = (String) params[0];
+                expectedType = (String) params[1];
+                return String.format("Type mismatch in condition statement. Expected type %s, actual type %s.", expectedType, actualType);
+            case INCOMPATIBLE_TYPES:
+                lhsType = (String) params[0];
+                rhsType = (String) params[1];
+                return String.format("Incompatible types in condition statement. Lhs type %s, rhs type %s.", lhsType, rhsType);
             default:
                 return "NOT_YET_IMPLEMENTED";
         }

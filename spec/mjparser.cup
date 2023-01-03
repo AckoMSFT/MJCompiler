@@ -126,14 +126,16 @@ nonterminal ActPars, MaybeActPars, FunctionInvocation;
 nonterminal FormPars, MaybeFormPars, FormalParam;
 
 /* Statements */
-nonterminal Statement, MaybeElseStatement, StatementList, Expr, Factor, Term, ConstFactor;
+nonterminal Statement, MaybeElseStatement, StatementList, ConstFactor;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Expr, Factor, Term;
 nonterminal MaybePrintWidth, MaybeReturnValue;
 
 /* Designators */
 nonterminal Designator, DesignatorAccessList, DesignatorStatement, MemberAccess, MaybeDesignator, DesignatorList;
 
 /* Conditions */
-nonterminal ConditionErrorRecovery, Condition, CondTerm, CondFact;
+nonterminal ConditionErrorRecovery;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Condition, CondTerm, CondFact;
 
 /* Objects */
 nonterminal rs.etf.pp1.symboltable.concepts.Obj ProgramName;
@@ -440,9 +442,9 @@ Factor ::=
 */
 
 ConstFactor ::=
-    (ConstFactorNumber) CONST_NUMBER
-    | (ConstFactorCharacter) CONST_CHARACTER
-    | (ConstFactorBoolean) CONST_BOOLEAN;
+    (ConstFactorNumber) CONST_NUMBER:value
+    | (ConstFactorCharacter) CONST_CHARACTER:value
+    | (ConstFactorBoolean) CONST_BOOLEAN:value;
 
 /* Designator = ident {"." ident | "[" Expr "]"} */
 

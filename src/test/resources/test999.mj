@@ -10,11 +10,13 @@ int asgard() int pera, zika, laza, mika; {
     return 5;
 }
 
-int foobbbb() bool z, zz, zzz, zzzz, zzzzz; char zZz; {
+int foobbbb() bool z, zz, zzz, zzzz[], zzzzz; char zZz; {
     return 8;
 }
 void main() int foobar; {
 
+     if(2 + 5 > 'c') {
+     }
 
      print(5);
      print(5+2);
