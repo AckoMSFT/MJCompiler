@@ -20,10 +20,12 @@ public class ErrorMessageGenerator {
         MAIN_METHOD_ARGUMENT_MISMATCH,
         TYPE_MISMATCH,
         INCOMPATIBLE_TYPES,
+        ILLEGAL_RELATIONAL_OPERATOR,
+        ADDITIONAL_ERROR_DESCRIPTION,
     }
 
     public static String generateMessage(MessageType messageType, Object... params) {
-        String name, type, actualType, expectedType, lhsType, rhsType;
+        String name, type, actualType, expectedType, lhsType, rhsType, relationalOperator, additionalErrorDescription;
         switch (messageType) {
             case SYNTAX_NODE_TRAVERSAL:
                 SyntaxNode syntaxNode = (SyntaxNode) params[0];
@@ -64,6 +66,13 @@ public class ErrorMessageGenerator {
                 lhsType = (String) params[0];
                 rhsType = (String) params[1];
                 return String.format("Incompatible types in condition statement. Lhs type %s, rhs type %s.", lhsType, rhsType);
+            case ILLEGAL_RELATIONAL_OPERATOR:
+                lhsType = (String) params[0];
+                relationalOperator = (String) params[1];
+                return String.format("Relational operator %s cannot be applied to lhs with type %s.", relationalOperator, lhsType);
+            case ADDITIONAL_ERROR_DESCRIPTION:
+                additionalErrorDescription = (String) params[0];
+                return additionalErrorDescription;
             default:
                 return "NOT_YET_IMPLEMENTED";
         }

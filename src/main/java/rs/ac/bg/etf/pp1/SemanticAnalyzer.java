@@ -86,6 +86,17 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logError(syntaxNode, MessageType.INCOMPATIBLE_TYPES, lhsTypeName, rhsTypeName);
     }
 
+    private void logIllegalRelationalOperatorError(SyntaxNode syntaxNode, Struct lhsType, RelationalOperator relationalOperator) {
+        String lhsTypeName = SymbolTable.getTypeName(lhsType);
+        String operatorCode = OperatorHelper.getOperatorCode(relationalOperator);
+
+        logError(syntaxNode, MessageType.ILLEGAL_RELATIONAL_OPERATOR, lhsTypeName, operatorCode);
+    }
+
+    private void logAdditionalErrorDescription(SyntaxNode syntaxNode, String additionalErrorDescrpition) {
+        String message = ErrorMessageGenerator.generateMessage(MessageType.ADDITIONAL_ERROR_DESCRIPTION, additionalErrorDescrpition);
+        logger.error(String.format("[Line #%d] Additional error description: %s", syntaxNode.getLine(), message));
+    }
 
     private boolean checkIfSymbolIsInUse(SyntaxNode node, String symbolName) {
         return checkIfSymbolIsInUse(node, symbolName, false);
@@ -550,9 +561,18 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
         if(!lhsType.compatibleWith(rhsType)) {
             logIncompatibleTypesError(condFactMulti, lhsType, rhsType);
+            return;
         }
 
-        // TODO (acko): Handle arrays and classes?
+        // Arrays and classes can only use == and != as relational operator
+        if (lhsType.getKind() == Struct.Array || lhsType.getKind() == Struct.Class) {
+            RelationalOperator relationalOperator = condFactMulti.getRelationalOperator();
+
+            if (!(relationalOperator instanceof RelationalOperatorEquals) && !(relationalOperator instanceof RelationalOperatorNotEquals)) {
+                logIllegalRelationalOperatorError(condFactMulti, lhsType, relationalOperator);
+                logAdditionalErrorDescription(condFactMulti, "Arrays and classes can only use == and != relational operators.");
+            }
+        }
     }
 
     /**************************************** Condition ***************************************************************/
