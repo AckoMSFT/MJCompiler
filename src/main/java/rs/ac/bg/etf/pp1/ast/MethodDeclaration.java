@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 27/11/2022 1:4:10
+// 3/0/2023 0:28:3
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -9,16 +9,16 @@ public class MethodDeclaration implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private ReturnType ReturnType;
-    private String I2;
+    public rs.etf.pp1.symboltable.concepts.Obj obj = null;
+
+    private MethodDeclarationHeader MethodDeclarationHeader;
     private MaybeFormPars MaybeFormPars;
     private LocalVarDeclList LocalVarDeclList;
     private StatementList StatementList;
 
-    public MethodDeclaration (ReturnType ReturnType, String I2, MaybeFormPars MaybeFormPars, LocalVarDeclList LocalVarDeclList, StatementList StatementList) {
-        this.ReturnType=ReturnType;
-        if(ReturnType!=null) ReturnType.setParent(this);
-        this.I2=I2;
+    public MethodDeclaration (MethodDeclarationHeader MethodDeclarationHeader, MaybeFormPars MaybeFormPars, LocalVarDeclList LocalVarDeclList, StatementList StatementList) {
+        this.MethodDeclarationHeader=MethodDeclarationHeader;
+        if(MethodDeclarationHeader!=null) MethodDeclarationHeader.setParent(this);
         this.MaybeFormPars=MaybeFormPars;
         if(MaybeFormPars!=null) MaybeFormPars.setParent(this);
         this.LocalVarDeclList=LocalVarDeclList;
@@ -27,20 +27,12 @@ public class MethodDeclaration implements SyntaxNode {
         if(StatementList!=null) StatementList.setParent(this);
     }
 
-    public ReturnType getReturnType() {
-        return ReturnType;
+    public MethodDeclarationHeader getMethodDeclarationHeader() {
+        return MethodDeclarationHeader;
     }
 
-    public void setReturnType(ReturnType ReturnType) {
-        this.ReturnType=ReturnType;
-    }
-
-    public String getI2() {
-        return I2;
-    }
-
-    public void setI2(String I2) {
-        this.I2=I2;
+    public void setMethodDeclarationHeader(MethodDeclarationHeader MethodDeclarationHeader) {
+        this.MethodDeclarationHeader=MethodDeclarationHeader;
     }
 
     public MaybeFormPars getMaybeFormPars() {
@@ -88,7 +80,7 @@ public class MethodDeclaration implements SyntaxNode {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(ReturnType!=null) ReturnType.accept(visitor);
+        if(MethodDeclarationHeader!=null) MethodDeclarationHeader.accept(visitor);
         if(MaybeFormPars!=null) MaybeFormPars.accept(visitor);
         if(LocalVarDeclList!=null) LocalVarDeclList.accept(visitor);
         if(StatementList!=null) StatementList.accept(visitor);
@@ -96,14 +88,14 @@ public class MethodDeclaration implements SyntaxNode {
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(ReturnType!=null) ReturnType.traverseTopDown(visitor);
+        if(MethodDeclarationHeader!=null) MethodDeclarationHeader.traverseTopDown(visitor);
         if(MaybeFormPars!=null) MaybeFormPars.traverseTopDown(visitor);
         if(LocalVarDeclList!=null) LocalVarDeclList.traverseTopDown(visitor);
         if(StatementList!=null) StatementList.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(ReturnType!=null) ReturnType.traverseBottomUp(visitor);
+        if(MethodDeclarationHeader!=null) MethodDeclarationHeader.traverseBottomUp(visitor);
         if(MaybeFormPars!=null) MaybeFormPars.traverseBottomUp(visitor);
         if(LocalVarDeclList!=null) LocalVarDeclList.traverseBottomUp(visitor);
         if(StatementList!=null) StatementList.traverseBottomUp(visitor);
@@ -115,13 +107,10 @@ public class MethodDeclaration implements SyntaxNode {
         buffer.append(tab);
         buffer.append("MethodDeclaration(\n");
 
-        if(ReturnType!=null)
-            buffer.append(ReturnType.toString("  "+tab));
+        if(MethodDeclarationHeader!=null)
+            buffer.append(MethodDeclarationHeader.toString("  "+tab));
         else
             buffer.append(tab+"  null");
-        buffer.append("\n");
-
-        buffer.append(" "+tab+I2);
         buffer.append("\n");
 
         if(MaybeFormPars!=null)

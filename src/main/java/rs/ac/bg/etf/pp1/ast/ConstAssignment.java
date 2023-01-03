@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 27/11/2022 1:4:10
+// 3/0/2023 0:28:3
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -9,24 +9,24 @@ public class ConstAssignment implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String I1;
+    private String name;
     private AssignmentOperator AssignmentOperator;
     private Constant Constant;
 
-    public ConstAssignment (String I1, AssignmentOperator AssignmentOperator, Constant Constant) {
-        this.I1=I1;
+    public ConstAssignment (String name, AssignmentOperator AssignmentOperator, Constant Constant) {
+        this.name=name;
         this.AssignmentOperator=AssignmentOperator;
         if(AssignmentOperator!=null) AssignmentOperator.setParent(this);
         this.Constant=Constant;
         if(Constant!=null) Constant.setParent(this);
     }
 
-    public String getI1() {
-        return I1;
+    public String getName() {
+        return name;
     }
 
-    public void setI1(String I1) {
-        this.I1=I1;
+    public void setName(String name) {
+        this.name=name;
     }
 
     public AssignmentOperator getAssignmentOperator() {
@@ -87,7 +87,7 @@ public class ConstAssignment implements SyntaxNode {
         buffer.append(tab);
         buffer.append("ConstAssignment(\n");
 
-        buffer.append(" "+tab+I1);
+        buffer.append(" "+tab+name);
         buffer.append("\n");
 
         if(AssignmentOperator!=null)

@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 27/11/2022 1:4:10
+// 3/0/2023 0:28:3
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -9,21 +9,21 @@ public class LocalVariableDeclaration implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String I1;
+    private String variableName;
     private MaybeArray MaybeArray;
 
-    public LocalVariableDeclaration (String I1, MaybeArray MaybeArray) {
-        this.I1=I1;
+    public LocalVariableDeclaration (String variableName, MaybeArray MaybeArray) {
+        this.variableName=variableName;
         this.MaybeArray=MaybeArray;
         if(MaybeArray!=null) MaybeArray.setParent(this);
     }
 
-    public String getI1() {
-        return I1;
+    public String getVariableName() {
+        return variableName;
     }
 
-    public void setI1(String I1) {
-        this.I1=I1;
+    public void setVariableName(String variableName) {
+        this.variableName=variableName;
     }
 
     public MaybeArray getMaybeArray() {
@@ -73,7 +73,7 @@ public class LocalVariableDeclaration implements SyntaxNode {
         buffer.append(tab);
         buffer.append("LocalVariableDeclaration(\n");
 
-        buffer.append(" "+tab+I1);
+        buffer.append(" "+tab+variableName);
         buffer.append("\n");
 
         if(MaybeArray!=null)

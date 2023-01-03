@@ -1,0 +1,23 @@
+program d12
+const int a = 5, b = -76, c = +7;
+const char bbb = 'c';
+const bool acko = true;
+const bool ackosa = false;
+int aasd, cbb;
+char osamnaest[];
+{
+int asgard() int pera, zika, laza, mika; {
+    return 5;
+}
+
+int foobbbb() bool z, zz, zzz, zzzz, zzzzz; char zZz; {
+    return 8;
+}
+void main() int foobar; {
+
+
+     print(5);
+     print(5+2);
+     print(5+2,8);
+    }
+}

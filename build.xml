@@ -8,7 +8,11 @@
                 <exclude name="MJCompiler.java"/>
                 <exclude name="CodeGenerator.java"/>
                 <exclude name="SemanticAnalyzer.java"/>
+                <exclude name="SymbolTable.java"/>
+                <exclude name="SymbolTableDumpVisitor.java"/>
+                <exclude name="MicroJavaSymbol.java"/>
                 <exclude name="util/LexerUtils.java"/>
+                <exclude name="util/ErrorMessageGenerator.java"/>
             </fileset>
         </delete>
 

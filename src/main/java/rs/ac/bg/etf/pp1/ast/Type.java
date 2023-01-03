@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 27/11/2022 1:4:11
+// 3/0/2023 0:28:3
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -9,18 +9,20 @@ public class Type implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String I1;
+    public rs.etf.pp1.symboltable.concepts.Struct struct = null;
 
-    public Type (String I1) {
-        this.I1=I1;
+    private String type;
+
+    public Type (String type) {
+        this.type=type;
     }
 
-    public String getI1() {
-        return I1;
+    public String getType() {
+        return type;
     }
 
-    public void setI1(String I1) {
-        this.I1=I1;
+    public void setType(String type) {
+        this.type=type;
     }
 
     public SyntaxNode getParent() {
@@ -59,7 +61,7 @@ public class Type implements SyntaxNode {
         buffer.append(tab);
         buffer.append("Type(\n");
 
-        buffer.append(" "+tab+I1);
+        buffer.append(" "+tab+type);
         buffer.append("\n");
 
         buffer.append(tab);

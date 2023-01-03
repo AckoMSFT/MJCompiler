@@ -10,8 +10,8 @@ import org.apache.logging.log4j.Logger;
 parser code {:
     Logger logger = LogManager.getLogger(MJParser.class);
 
-    boolean errorDetected = false;
-    int errorLine, errorColumn;
+    boolean errorDetected = false, fatalErrorDected = false;
+    int errorLine, errorColumn, recoveredFromErrorCount = 0;
 
     public void report_fatal_error(String message, Object info) throws java.lang.Exception {
         done_parsing();
@@ -19,22 +19,25 @@ parser code {:
     }
 
     @Override
-    public void syntax_error(Symbol curr_token) {
-        report_error("Syntax error while parsing: ", curr_token);
+    public void syntax_error(Symbol currentToken) {
+        report_error("Syntax error while parsing: ", currentToken);
 
-        errorLine = curr_token.left;
-        errorColumn = curr_token.right;
+        errorLine = currentToken.left;
+        errorColumn = currentToken.right;
     }
 
     @Override
-    public void unrecovered_syntax_error(Symbol curr_token) throws java.lang.Exception {
-        report_fatal_error("YOU SHALL NOT PASS! Could not recover from syntax error", curr_token);
+    public void unrecovered_syntax_error(Symbol currentToken) throws java.lang.Exception {
+        report_fatal_error("YOU SHALL NOT PASS! Could not recover from syntax error", currentToken);
+        fatalErrorDected = true;
     }
 
     public void log_error_recovery() {
         StringBuilder msg = new StringBuilder();
         msg.append("Performed error recovery on line ").append(errorLine).append(" and column ").append(errorColumn).append(". The parsing must go on!");
         logger.warn(msg.toString());
+
+        recoveredFromErrorCount++;
     }
 
     public void report_error(String message, Object info) {
@@ -77,7 +80,7 @@ terminal RETURN, VOID, EXTENDS, CONTINUE, FOR_EACH;
 /* TODO (acko): enum, do, this, return, void, this, THEN??? STATIC??? */
 
 /* Constants */
-terminal CONST_BOOLEAN;
+terminal Boolean CONST_BOOLEAN;
 
 /* Operators */
 terminal ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION, MODULO;
@@ -92,10 +95,13 @@ terminal EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL_THAN, LES
 /* NonTerminals */
 
 /* Program */
-nonterminal Program, GlobalDeclarationList, GlobalDeclaration, MethodDeclarationList, MethodDeclaration;
+nonterminal Program, GlobalDeclarationList, GlobalDeclaration, MethodDeclarationList;
+
+nonterminal rs.etf.pp1.symboltable.concepts.Obj MethodDeclaration, MethodDeclarationHeader;
 
 /* Common */
-nonterminal Type, ReturnType, Sign, MaybeArray, MemberElement, ArrayElement, AssignmentOperation;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Type, ReturnType;
+nonterminal Sign, MaybeArray, MemberElement, ArrayElement, AssignmentOperation;
 
 /* Constants */
 nonterminal ConstDecl, ConstDeclarationList, ConstAssignment, Constant;
@@ -129,6 +135,9 @@ nonterminal Designator, DesignatorAccessList, DesignatorStatement, MemberAccess,
 /* Conditions */
 nonterminal ConditionErrorRecovery, Condition, CondTerm, CondFact;
 
+/* Objects */
+nonterminal rs.etf.pp1.symboltable.concepts.Obj ProgramName;
+
 precedence left ELSE;
 
 /*
@@ -138,7 +147,10 @@ precedence left ELSE;
 */
 
 Program ::=
-    (Program) PROGRAM IDENTIFIER GlobalDeclarationList LEFT_BRACE MethodDeclarationList RIGHT_BRACE;
+    (Program) ProgramName GlobalDeclarationList LEFT_BRACE MethodDeclarationList RIGHT_BRACE;
+
+ProgramName ::=
+    (ProgramName) PROGRAM IDENTIFIER:programName;
 
 GlobalDeclarationList ::=
     (GlobalDeclarationListMulti) GlobalDeclarationList GlobalDeclaration
@@ -159,12 +171,12 @@ ConstDeclarationList ::=
     | (ConstDeclarationListSingle) ConstAssignment;
 
 ConstAssignment ::=
-    (ConstAssignment) IDENTIFIER AssignmentOperator Constant;
+    (ConstAssignment) IDENTIFIER:name AssignmentOperator Constant;
 
 Constant ::=
-    (ConstantNumber) Sign CONST_NUMBER
-    | (ConstantCharacter) CONST_CHARACTER
-    | (ConstantBoolean) CONST_BOOLEAN;
+    (ConstantNumber) Sign CONST_NUMBER:value
+    | (ConstantCharacter) CONST_CHARACTER:value
+    | (ConstantBoolean) CONST_BOOLEAN:value;
 
 /* VarDecl = Type ident ["[" "]"] {"," ident ["[" "]"]} ";" */
 
@@ -177,7 +189,7 @@ VariableDeclarationList ::=
     | (VariableDeclarationSingle) VarDeclaration;
 
 VarDeclaration ::=
-    (VariableDeclaration) IDENTIFIER MaybeArray
+    (VariableDeclaration) IDENTIFIER:variableName MaybeArray:maybeArray
     | (VariableDeclarationError) error {: parser.log_error_recovery(); :};
 
 /* MethodDeclarationList := {MethodDeclaration} */
@@ -189,7 +201,12 @@ MethodDeclarationList ::=
 /* MethodDecl = (Type | "void") ident "(" [FormPars] ")" {VarDecl} "{" {Statement} "}" */
 
 MethodDeclaration ::=
-    (MethodDeclaration) ReturnType IDENTIFIER LEFT_PARENTHESES MaybeFormPars RIGHT_PARENTHESES LocalVarDeclList LEFT_BRACE StatementList RIGHT_BRACE;
+    (MethodDeclaration) MethodDeclarationHeader LEFT_PARENTHESES MaybeFormPars RIGHT_PARENTHESES LocalVarDeclList LEFT_BRACE StatementList RIGHT_BRACE;
+
+/* MethodDeclarationHeader = (Type | "void") ident */
+
+MethodDeclarationHeader ::=
+    (MethodDeclarationHeader) ReturnType:returnType IDENTIFIER:methodName;
 
 /* LocalVarDeclList := {VarDecl} */
 
@@ -211,7 +228,7 @@ LocalVariableDeclarationList ::=
 /* LocalVariableDeclaration := ident ["[" "]"] */
 
 LocalVariableDeclaration ::=
-    (LocalVariableDeclaration) IDENTIFIER MaybeArray;
+    (LocalVariableDeclaration) IDENTIFIER:variableName MaybeArray:maybeArray;
 
 /* nonterminals used: C */
 
@@ -491,7 +508,7 @@ RelationalOperator ::=
 /* Type = ident */
 
 Type ::=
-    (Type) IDENTIFIER;
+    (Type) IDENTIFIER:type;
 
 /* ReturnType = Type | "void" */
 

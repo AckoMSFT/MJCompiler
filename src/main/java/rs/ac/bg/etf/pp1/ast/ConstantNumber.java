@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 27/11/2022 1:4:10
+// 3/0/2023 0:28:3
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -8,12 +8,12 @@ package rs.ac.bg.etf.pp1.ast;
 public class ConstantNumber extends Constant {
 
     private Sign Sign;
-    private Integer C2;
+    private Integer value;
 
-    public ConstantNumber (Sign Sign, Integer C2) {
+    public ConstantNumber (Sign Sign, Integer value) {
         this.Sign=Sign;
         if(Sign!=null) Sign.setParent(this);
-        this.C2=C2;
+        this.value=value;
     }
 
     public Sign getSign() {
@@ -24,12 +24,12 @@ public class ConstantNumber extends Constant {
         this.Sign=Sign;
     }
 
-    public Integer getC2() {
-        return C2;
+    public Integer getValue() {
+        return value;
     }
 
-    public void setC2(Integer C2) {
-        this.C2=C2;
+    public void setValue(Integer value) {
+        this.value=value;
     }
 
     public void accept(Visitor visitor) {
@@ -61,7 +61,7 @@ public class ConstantNumber extends Constant {
             buffer.append(tab+"  null");
         buffer.append("\n");
 
-        buffer.append(" "+tab+C2);
+        buffer.append(" "+tab+value);
         buffer.append("\n");
 
         buffer.append(tab);

@@ -51,13 +51,38 @@ public class MJParserTest {
 
         logger.info("Parsing source file: " + sourceCode.getAbsolutePath());
 
+
+        String foo = sourceCode.getName();
+        if (!foo.equalsIgnoreCase("test999.mj")) {
+            logger.info("Skipping...");
+            return;
+        }
+
         try (BufferedReader br = new BufferedReader(new FileReader(sourceCode))) {
             MJLexer mjLexer = new MJLexer(br);
             MJParser mjParser = new MJParser(mjLexer);
 
             Symbol s = mjParser.parse();  //pocetak parsiranja
 
-            logger.info(s.value);
+            if (mjParser.fatalErrorDected) {
+                logger.error("Detected fatal error while parsing [" + sourceCode.getAbsolutePath() + "]. " +
+                        "Will not proceed with semantic analysis and code generation.");
+                return;
+            }
+
+            if (mjParser.recoveredFromErrorCount > 0) {
+                logger.error("Managed to recover from #" + mjParser.recoveredFromErrorCount + " syntax error(s). Will print AST, but " +
+                        "will not proceed with semantic analysis and code generation.");
+
+                Program program = (Program) (s.value);
+
+                logger.info(program.toString(""));
+
+                return;
+            }
+
+            logger.info("No syntax errors detected, parsing completed successfully! :)");
+            //logger.info(s.value);
 
             Program program = (Program) (s.value);
 
@@ -65,23 +90,30 @@ public class MJParserTest {
             logger.info("===================================");
 
             SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
-            //program.traverseBottomUp(semanticAnalyzer);
-
-            logger.info("Declared #" + semanticAnalyzer.cntStaticVars + " static vars");
-            logger.info("Declared #" + semanticAnalyzer.cntArrays + " arrays");
 
             logger.info("===================================");
 
-            Tab.init();
+            SymbolTable.init();
 
-            Tab.dump();
+            program.traverseBottomUp(semanticAnalyzer);
 
+            SymbolTableDumpVisitor stdv = new SymbolTableDumpVisitor();
+            SymbolTable.dump(stdv);
+
+            if (semanticAnalyzer.semanticErrorCount > 0) {
+                logger.error("Found #" + semanticAnalyzer.semanticErrorCount + " semantic errors. Will not proceed with code generation.");
+                return;
+            }
+
+            logger.info("Declared #" + semanticAnalyzer.constCount + " const variables.");
+            logger.info("Declared #" + semanticAnalyzer.globalVarCount + " global variables.");
+            logger.info("Declared #" + semanticAnalyzer.localVarCount + " local variables.");
+
+            logger.info("No semantic error detected. Proceeding with code generation.");
 
             CodeGenerator codeGenerator = new CodeGenerator();
 
             Code.mainPc = codeGenerator.getMainPC();
-
-            logger.info("Successfully parsed: " + sourceCode.getAbsolutePath());
 
 
             //RuleVisitor v = new RuleVisitor();

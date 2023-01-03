@@ -1,0 +1,13 @@
+program MJProgram
+    int x =, y;
+    const pera mika = 18;
+{
+    int main() {
+
+        print(1);
+
+        x = y + 5;
+
+        print(2);
+    }
+}
