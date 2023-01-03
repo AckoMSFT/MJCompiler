@@ -13,7 +13,6 @@ public class ErrorMessageGenerator {
         /* Warning */
         /* Error */
         SYMBOL_ALREADY_IN_USE,
-        RETURN_STATEMENT_OUTSIDE_OF_METHOD,
         RETURN_STATEMENT_NOT_FOUND,
         MAIN_METHOD_NOT_FOUND,
         MAIN_METHOD_RETURN_TYPE_MISMATCH,
@@ -22,6 +21,9 @@ public class ErrorMessageGenerator {
         INCOMPATIBLE_TYPES,
         ILLEGAL_RELATIONAL_OPERATOR,
         ADDITIONAL_ERROR_DESCRIPTION,
+        ILLEGAL_BREAK_STATEMENT,
+        ILLEGAL_CONTINUE_STATEMENT,
+        ILLEGAL_RETURN_STATEMENT,
     }
 
     public static String generateMessage(MessageType messageType, Object... params) {
@@ -46,8 +48,6 @@ public class ErrorMessageGenerator {
             case SYMBOL_ALREADY_IN_USE:
                 String symbolName = (String) params[0];
                 return String.format("Symbol %s is already in use.", symbolName);
-            case RETURN_STATEMENT_OUTSIDE_OF_METHOD:
-                return "Return statement found outside of method.";
             case RETURN_STATEMENT_NOT_FOUND:
                 name = (String) params[0];
                 return String.format("No return statement in method %s.", name);
@@ -61,11 +61,11 @@ public class ErrorMessageGenerator {
             case TYPE_MISMATCH:
                 actualType = (String) params[0];
                 expectedType = (String) params[1];
-                return String.format("Type mismatch in condition statement. Expected type %s, actual type %s.", expectedType, actualType);
+                return String.format("Type mismatch. Expected type %s, actual type %s.", expectedType, actualType);
             case INCOMPATIBLE_TYPES:
                 lhsType = (String) params[0];
                 rhsType = (String) params[1];
-                return String.format("Incompatible types in condition statement. Lhs type %s, rhs type %s.", lhsType, rhsType);
+                return String.format("Incompatible types. Lhs type %s, rhs type %s.", lhsType, rhsType);
             case ILLEGAL_RELATIONAL_OPERATOR:
                 lhsType = (String) params[0];
                 relationalOperator = (String) params[1];
@@ -73,6 +73,12 @@ public class ErrorMessageGenerator {
             case ADDITIONAL_ERROR_DESCRIPTION:
                 additionalErrorDescription = (String) params[0];
                 return additionalErrorDescription;
+            case ILLEGAL_RETURN_STATEMENT:
+                return "Return statement not bound to any method.";
+            case ILLEGAL_BREAK_STATEMENT:
+                return "Break statement not bound to any loop.";
+            case ILLEGAL_CONTINUE_STATEMENT:
+                return "Continue statement not bound to any loop.";
             default:
                 return "NOT_YET_IMPLEMENTED";
         }

@@ -163,7 +163,7 @@ nonterminal MaybePrintWidth MaybePrintWidth;
 nonterminal MaybeReturnValue MaybeReturnValue;
 
 /* Designators */
-nonterminal Designator Designator;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator;
 nonterminal DesignatorAccessList DesignatorAccessList;
 nonterminal DesignatorStatement DesignatorStatement;
 nonterminal MemberAccess MemberAccess;

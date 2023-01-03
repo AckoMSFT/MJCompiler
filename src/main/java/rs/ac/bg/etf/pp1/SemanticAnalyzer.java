@@ -23,6 +23,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
     public int localVarCount = 0;
 
+    private int currentLoopDepth = 0;
 
     /**
      * Helpers
@@ -335,6 +336,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     @Override
     public void visit(FactorDesignator factorDesignator) {
         logSyntaxNodeTraversal(factorDesignator);
+
+        Designator designator = factorDesignator.getDesignator();
+        factorDesignator.obj = designator.obj;
     }
 
 
@@ -377,11 +381,41 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     @Override
     public void visit(FactorNewArray factorNewArray) {
         logSyntaxNodeTraversal(factorNewArray);
+
+        ArrayElement arraySize = factorNewArray.getArrayElement();
+        Type type = factorNewArray.getType();
+        Expr expr = arraySize.getExpr();
+        Struct exprType = expr.obj.getType();
+
+        if (!exprType.equals(SymbolTable.intType)) {
+            logTypeMismatchError(factorNewArray, exprType, SymbolTable.intType);
+            logAdditionalErrorDescription(factorNewArray, "Array size must be of type int.");
+        }
+
+        Obj factorNewArrayObj = new Obj(Obj.Con, "", new Struct(Struct.Array, type.struct));
+        factorNewArray.obj = factorNewArrayObj;
     }
 
     @Override
     public void visit(FactorNewClass factorNewClass) {
         logSyntaxNodeTraversal(factorNewClass);
+
+        /*
+        ArrayElement arraySize = factorNewArray.getArrayElement();
+
+        Type type = factorNewArray.getType();
+        Expr expr = arraySize.getExpr();
+        Struct exprType = expr.obj.getType();
+
+        if (!exprType.equals(SymbolTable.intType)) {
+            logTypeMismatchError(factorNewArray, exprType, SymbolTable.intType);
+            logAdditionalErrorDescription(factorNewArray, "Array size must be of type int.");
+        }
+
+        Obj factorNewArrayObj = new Obj(Obj.Con, "", new Struct(Struct.Array, type.struct));
+        factorNewArray.obj = factorNewArrayObj;
+         */
+        // TODO (acko): Not yet implemented...
     }
 
     @Override
@@ -577,7 +611,39 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
     /**************************************** Condition ***************************************************************/
 
-    /** Statements **/
+    /**************************************** Statement ***************************************************************/
+
+    /*
+        Statement ::=
+            (StatementDesignator) DesignatorStatement SEMI_COLON
+            | (StatementIfElse) IF LEFT_PARENTHESES ConditionErrorRecovery Statement MaybeElseStatement
+            | (StatementWhile) WHILE LEFT_PARENTHESES Condition RIGHT_PARENTHESES Statement
+            | (StatementBreak) BREAK SEMI_COLON
+            | (StatementContinue) CONTINUE SEMI_COLON
+            | (StatementRead) READ LEFT_PARENTHESES Designator RIGHT_PARENTHESES SEMI_COLON
+            | (StatementReturn) RETURN MaybeReturnValue SEMI_COLON
+            | (StatementPrint) PRINT LEFT_PARENTHESES Expr MaybePrintWidth RIGHT_PARENTHESES SEMI_COLON
+            | (StatementForEach) MemberAccess FOR_EACH LEFT_PARENTHESES IDENTIFIER LAMBDA Statement RIGHT_PARENTHESES SEMI_COLON
+            | (StatementBlock) LEFT_BRACE StatementList RIGHT_BRACE;
+     */
+
+    @Override
+    public void visit(StatementBreak statementBreak) {
+        logSyntaxNodeTraversal(statementBreak);
+
+        if (currentLoopDepth == 0) {
+            logError(statementBreak, MessageType.ILLEGAL_BREAK_STATEMENT);
+        }
+    }
+
+    @Override
+    public void visit(StatementContinue statementContinue) {
+        logSyntaxNodeTraversal(statementContinue);
+
+        if (currentLoopDepth == 0) {
+            logError(statementContinue, MessageType.ILLEGAL_CONTINUE_STATEMENT);
+        }
+    }
 
     @Override
     public void visit(StatementReturn statementReturn) {
@@ -586,7 +652,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         if (SymbolTable.isValidSymbol(currentMethodSymbol)) {
             hasReturnStatement = true;
         } else {
-            logError(statementReturn, MessageType.RETURN_STATEMENT_OUTSIDE_OF_METHOD);
+            logError(statementReturn, MessageType.ILLEGAL_RETURN_STATEMENT);
         }
     }
+
+    /**************************************** Statement ***************************************************************/
 }

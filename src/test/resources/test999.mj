@@ -21,5 +21,10 @@ void main() int foobar; {
      print(5);
      print(5+2);
      print(5+2,8);
+
+     a = new int[25];
+     break;
+     continue;
+
     }
 }

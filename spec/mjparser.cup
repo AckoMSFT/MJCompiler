@@ -131,7 +131,8 @@ nonterminal rs.etf.pp1.symboltable.concepts.Obj Expr, Factor, Term;
 nonterminal MaybePrintWidth, MaybeReturnValue;
 
 /* Designators */
-nonterminal Designator, DesignatorAccessList, DesignatorStatement, MemberAccess, MaybeDesignator, DesignatorList;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator;
+nonterminal DesignatorAccessList, DesignatorStatement, MemberAccess, MaybeDesignator, DesignatorList;
 
 /* Conditions */
 nonterminal ConditionErrorRecovery;
