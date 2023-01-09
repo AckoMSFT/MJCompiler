@@ -163,9 +163,8 @@ nonterminal MaybePrintWidth MaybePrintWidth;
 nonterminal MaybeReturnValue MaybeReturnValue;
 
 /* Designators */
-nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator, DesignatorStatement;
 nonterminal DesignatorAccessList DesignatorAccessList;
-nonterminal DesignatorStatement DesignatorStatement;
 nonterminal MemberAccess MemberAccess;
 nonterminal MaybeDesignator MaybeDesignator;
 nonterminal DesignatorList DesignatorList;
@@ -274,7 +273,7 @@ LocalVariableDeclaration ::=
 /* ClassDecl = "class" ident ["extends" Type] "{" {VarDecl} ["{" {ConstructorDecl} {MethodDecl} "}"] "}" */
 
 ClassDecl ::=
-    (ClassDecl) CLASS IDENTIFIER:I1 MaybeExtendedClass:M2 LEFT_BRACE ClassVarDeclList:C3 MaybeClassMethodList:M4 RIGHT_BRACE {: RESULT=new ClassDecl(I1, M2, C3, M4); RESULT.setLine(I1left); :};
+    (ClassDeclaration) CLASS IDENTIFIER:I1 MaybeExtendedClass:M2 LEFT_BRACE ClassVarDeclList:C3 MaybeClassMethodList:M4 RIGHT_BRACE {: RESULT=new ClassDeclaration(I1, M2, C3, M4); RESULT.setLine(I1left); :};
 
 /* MaybeClassMethodList := "{" {ConstructorDecl} {MethodDecl} "}"] */
 MaybeClassMethodList ::=

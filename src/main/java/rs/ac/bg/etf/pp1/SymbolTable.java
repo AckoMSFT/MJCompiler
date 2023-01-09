@@ -1,20 +1,23 @@
 package rs.ac.bg.etf.pp1;
 
-import java_cup.runtime.Symbol;
 import rs.etf.pp1.symboltable.Tab;
 import rs.etf.pp1.symboltable.concepts.Obj;
 import rs.etf.pp1.symboltable.concepts.Scope;
 import rs.etf.pp1.symboltable.concepts.Struct;
-import rs.etf.pp1.symboltable.visitors.DumpSymbolTableVisitor;
-import rs.etf.pp1.symboltable.visitors.SymbolTableVisitor;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static rs.etf.pp1.symboltable.concepts.Obj.*;
 import static rs.etf.pp1.symboltable.concepts.Struct.*;
 
 public class SymbolTable extends Tab {
     public static final Struct boolType = new Struct(Struct.Bool);
+
+    public static int LEVEL_GLOBAL = 0;
+    public static int LEVEL_LOCAL = 1;
+    public static int FP_POS_INVALID = -1;
 
     public static String[] reservedNames = new String[] {
             "int",
@@ -42,7 +45,7 @@ public class SymbolTable extends Tab {
 
     public static int[] assignableSymbolTypes = new int[] {
             Obj.Var,
-            Obj.Fld,
+            // Obj.Fld, // For level C only
             Obj.Elem
     };
 
@@ -71,6 +74,17 @@ public class SymbolTable extends Tab {
                 return "char";
             case Bool:
                 return "bool";
+            case Array:
+                switch(type.getElemType().getKind()) {
+                    case Int:
+                        return "Arr of int";
+                    case Char:
+                        return "Arr of char";
+                    case Bool:
+                        return "Arr of bool";
+                    default:
+                        return "NOT_YET_IMPLEMENTED";
+                }
             default:
                 return "NOT_YET_IMPLEMENTED";
         }
@@ -97,11 +111,12 @@ public class SymbolTable extends Tab {
         return symbol != null && symbol != SymbolTable.noObj;
     }
 
-    public static boolean isSymbolAssignable(Obj symbol) {
+    public static boolean canAssignToSymbol(Obj symbol) {
         if (symbol == null) {
             return false;
         }
-        return Arrays.asList(assignableSymbolTypes).contains(symbol.getKind());
+
+        return Arrays.stream(assignableSymbolTypes).anyMatch(type -> type == symbol.getKind());
     }
 
     public static boolean isSymbolType(Obj symbol) {
@@ -155,7 +170,9 @@ public class SymbolTable extends Tab {
         String name = obj.getName();
         String kind = objKindToString(obj.getKind());
         String type = getTypeName(obj.getType());
+        int level = obj.getLevel();
+        int fpPos = obj.getFpPos();
 
-        return String.format("Symbol {name %s, kind %s, type %s}.", name, kind, type);
+        return String.format("Symbol {name %s, kind %s, type %s, level %d, fpPos %d}", name, kind, type, level, fpPos);
     }
 }

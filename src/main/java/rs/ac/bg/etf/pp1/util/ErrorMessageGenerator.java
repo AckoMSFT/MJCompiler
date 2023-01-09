@@ -6,6 +6,7 @@ public class ErrorMessageGenerator {
     public enum MessageType {
         /* Debug */
         SYNTAX_NODE_TRAVERSAL,
+        DEBUG_SYMBOL_MESSAGE,
         /* Info */
         CONST_DECLARATION,
         GLOBAL_VARIABLE_DECLARATION,
@@ -34,15 +35,24 @@ public class ErrorMessageGenerator {
         NON_ONE_DIMENSIONAL_ARRAY_DETECTED,
         UNDEFINED_SYMBOL,
         DETECTED_SYMBOL_USAGE,
+        NON_BASIC_TYPE_READ,
+        NON_ASSIGNABLE_SYMBOL,
+        CLASS_INSTANTIATION_NOT_SUPPORTED,
+        CLASS_DECLARATION_NOT_SUPPORTED,
     }
 
     public static String generateMessage(MessageType messageType, Object... params) {
-        String name, type, actualType, expectedType, lhsType, rhsType, relationalOperator, additionalErrorDescription, symbolDescription;
+        String name, type, actualType, expectedType, lhsType, rhsType, relationalOperator, additionalErrorDescription;
+        String debugMessage, symbol, symbolDescription;
         SYMBOL_TYPE symbolType;
         switch (messageType) {
             case SYNTAX_NODE_TRAVERSAL:
                 SyntaxNode syntaxNode = (SyntaxNode) params[0];
                 return String.format("Traversing syntax node %s.", syntaxNode.getClass().getSimpleName());
+            case DEBUG_SYMBOL_MESSAGE:
+                debugMessage = (String) params[0];
+                symbol = (String) params[1];
+                return String.format("%s. %s.", debugMessage, symbol);
             case CONST_DECLARATION:
                 name = (String) params[0];
                 type = (String) params[1];
@@ -108,7 +118,11 @@ public class ErrorMessageGenerator {
                 actualType = (String) params[0];
                 return String.format("Non-void return statement found inside a void function. Actual type is %s.", actualType);
             case CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED:
-                return "Class member access operator detected. This not supported in Acko's MJCompiler since it's not done for level C.";
+                return "Class member access operator detected. This is not supported in Acko's MJCompiler since it's not done for level C.";
+            case CLASS_INSTANTIATION_NOT_SUPPORTED:
+                return "Class instantiation detected. This is not supported in Acko's MJCompiler since it's not done for level C.";
+            case CLASS_DECLARATION_NOT_SUPPORTED:
+                return "Class declaration detected. This is not supported in Acko's MJCompiler since it's not done for level C.";
             case INCOMPATIBLE_ARRAY_INDEX_TYPE:
                 actualType = (String) params[0];
                 return String.format("Array index must be of type int. Actual type %s.", actualType);
@@ -122,7 +136,13 @@ public class ErrorMessageGenerator {
                 symbolType = (SYMBOL_TYPE) params[1];
                 actualType = GetSymbolTypeName(symbolType);
                 symbolDescription = (String) params[2];
-                return String.format("Detected symbol usage. Name %s, symbol type %s. %s", name, actualType, symbolDescription);
+                return String.format("Detected symbol usage. Name %s, symbol type %s. %s.", name, actualType, symbolDescription);
+            case NON_BASIC_TYPE_READ:
+                actualType = (String) params[1];
+                return String.format("You can only read basic types (int, char, bool). Actual type is %s.", actualType);
+            case NON_ASSIGNABLE_SYMBOL:
+                symbol = (String) params[0];
+                return String.format("Cannot assign value to %s. You can only assign value to Var and Elem symbol types.", symbol);
             default:
                 return "NOT_YET_IMPLEMENTED";
         }
