@@ -6,12 +6,12 @@ const bool ackosa = false;
 int aasd, cbb;
 char osamnaest[];
 {
-int asgard() int pera, zika, laza, mika; {
-    return 5;
+int asgard(int prvi, char drugi, bool treci[]) int pera, zika, laza, mika; {
+    return true;
 }
 
 int foobbbb() bool z, zz, zzz, zzzz[], zzzzz; char zZz; {
-    return 8;
+    return ;
 }
 void main() int foobar; {
 
@@ -26,5 +26,18 @@ void main() int foobar; {
      break;
      continue;
 
+     a.b = 5;
+      a[true] = 5;
+      a['c'] = 5;
+      a[3] = 5;
+        a[3].pet=8;
+    // a[3][5] = 9;
+
+        hiljaduitri = 5;
+       foobbbb = 5;
+   //  return 8;
+   //  return 'c';
+    // return true;
+//
     }
 }

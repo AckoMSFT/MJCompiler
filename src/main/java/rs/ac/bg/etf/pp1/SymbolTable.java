@@ -10,6 +10,7 @@ import rs.etf.pp1.symboltable.visitors.SymbolTableVisitor;
 
 import java.util.Arrays;
 
+import static rs.etf.pp1.symboltable.concepts.Obj.*;
 import static rs.etf.pp1.symboltable.concepts.Struct.*;
 
 public class SymbolTable extends Tab {
@@ -53,6 +54,14 @@ public class SymbolTable extends Tab {
     }
 
     public static String getTypeName(Struct type) {
+        if (type == null) {
+            return "null";
+        }
+
+        if (type.equals(SymbolTable.noType)) {
+            return "void";
+        }
+
         switch (type.getKind()) {
             case None:
                 return "none";
@@ -121,5 +130,32 @@ public class SymbolTable extends Tab {
             }
         }
         return null;
+    }
+
+    public static String objKindToString(int kind) {
+        switch (kind) {
+            case Con:
+                return "Con";
+            case Var:
+                return "Var";
+            case Type:
+                return "Type";
+            case Meth:
+                return "Meth";
+            case Fld:
+                return "Fld";
+            case Prog:
+                return "Prog";
+        }
+
+        return "null";
+    }
+
+    public static String ObjToString(Obj obj) {
+        String name = obj.getName();
+        String kind = objKindToString(obj.getKind());
+        String type = getTypeName(obj.getType());
+
+        return String.format("Symbol {name %s, kind %s, type %s}.", name, kind, type);
     }
 }

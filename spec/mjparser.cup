@@ -123,7 +123,8 @@ nonterminal AssignmentOperator, AdditionOperator, MultiplicationOperator, Relati
 nonterminal ActPars, MaybeActPars, FunctionInvocation;
 
 /* Formal parameter */
-nonterminal FormPars, MaybeFormPars, FormalParam;
+nonterminal FormPars, MaybeFormPars;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj FormalParam;
 
 /* Statements */
 nonterminal Statement, MaybeElseStatement, StatementList, ConstFactor;
@@ -290,7 +291,7 @@ FormPars ::=
 /* FormalParam := Type ident ["[" "]"] */
 
 FormalParam ::=
-    (FormalParameter) Type IDENTIFIER MaybeArray
+    (FormalParameter) Type IDENTIFIER:name MaybeArray
     | (FormalParameterError) error {: parser.log_error_recovery(); :};
 
 /* MaybeFormPars := [FormPars] */
@@ -450,7 +451,7 @@ ConstFactor ::=
 /* Designator = ident {"." ident | "[" Expr "]"} */
 
 Designator ::=
-    (DesignatorIdentifier) IDENTIFIER DesignatorAccessList;
+    (Designator) IDENTIFIER:name DesignatorAccessList:designatorAccessList;
 
 /* DesignatorAccessList = {"." ident | "[" Expr "]"} */
 
@@ -534,12 +535,12 @@ MaybeArray ::=
 /* MemberElement := "." ident */
 
 MemberElement ::=
-    (MemberElement) DOT IDENTIFIER;
+    (MemberElement) DOT IDENTIFIER:name;
 
 /* ArrayElement := "[" Expr "]" */
 
 ArrayElement ::=
-    (ArrayElement) LEFT_BRACKET Expr RIGHT_BRACKET;
+    (ArrayElement) LEFT_BRACKET Expr:position RIGHT_BRACKET;
 
 /*
     AssignmentOperation := "=" Expr | error

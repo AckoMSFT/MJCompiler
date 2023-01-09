@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 3/0/2023 18:41:12
+// 9/0/2023 19:3:49
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -8,13 +8,13 @@ package rs.ac.bg.etf.pp1.ast;
 public class FormalParameter extends FormalParam {
 
     private Type Type;
-    private String I2;
+    private String name;
     private MaybeArray MaybeArray;
 
-    public FormalParameter (Type Type, String I2, MaybeArray MaybeArray) {
+    public FormalParameter (Type Type, String name, MaybeArray MaybeArray) {
         this.Type=Type;
         if(Type!=null) Type.setParent(this);
-        this.I2=I2;
+        this.name=name;
         this.MaybeArray=MaybeArray;
         if(MaybeArray!=null) MaybeArray.setParent(this);
     }
@@ -27,12 +27,12 @@ public class FormalParameter extends FormalParam {
         this.Type=Type;
     }
 
-    public String getI2() {
-        return I2;
+    public String getName() {
+        return name;
     }
 
-    public void setI2(String I2) {
-        this.I2=I2;
+    public void setName(String name) {
+        this.name=name;
     }
 
     public MaybeArray getMaybeArray() {
@@ -75,7 +75,7 @@ public class FormalParameter extends FormalParam {
             buffer.append(tab+"  null");
         buffer.append("\n");
 
-        buffer.append(" "+tab+I2);
+        buffer.append(" "+tab+name);
         buffer.append("\n");
 
         if(MaybeArray!=null)

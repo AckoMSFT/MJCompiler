@@ -151,7 +151,7 @@ nonterminal FunctionInvocation FunctionInvocation;
 /* Formal parameter */
 nonterminal FormPars FormPars;
 nonterminal MaybeFormPars MaybeFormPars;
-nonterminal FormalParam FormalParam;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj FormalParam;
 
 /* Statements */
 nonterminal Statement Statement;
@@ -326,7 +326,7 @@ FormPars ::=
 /* FormalParam := Type ident ["[" "]"] */
 
 FormalParam ::=
-    (FormalParameter) Type:T1 IDENTIFIER:I2 MaybeArray:M3 {: RESULT=new FormalParameter(T1, I2, M3); RESULT.setLine(T1left); :}
+    (FormalParameter) Type:T1 IDENTIFIER:name MaybeArray:M2 {: RESULT=new FormalParameter(T1, name, M2); RESULT.setLine(T1left); :}
     | (FormalParameterError) error {: parser.log_error_recovery(); :} {: RESULT=new FormalParameterError(); :};
 
 /* MaybeFormPars := [FormPars] */
@@ -486,7 +486,7 @@ ConstFactor ::=
 /* Designator = ident {"." ident | "[" Expr "]"} */
 
 Designator ::=
-    (DesignatorIdentifier) IDENTIFIER:I1 DesignatorAccessList:D2 {: RESULT=new DesignatorIdentifier(I1, D2); RESULT.setLine(I1left); :};
+    (Designator) IDENTIFIER:name DesignatorAccessList:designatorAccessList {: RESULT=new Designator(name, designatorAccessList); RESULT.setLine(nameleft); :};
 
 /* DesignatorAccessList = {"." ident | "[" Expr "]"} */
 
@@ -570,12 +570,12 @@ MaybeArray ::=
 /* MemberElement := "." ident */
 
 MemberElement ::=
-    (MemberElement) DOT IDENTIFIER:I1 {: RESULT=new MemberElement(I1); RESULT.setLine(I1left); :};
+    (MemberElement) DOT IDENTIFIER:name {: RESULT=new MemberElement(name); RESULT.setLine(nameleft); :};
 
 /* ArrayElement := "[" Expr "]" */
 
 ArrayElement ::=
-    (ArrayElement) LEFT_BRACKET Expr:E1 RIGHT_BRACKET {: RESULT=new ArrayElement(E1); RESULT.setLine(E1left); :};
+    (ArrayElement) LEFT_BRACKET Expr:position RIGHT_BRACKET {: RESULT=new ArrayElement(position); RESULT.setLine(positionleft); :};
 
 /*
     AssignmentOperation := "=" Expr | error

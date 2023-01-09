@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 3/0/2023 18:41:12
+// 9/0/2023 19:3:49
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -9,18 +9,18 @@ public class MemberElement implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String I1;
+    private String name;
 
-    public MemberElement (String I1) {
-        this.I1=I1;
+    public MemberElement (String name) {
+        this.name=name;
     }
 
-    public String getI1() {
-        return I1;
+    public String getName() {
+        return name;
     }
 
-    public void setI1(String I1) {
-        this.I1=I1;
+    public void setName(String name) {
+        this.name=name;
     }
 
     public SyntaxNode getParent() {
@@ -59,7 +59,7 @@ public class MemberElement implements SyntaxNode {
         buffer.append(tab);
         buffer.append("MemberElement(\n");
 
-        buffer.append(" "+tab+I1);
+        buffer.append(" "+tab+name);
         buffer.append("\n");
 
         buffer.append(tab);

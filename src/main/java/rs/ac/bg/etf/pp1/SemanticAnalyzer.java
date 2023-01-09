@@ -1,5 +1,6 @@
 package rs.ac.bg.etf.pp1;
 
+import jdk.nashorn.internal.ir.Symbol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rs.ac.bg.etf.pp1.ast.*;
@@ -25,6 +26,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
     private int currentLoopDepth = 0;
 
+    private int currentFormalParameterCount = 0;
+
     /**
      * Helpers
      **/
@@ -38,6 +41,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
     private Obj currentMethodSymbol = Tab.noObj;
 
+    private String currentDesignatorName = null;
+
     private void logInfo(SyntaxNode syntaxNode, MessageType messageType, Object... params) {
         String message = ErrorMessageGenerator.generateMessage(messageType, params);
         logger.info(String.format("[Line #%d] %s", syntaxNode.getLine(), message));
@@ -46,6 +51,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     private void logDebug(SyntaxNode syntaxNode, MessageType messageType, Object... params) {
         String message = ErrorMessageGenerator.generateMessage(messageType, params);
         logger.debug(String.format("[Line #%d] %s", syntaxNode.getLine(), message));
+    }
+
+    private void logWarning(SyntaxNode syntaxNode, MessageType messageType, Object... params) {
+        String message = ErrorMessageGenerator.generateMessage(messageType, params);
+        logger.warn(String.format("[Line #%d] %s", syntaxNode.getLine(), message));
     }
 
     private void logError(SyntaxNode syntaxNode, MessageType messageType, Object... params) {
@@ -73,6 +83,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logInfo(syntaxNode, MessageType.GLOBAL_VARIABLE_DECLARATION, name, type);
     }
 
+    private void logFormalParameterDeclaration(SyntaxNode syntaxNode, String name, String type) {
+        logInfo(syntaxNode, MessageType.FORMAL_PARAMETER_DECLARATION, name, type);
+    }
+
     private void logTypeMismatchError(SyntaxNode syntaxNode, Struct actualType, Struct expectedType) {
         String actualTypeName = SymbolTable.getTypeName(actualType);
         String expectedTypeName = SymbolTable.getTypeName(expectedType);
@@ -85,6 +99,13 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         String rhsTypeName = SymbolTable.getTypeName(rhsType);
 
         logError(syntaxNode, MessageType.INCOMPATIBLE_TYPES, lhsTypeName, rhsTypeName);
+    }
+
+    private void logIncompatibleReturnTypeError(SyntaxNode syntaxNode, Struct actualType, Struct expectedType) {
+        String actualTypeName = SymbolTable.getTypeName(actualType);
+        String expectedTypeName = SymbolTable.getTypeName(expectedType);
+
+        logError(syntaxNode, MessageType.INCOMPATIBLE_RETURN_TYPE, actualTypeName, expectedTypeName);
     }
 
     private void logIllegalRelationalOperatorError(SyntaxNode syntaxNode, Struct lhsType, RelationalOperator relationalOperator) {
@@ -113,6 +134,29 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         }
     }
 
+    private boolean checkIfReservedName(SyntaxNode node, String symbolName) {
+        if (SymbolTable.isReservedName(symbolName)) {
+            logWarning(node, MessageType.NAME_SHADOWING_RESERVED_NAME, symbolName);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void logIncompatibleArrayIndexType(SyntaxNode node, Struct actualType) {
+        String actualtypeName = SymbolTable.getTypeName(actualType);
+        logError(node, MessageType.INCOMPATIBLE_ARRAY_INDEX_TYPE, actualtypeName);
+    }
+
+    private void logUndefinedSymbolError(SyntaxNode node, String symbolName) {
+        logError(node, MessageType.UNDEFINED_SYMBOL, symbolName);
+    }
+
+    private void logSymbolUsage(SyntaxNode node, String symbolName, ErrorMessageGenerator.SYMBOL_TYPE symbolType, Obj symbol) {
+        String symbolString = SymbolTable.ObjToString(symbol);
+        logInfo(node, MessageType.DETECTED_SYMBOL_USAGE, symbolName, symbolType, symbolString);
+    }
+
     @Override
     public void visit(Program program) {
         //nVars = SymbolTable.currentScope.getnVars();
@@ -131,18 +175,18 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logSyntaxNodeTraversal(type);
 
         String name = type.getType();
-        logger.debug("Type name: " + name);
 
         // Check if type is present in SymbolTable in any enclosing scope.
         Obj typeSymbol = SymbolTable.getSymbol(name, false);
         if (SymbolTable.isSymbolType(typeSymbol)) {
-            logger.debug("Found valid type!");
             currentTypeSymbol = typeSymbol.getType();
         } else {
             logger.error("Semantic error on line " + type.getLine() + ". " + name + " isn't a declared type in the scope.");
             semanticErrorCount++;
             currentTypeSymbol = SymbolTable.noType;
         }
+
+        type.struct = currentTypeSymbol;
     }
 
     public void visit(ConstAssignment constAssignment) {
@@ -243,13 +287,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
             return;
         }
 
-        // TODO (acko): Name shadowing
+        checkIfReservedName(localVariableDeclaration, variableName);
 
         boolean isArray = localVariableDeclaration.getMaybeArray() instanceof MaybeArrayIsArray;
         Obj sym = SymbolTable.insert(Obj.Var, variableName, isArray ? new Struct(Struct.Array, currentTypeSymbol) : currentTypeSymbol);
 
         logLocalVariableDeclaration(localVariableDeclaration, variableName, SymbolTable.getTypeName(currentTypeSymbol) + (isArray ? "[]" : ""));
-
     }
 
     /**
@@ -289,6 +332,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         SymbolTable.chainLocalSymbols(currentMethodSymbol);
         SymbolTable.closeScope();
 
+        currentMethodSymbol.setLevel(currentFormalParameterCount);
+
         MethodDeclarationHeader methodDeclarationHeader = methodDeclaration.getMethodDeclarationHeader();
         String methodName = methodDeclarationHeader.getMethodName();
         ReturnType returnType = methodDeclarationHeader.getReturnType();
@@ -308,15 +353,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
         hasReturnStatement = false;
         currentMethodSymbol = null;
-
-        // if(!returnFound && currentMethod.getType() != Tab.noType){
-        //    report_error("Semanticka greska na liniji " + methodDecl.getLine() + ": funkcija " + currentMethod.getName() + " nema return iskaz!", null);
-        // }
-        // Tab.chainLocalSymbols(currentMethod);
-        //Tab.closeScope();
-
-//        returnFound = false;
-        //      currentMethod = null;
+        currentFormalParameterCount = 0;
     }
 
     /****************************************** Factor ****************************************************************/
@@ -611,6 +648,41 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
     /**************************************** Condition ***************************************************************/
 
+    /**************************************** Formal Parameters *******************************************************/
+
+    /*
+        FormalParam := Type ident ["[" "]"]
+
+        FormalParam ::=
+            (FormalParameter) Type IDENTIFIER:name MaybeArray
+            | (FormalParameterError) error {: parser.log_error_recovery(); :};
+     */
+
+    @Override
+    public void visit(FormalParameter formalParameter) {
+        logSyntaxNodeTraversal(formalParameter);
+        Struct type = formalParameter.getType().struct;
+        String name = formalParameter.getName();
+        MaybeArray maybeArray = formalParameter.getMaybeArray();
+
+        if (checkIfSymbolIsInUse(formalParameter, name, true)) {
+            return;
+        }
+
+        checkIfReservedName(formalParameter, name);
+
+        boolean isArray = maybeArray instanceof MaybeArrayIsArray;
+
+        Obj formalParameterObj = SymbolTable.insert(Obj.Var, name, isArray ? new Struct(Struct.Array, type) : type);
+        formalParameterObj.setFpPos(currentFormalParameterCount);
+        currentFormalParameterCount++;
+
+        formalParameter.obj = formalParameterObj;
+
+        logFormalParameterDeclaration(formalParameter, name, SymbolTable.getTypeName(type) + (isArray ? "[]" : ""));
+    }
+    /**************************************** Formal Parameters *******************************************************/
+
     /**************************************** Statement ***************************************************************/
 
     /*
@@ -646,6 +718,20 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     }
 
     @Override
+    public void visit(StatementRead statementRead) {
+        logSyntaxNodeTraversal(statementRead);
+
+        Designator designator = statementRead.getDesignator();
+        Obj designatorSymbol = designator.obj;
+
+        // Check if we have a valid designator
+        if (!SymbolTable.isValidSymbol(designatorSymbol)) {
+            return;
+        }
+    }
+
+
+    @Override
     public void visit(StatementReturn statementReturn) {
         logSyntaxNodeTraversal(statementReturn);
 
@@ -653,8 +739,155 @@ public class SemanticAnalyzer extends VisitorAdaptor {
             hasReturnStatement = true;
         } else {
             logError(statementReturn, MessageType.ILLEGAL_RETURN_STATEMENT);
+            return;
+        }
+
+        Struct returnType = currentMethodSymbol.getType();
+
+        MaybeReturnValue maybeReturnValue = statementReturn.getMaybeReturnValue();
+        if (maybeReturnValue instanceof MaybeReturnValueIsReturnValue) {
+            Expr expr = ((MaybeReturnValueIsReturnValue) maybeReturnValue).getExpr();
+            Struct type = expr.obj.getType();
+
+            if (returnType.equals(SymbolTable.noType)) {
+                if (!type.equals(SymbolTable.noType)) {
+                    String actualType = SymbolTable.getTypeName(type);
+                    logError(statementReturn, MessageType.NON_VOID_RETURN_STATEMENT_INSIDE_VOID_FUNCTION, actualType);
+                }
+            } else {
+                if (!type.equals(returnType)) {
+                    logIncompatibleReturnTypeError(statementReturn, type, returnType);
+                }
+            }
+        } else {
+            if (!returnType.equals(SymbolTable.noType)) {
+                logIncompatibleReturnTypeError(statementReturn, SymbolTable.noType, returnType);
+            }
+        }
+    }
+
+    @Override
+    public void visit(StatementPrint statementPrint) {
+        logSyntaxNodeTraversal(statementPrint);
+
+        Expr expr = statementPrint.getExpr();
+        Struct type = expr.obj.getType();
+
+        if (!SymbolTable.isBasicType(type)) {
+            String actualType = SymbolTable.getTypeName(type);
+            logError(statementPrint, MessageType.NOT_A_BASIC_TYPE, actualType);
         }
     }
 
     /**************************************** Statement ***************************************************************/
+
+    /**************************************** Designator **************************************************************/
+
+    /*
+        Designator = ident {"." ident | "[" Expr "]"}
+
+        Designator ::=
+            (DesignatorIdentifier) IDENTIFIER DesignatorAccessList;
+
+        DesignatorAccessList = {"." ident | "[" Expr "]"}
+
+        DesignatorAccessList ::=
+            (DesignatorAccessListMember) DesignatorAccessList MemberElement
+            | (DesignatorAccessListElement) DesignatorAccessList ArrayElement
+            | (DesignatorAccessListEpsilon) ;
+
+        DesignatorStatement =
+            Designator (Assignop Expr | "(" [ActPars] ")" | "++" | "--")
+            | "[" [Designator] {"," [Designator]}"]" "=" Designator
+
+        DesignatorStatement ::=
+            (DesignatorStatementAssignment) Designator AssignmentOperation
+            | (DesignatorStatementFunctionInvocation) Designator FunctionInvocation
+            | (DesignatorStatementIncrement) Designator INCREMENT
+            | (DesignatorStatementDecrement) Designator DECREMENT
+            | (DesignatorStatementUnpack) LEFT_BRACKET DesignatorList RIGHT_BRACKET AssignmentOperator Designator;
+
+        MaybeDesignator ::=
+            (MaybeDesignatorIsDesignator) Designator
+            | (MaybeDesignatorEpsilon) ;
+
+        DesignatorList ::=
+            (DeisgnatorListMulti) DesignatorList COMMA MaybeDesignator
+            | (DesignatorListSingle) MaybeDesignator;
+     */
+
+    @Override
+    public void visit(Designator designator) {
+        logSyntaxNodeTraversal(designator);
+
+        String name = designator.getName();
+        DesignatorAccessList designatorAccessList = designator.getDesignatorAccessList();
+
+        // Designator = ident {"." ident | "[" Expr "]"}
+        // This means that we can indefinitely chain class member access and array index access
+        // Since this project is for level B (i.e. no classes) and we don't have >1-dimensional data types supported
+        // Designator can only be variable or array element
+
+        if (designatorAccessList instanceof DesignatorAccessListMember) {
+            // Class member access isn't allowed
+            logError(designator, MessageType.CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED);
+        } else if (designatorAccessList instanceof DesignatorAccessListElement) {
+            ArrayElement arrayElement = ((DesignatorAccessListElement) designatorAccessList).getArrayElement();
+            Expr arrayElementIndex = arrayElement.getExpr();
+            Struct arrayElementIndexType = arrayElementIndex.obj.getType();
+
+            if (!arrayElementIndexType.equals(SymbolTable.intType)) {
+                logIncompatibleArrayIndexType(designator, arrayElementIndexType);
+                return;
+            }
+
+            DesignatorAccessList nextDesignatorAccessList = ((DesignatorAccessListElement) designatorAccessList).getDesignatorAccessList();
+
+            if (nextDesignatorAccessList instanceof DesignatorAccessListMember) {
+                // Class member access isn't allowed
+                logError(designator, MessageType.CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED);
+                return;
+            } else if (nextDesignatorAccessList instanceof DesignatorAccessListElement) {
+                logError(designator, MessageType.NON_ONE_DIMENSIONAL_ARRAY_DETECTED);
+                return;
+            }
+        }
+
+        // Handle array better?
+        Obj symbol = SymbolTable.getSymbol(name, false);
+        if (!SymbolTable.isValidSymbol(symbol)) {
+            logUndefinedSymbolError(designator, name);
+            return;
+        }
+
+        currentDesignatorName = name;
+        designator.obj = symbol;
+
+        // Log symbol usage
+        switch (symbol.getKind()) {
+            case Obj.Con:
+                logSymbolUsage(designator, name, ErrorMessageGenerator.SYMBOL_TYPE.SYMBOLIC_CONSTANT, symbol);
+                break;
+            case Obj.Var:
+                // Global variable
+                if (symbol.getLevel() == 0) {
+                    logSymbolUsage(designator, name, ErrorMessageGenerator.SYMBOL_TYPE.GLOBAL_VARIABLE, symbol);
+                } else {
+                    // Formal parameter
+                    if (symbol.getFpPos() != -1) {
+                        logSymbolUsage(designator, name, ErrorMessageGenerator.SYMBOL_TYPE.FORMAL_PARAMETER, symbol);
+                    } else {
+                        // Local variable
+                        logSymbolUsage(designator, name, ErrorMessageGenerator.SYMBOL_TYPE.LOCAL_VARIABLE, symbol);
+                    }
+                }
+                break;
+            case Obj.Meth:
+                logSymbolUsage(designator, name, ErrorMessageGenerator.SYMBOL_TYPE.GLOBAL_FUNCTION_CALL, symbol);
+                break;
+
+        }
+
+    }
+    /**************************************** Designator **************************************************************/
 }
