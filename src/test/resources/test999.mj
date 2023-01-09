@@ -51,6 +51,7 @@ program test301
        // niz = 5;
         niz[2] = 5;
 
-        sum(4, 5);
+        sum(4, '5');
+        nizch(4, 5);
 	}
 }

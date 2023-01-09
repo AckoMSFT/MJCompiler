@@ -171,6 +171,21 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logDebug(node, MessageType.DEBUG_SYMBOL_MESSAGE, debugMessage, symbolString);
     }
 
+    private void logParameterCountMismatch(SyntaxNode node, int formalParamterCount, int actualParamterCount) {
+        logError(node, MessageType.PARAMETER_COUNT_MISMATCH, formalParamterCount, actualParamterCount);
+    }
+
+    private void logFormalAndActualParameterMismatch(SyntaxNode node, Obj formalParameter, Obj actualParameter) {
+        String formalParameterString = SymbolTable.ObjToString(formalParameter);
+        String actualParameterString = SymbolTable.ObjToString(actualParameter);
+        logError(node, MessageType.FORMAL_AND_ACTUAL_PARAMETER_MISMATCH, formalParameterString, actualParameterString);
+    }
+
+    private void logInvalidFunctionInvocation(SyntaxNode syntaxNode, Obj designatorSymbol) {
+        String designator = SymbolTable.ObjToString(designatorSymbol);
+        logError(syntaxNode, MessageType.INVALID_FUNCTION_INVOCATION, designator);
+    }
+
     @Override
     public void visit(Program program) {
         //nVars = SymbolTable.currentScope.getnVars();
@@ -1001,13 +1016,17 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logSyntaxNodeTraversal(designatorStatementFunctionInvocation);
 
         Designator designator = designatorStatementFunctionInvocation.getDesignator();
-        FunctionInvocation functionInvocation = designatorStatementFunctionInvocation.getFunctionInvocation();
-
-        String foo = SymbolTable.ObjToString(designator.obj);
-        logAdditionalErrorDescription(designatorStatementFunctionInvocation, foo);
-
         Obj methodSymbol = designator.obj;
+
+        if (!SymbolTable.isValidSymbol(methodSymbol) || methodSymbol.getKind() != Obj.Meth) {
+            logInvalidFunctionInvocation(designatorStatementFunctionInvocation, methodSymbol);
+            return;
+        }
+
         Collection<Obj> localSymbols = methodSymbol.getLocalSymbols();
+        
+        int formalParameterCount = 0;
+        ArrayList<Obj> formalParameters = new ArrayList<>();
         for (Obj localSymbol: localSymbols) {
             // Need to filter out actual formal parameters from local symbols
             int fpPos = localSymbol.getFpPos();
@@ -1016,14 +1035,34 @@ public class SemanticAnalyzer extends VisitorAdaptor {
                 logSymbolDebugMessage(designatorStatementFunctionInvocation, "Skipping local symbol", localSymbol);
             } else {
                 logSymbolDebugMessage(designatorStatementFunctionInvocation, "Detected formal parameter", localSymbol);
+                formalParameterCount++;
+                formalParameters.add(localSymbol);
             }
         }
 
+        // Sort formal parameters by their fpPos
+        formalParameters.sort(Comparator.comparingInt(Obj::getFpPos));
+
+        int actualParameterCount = actualParameters.size();
         for (Obj t: actualParameters) {
             logSymbolDebugMessage(designatorStatementFunctionInvocation, "Detected actual parameter", t);
         }
-        // TODO (acko): Not yet implemented
 
+        if (formalParameterCount != actualParameterCount) {
+            logParameterCountMismatch(designatorStatementFunctionInvocation, formalParameterCount, actualParameterCount);
+        }
+
+        for (int i = 0; i < formalParameterCount; i++) {
+            Obj formalParameter = formalParameters.get(i);
+            Obj actualParameter = actualParameters.get(i);
+
+            Struct formalParameterType = formalParameter.getType();
+            Struct actualParameterType = actualParameter.getType();
+
+            if (!actualParameterType.compatibleWith(formalParameterType)) {
+                logFormalAndActualParameterMismatch(designatorStatementFunctionInvocation, formalParameter, actualParameter);
+            }
+        }
     }
 
     @Override

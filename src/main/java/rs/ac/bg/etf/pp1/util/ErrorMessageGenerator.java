@@ -39,12 +39,18 @@ public class ErrorMessageGenerator {
         NON_ASSIGNABLE_SYMBOL,
         CLASS_INSTANTIATION_NOT_SUPPORTED,
         CLASS_DECLARATION_NOT_SUPPORTED,
+        PARAMETER_COUNT_MISMATCH,
+        FORMAL_AND_ACTUAL_PARAMETER_MISMATCH,
+        INVALID_FUNCTION_INVOCATION,
     }
 
     public static String generateMessage(MessageType messageType, Object... params) {
         String name, type, actualType, expectedType, lhsType, rhsType, relationalOperator, additionalErrorDescription;
         String debugMessage, symbol, symbolDescription;
         SYMBOL_TYPE symbolType;
+        int formalParameterCount, actualParameterCount;
+        String formalParameter, actualParameter;
+
         switch (messageType) {
             case SYNTAX_NODE_TRAVERSAL:
                 SyntaxNode syntaxNode = (SyntaxNode) params[0];
@@ -143,6 +149,17 @@ public class ErrorMessageGenerator {
             case NON_ASSIGNABLE_SYMBOL:
                 symbol = (String) params[0];
                 return String.format("Cannot assign value to %s. You can only assign value to Var and Elem symbol types.", symbol);
+            case PARAMETER_COUNT_MISMATCH:
+                formalParameterCount = (int) params[0];
+                actualParameterCount = (int) params[1];
+                return String.format("Parameter count mismatch. Formal parameter count %d, actual parameter count %d", formalParameterCount, actualParameterCount);
+            case FORMAL_AND_ACTUAL_PARAMETER_MISMATCH:
+                formalParameter = (String) params[0];
+                actualParameter = (String) params[1];
+                return String.format("Cannot assign actual parameter %s to formal parameter %s during function invocation due to type mismatch.", actualParameter, formalParameter);
+            case INVALID_FUNCTION_INVOCATION:
+                symbol = (String) params[0];
+                return String.format("Cannot perform a function invocation on symbol %s as it is not a Meth symbol.", symbol);
             default:
                 return "NOT_YET_IMPLEMENTED";
         }
