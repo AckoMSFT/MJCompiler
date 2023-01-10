@@ -120,7 +120,8 @@ nonterminal ClassVarDeclList, MaybeClassMethodList, ClassMethodList, Constructor
 nonterminal AssignmentOperator, AdditionOperator, MultiplicationOperator, RelationalOperator;
 
 /* Methods */
-nonterminal ActPars, MaybeActPars, FunctionInvocation;
+nonterminal ActPars, MaybeActPars, ActualParameter;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj FunctionInvocation, FunctionInvocationHeader;
 
 /* Formal parameter */
 nonterminal FormPars, MaybeFormPars;
@@ -405,8 +406,13 @@ Term ::=
 /* ActPars := Expr {"," Expr } */
 
 ActPars ::=
-    (ActParsMulti) ActPars COMMA Expr
-    | (ActParsSingle) Expr;
+    (ActParsMulti) ActPars COMMA ActualParameter
+    | (ActParsSingle) ActualParameter;
+
+/* ActualParameter := Expr */
+
+ActualParameter ::=
+    (ActualParameter) Expr;
 
 /* MaybeActPars := [ActPars] */
 
@@ -431,11 +437,14 @@ FunctionInvocation ::=
 
 Factor ::=
     (FactorDesignator) Designator
-    | (FactorFunctionInvocation) Designator FunctionInvocation
+    | (FactorFunctionInvocation) FunctionInvocationHeader FunctionInvocation
     | (FactorConstant) ConstFactor
     | (FactorNewArray) NEW Type ArrayElement
     | (FactorNewClass) NEW Type FunctionInvocation
     | (FactorExpr) LEFT_PARENTHESES Expr RIGHT_PARENTHESES;
+
+FunctionInvocationHeader ::=
+    (FunctionInvocationHeader) Designator:name;
 
 /*
         ConstFactor = numConst
@@ -468,7 +477,7 @@ DesignatorAccessList ::=
 
 DesignatorStatement ::=
     (DesignatorStatementAssignment) Designator AssignmentOperation
-    | (DesignatorStatementFunctionInvocation) Designator FunctionInvocation
+    | (DesignatorStatementFunctionInvocation) FunctionInvocationHeader FunctionInvocation
     | (DesignatorStatementIncrement) Designator INCREMENT
     | (DesignatorStatementDecrement) Designator DECREMENT
     | (DesignatorStatementUnpack) LEFT_BRACKET DesignatorList RIGHT_BRACKET AssignmentOperator Designator;
@@ -478,7 +487,7 @@ MaybeDesignator ::=
     | (MaybeDesignatorEpsilon) /* epsilon */;
 
 DesignatorList ::=
-    (DeisgnatorListMulti) DesignatorList COMMA MaybeDesignator
+    (DesignatorListMulti) DesignatorList COMMA MaybeDesignator
     | (DesignatorListSingle) MaybeDesignator;
 
 /* Assignop = "=" */

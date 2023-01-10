@@ -5,23 +5,25 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ExtendedClass implements SyntaxNode {
+public class FunctionInvocationHeader implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private Type Type;
+    public rs.etf.pp1.symboltable.concepts.Obj obj = null;
 
-    public ExtendedClass (Type Type) {
-        this.Type=Type;
-        if(Type!=null) Type.setParent(this);
+    private Designator Designator;
+
+    public FunctionInvocationHeader (Designator Designator) {
+        this.Designator=Designator;
+        if(Designator!=null) Designator.setParent(this);
     }
 
-    public Type getType() {
-        return Type;
+    public Designator getDesignator() {
+        return Designator;
     }
 
-    public void setType(Type Type) {
-        this.Type=Type;
+    public void setDesignator(Designator Designator) {
+        this.Designator=Designator;
     }
 
     public SyntaxNode getParent() {
@@ -45,32 +47,32 @@ public class ExtendedClass implements SyntaxNode {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(Type!=null) Type.accept(visitor);
+        if(Designator!=null) Designator.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(Type!=null) Type.traverseTopDown(visitor);
+        if(Designator!=null) Designator.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(Type!=null) Type.traverseBottomUp(visitor);
+        if(Designator!=null) Designator.traverseBottomUp(visitor);
         accept(visitor);
     }
 
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("ExtendedClass(\n");
+        buffer.append("FunctionInvocationHeader(\n");
 
-        if(Type!=null)
-            buffer.append(Type.toString("  "+tab));
+        if(Designator!=null)
+            buffer.append(Designator.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [ExtendedClass]");
+        buffer.append(") [FunctionInvocationHeader]");
         return buffer.toString();
     }
 }

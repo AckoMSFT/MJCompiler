@@ -14,6 +14,7 @@
                 <exclude name="util/LexerUtils.java"/>
                 <exclude name="util/ErrorMessageGenerator.java"/>
                 <exclude name="util/OperatorHelper.java"/>
+                <exclude name="util/ActualParametersStack.java"/>
             </fileset>
         </delete>
 
@@ -70,7 +71,7 @@
 
     <target name="disasm">
         <java classname="rs.etf.pp1.mj.runtime.disasm">
-            <arg value="src/test/resources/acko.obj"/>
+            <arg value="src/test/resources/program.obj"/>
             <classpath>
                 <pathelement location="lib/mj-runtime-1.1.jar"/>
             </classpath>

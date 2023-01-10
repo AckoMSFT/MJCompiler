@@ -3,6 +3,7 @@ package rs.ac.bg.etf.pp1;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rs.ac.bg.etf.pp1.ast.*;
+import rs.ac.bg.etf.pp1.util.ActualParametersStack;
 import rs.ac.bg.etf.pp1.util.ErrorMessageGenerator;
 import rs.ac.bg.etf.pp1.util.ErrorMessageGenerator.MessageType;
 import rs.ac.bg.etf.pp1.util.OperatorHelper;
@@ -10,6 +11,7 @@ import rs.etf.pp1.symboltable.Tab;
 import rs.etf.pp1.symboltable.concepts.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static rs.ac.bg.etf.pp1.SymbolTable.FP_POS_INVALID;
 import static rs.ac.bg.etf.pp1.SymbolTable.LEVEL_LOCAL;
@@ -30,7 +32,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
     private int currentFormalParameterCount = 0;
 
-    private List<Obj> actualParameters = new ArrayList<Obj>();
+    ActualParametersStack actualParametersStack = new ActualParametersStack();
 
     /**
      * Helpers
@@ -119,8 +121,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logError(syntaxNode, MessageType.ILLEGAL_RELATIONAL_OPERATOR, lhsTypeName, operatorCode);
     }
 
-    private void logAdditionalErrorDescription(SyntaxNode syntaxNode, String additionalErrorDescrpition) {
-        String message = ErrorMessageGenerator.generateMessage(MessageType.ADDITIONAL_ERROR_DESCRIPTION, additionalErrorDescrpition);
+    private void logAdditionalErrorDescription(SyntaxNode syntaxNode, String additionalErrorDescription) {
+        String message = ErrorMessageGenerator.generateMessage(MessageType.ADDITIONAL_ERROR_DESCRIPTION, additionalErrorDescription);
         logger.error(String.format("[Line #%d] Additional error description: %s", syntaxNode.getLine(), message));
     }
 
@@ -148,8 +150,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     }
 
     private void logIncompatibleArrayIndexType(SyntaxNode node, Struct actualType) {
-        String actualtypeName = SymbolTable.getTypeName(actualType);
-        logError(node, MessageType.INCOMPATIBLE_ARRAY_INDEX_TYPE, actualtypeName);
+        String actualTypeName = SymbolTable.getTypeName(actualType);
+        logError(node, MessageType.INCOMPATIBLE_ARRAY_INDEX_TYPE, actualTypeName);
     }
 
     private void logUndefinedSymbolError(SyntaxNode node, String symbolName) {
@@ -161,7 +163,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logInfo(node, MessageType.DETECTED_SYMBOL_USAGE, symbolName, symbolType, symbolString);
     }
 
-    private void logUnassingableSymbolError(SyntaxNode node, Obj symbol) {
+    private void logNonAssignableSymbolError(SyntaxNode node, Obj symbol) {
         String symbolString = SymbolTable.ObjToString(symbol);
         logError(node, MessageType.NON_ASSIGNABLE_SYMBOL, symbolString);
     }
@@ -171,8 +173,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logDebug(node, MessageType.DEBUG_SYMBOL_MESSAGE, debugMessage, symbolString);
     }
 
-    private void logParameterCountMismatch(SyntaxNode node, int formalParamterCount, int actualParamterCount) {
-        logError(node, MessageType.PARAMETER_COUNT_MISMATCH, formalParamterCount, actualParamterCount);
+    private void logParameterCountMismatch(SyntaxNode node, int formalParameterCount, int actualParameterCount) {
+        logError(node, MessageType.PARAMETER_COUNT_MISMATCH, formalParameterCount, actualParameterCount);
     }
 
     private void logFormalAndActualParameterMismatch(SyntaxNode node, Obj formalParameter, Obj actualParameter) {
@@ -188,6 +190,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
     @Override
     public void visit(Program program) {
+        // TODO (acko) GetNVars?
         //nVars = SymbolTable.currentScope.getnVars();
         SymbolTable.chainLocalSymbols(program.getProgramName().obj);
         SymbolTable.closeScope();
@@ -396,23 +399,13 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     /****************************************** Act Pars **************************************************************/
 
     @Override
-    public void visit(ActParsMulti actParsMulti) {
-        logSyntaxNodeTraversal(actParsMulti);
+    public void visit(ActualParameter actualParameter) {
+        logSyntaxNodeTraversal(actualParameter);
 
-        Expr expr = actParsMulti.getExpr();
+        Expr expr = actualParameter.getExpr();
         Obj exprSymbol = expr.obj;
 
-        actualParameters.add(exprSymbol);
-    }
-
-    @Override
-    public void visit(ActParsSingle actParsSingle) {
-        logSyntaxNodeTraversal(actParsSingle);
-
-        Expr expr = actParsSingle.getExpr();
-        Obj exprSymbol = expr.obj;
-
-        actualParameters.add(exprSymbol);
+        actualParametersStack.push(exprSymbol);
     }
 
     /****************************************** Act Pars **************************************************************/
@@ -438,10 +431,82 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         factorDesignator.obj = designator.obj;
     }
 
+    @Override
+    public void visit(FunctionInvocationHeader functionInvocationHeader) {
+        Designator designator = functionInvocationHeader.getDesignator();
+        Obj methodSymbol = designator.obj;
+
+        if (!SymbolTable.isValidSymbol(methodSymbol) || methodSymbol.getKind() != Obj.Meth) {
+            logInvalidFunctionInvocation(functionInvocationHeader, methodSymbol);
+            return;
+        }
+
+        functionInvocationHeader.obj = methodSymbol;
+
+        actualParametersStack.push(new ArrayList<>());
+    }
 
     @Override
     public void visit(FactorFunctionInvocation factorFunctionInvocation) {
         logSyntaxNodeTraversal(factorFunctionInvocation);
+
+        FunctionInvocationHeader functionInvocationHeader = factorFunctionInvocation.getFunctionInvocationHeader();
+
+        Obj methodSymbol = functionInvocationHeader.obj;
+        Collection<Obj> localSymbols = methodSymbol.getLocalSymbols();
+
+        int formalParameterCount = 0;
+        ArrayList<Obj> formalParameters = new ArrayList<>();
+        for (Obj localSymbol: localSymbols) {
+            // Need to filter out actual formal parameters from local symbols
+            int fpPos = localSymbol.getFpPos();
+            if (fpPos == FP_POS_INVALID) {
+                // This is a local symbol, and not a formal parameter
+                logSymbolDebugMessage(factorFunctionInvocation, "Skipping local symbol", localSymbol);
+            } else {
+                logSymbolDebugMessage(factorFunctionInvocation, "Detected formal parameter", localSymbol);
+                formalParameterCount++;
+                formalParameters.add(localSymbol);
+            }
+        }
+
+        // Sort formal parameters by their fpPos
+        formalParameters.sort(Comparator.comparingInt(Obj::getFpPos));
+
+        ArrayList<Obj> actualParameters = actualParametersStack.pop();
+        int actualParameterCount = actualParameters.size();
+        for (Obj actualParameter: actualParameters) {
+            logSymbolDebugMessage(factorFunctionInvocation, "Detected actual parameter", actualParameter);
+        }
+
+        if (formalParameterCount != actualParameterCount) {
+            logParameterCountMismatch(factorFunctionInvocation, formalParameterCount, actualParameterCount);
+
+            return;
+        }
+
+        ArrayList<String> actualParameterNames = new ArrayList<>();
+
+        for (int i = 0; i < formalParameterCount; i++) {
+            Obj formalParameter = formalParameters.get(i);
+            Obj actualParameter = actualParameters.get(i);
+
+            Struct formalParameterType = formalParameter.getType();
+            Struct actualParameterType = actualParameter.getType();
+
+            if (!actualParameterType.compatibleWith(formalParameterType)) {
+                logFormalAndActualParameterMismatch(factorFunctionInvocation, formalParameter, actualParameter);
+            }
+
+            actualParameterNames.add(actualParameter.getName());
+        }
+
+        Struct returnType = methodSymbol.getType();
+        String methodName = methodSymbol.getName();
+        String actualParametersNamesJoined = actualParameters.stream().map(Obj::getName).collect(Collectors.joining(", "));
+
+        String factorFunctionInvocationName = String.format("%s(%s)", methodName, actualParametersNamesJoined);
+        factorFunctionInvocation.obj = new Obj(Obj.Con, factorFunctionInvocationName, returnType);
     }
 
     @Override
@@ -794,7 +859,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
         // Designator can only be variable or array element
         if (!SymbolTable.canAssignToSymbol(designatorSymbol)) {
-            logUnassingableSymbolError(statementRead, designatorSymbol);
+            logNonAssignableSymbolError(statementRead, designatorSymbol);
             return;
         }
 
@@ -887,7 +952,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
             | (MaybeDesignatorEpsilon) ;
 
         DesignatorList ::=
-            (DeisgnatorListMulti) DesignatorList COMMA MaybeDesignator
+            (DesignatorListMulti) DesignatorList COMMA MaybeDesignator
             | (DesignatorListSingle) MaybeDesignator;
      */
     @Override
@@ -977,10 +1042,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logSyntaxNodeTraversal(designatorStatementAssignment);
 
         Designator designator = designatorStatementAssignment.getDesignator();
-        Obj designatorSybol = designator.obj;
+        Obj designatorSymbol = designator.obj;
 
         // Invalid designator symbol
-        if (!SymbolTable.isValidSymbol(designatorSybol)) {
+        if (!SymbolTable.isValidSymbol(designatorSymbol)) {
             return;
         }
 
@@ -1002,7 +1067,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         // TODO (acko): Handle read-only!!!
 
         // Check for type mismatch
-        Struct designatorType = designatorSybol.getType();
+        Struct designatorType = designatorSymbol.getType();
         Struct exprType = exprSymbol.getType();
 
         if (!exprType.compatibleWith(designatorType)) {
@@ -1015,16 +1080,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     public void visit(DesignatorStatementFunctionInvocation designatorStatementFunctionInvocation) {
         logSyntaxNodeTraversal(designatorStatementFunctionInvocation);
 
-        Designator designator = designatorStatementFunctionInvocation.getDesignator();
-        Obj methodSymbol = designator.obj;
+        FunctionInvocationHeader functionInvocationHeader = designatorStatementFunctionInvocation.getFunctionInvocationHeader();
 
-        if (!SymbolTable.isValidSymbol(methodSymbol) || methodSymbol.getKind() != Obj.Meth) {
-            logInvalidFunctionInvocation(designatorStatementFunctionInvocation, methodSymbol);
-            return;
-        }
-
+        Obj methodSymbol = functionInvocationHeader.obj;
         Collection<Obj> localSymbols = methodSymbol.getLocalSymbols();
-        
+
         int formalParameterCount = 0;
         ArrayList<Obj> formalParameters = new ArrayList<>();
         for (Obj localSymbol: localSymbols) {
@@ -1043,6 +1103,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         // Sort formal parameters by their fpPos
         formalParameters.sort(Comparator.comparingInt(Obj::getFpPos));
 
+        ArrayList<Obj> actualParameters = actualParametersStack.pop();
         int actualParameterCount = actualParameters.size();
         for (Obj t: actualParameters) {
             logSymbolDebugMessage(designatorStatementFunctionInvocation, "Detected actual parameter", t);
@@ -1070,22 +1131,22 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logSyntaxNodeTraversal(designatorStatementIncrement);
 
         Designator designator = designatorStatementIncrement.getDesignator();
-        Obj designatorSybol = designator.obj;
+        Obj designatorSymbol = designator.obj;
 
-        if (SymbolTable.isValidSymbol(designatorSybol)) {
-            if (!SymbolTable.canAssignToSymbol(designatorSybol)) {
-                logUnassingableSymbolError(designatorStatementIncrement, designatorSybol);
+        if (SymbolTable.isValidSymbol(designatorSymbol)) {
+            if (!SymbolTable.canAssignToSymbol(designatorSymbol)) {
+                logNonAssignableSymbolError(designatorStatementIncrement, designatorSymbol);
                 logAdditionalErrorDescription(designatorStatementIncrement,"Trying to increment a non-assignable designator.");
             }
 
-            Struct designatorType = designatorSybol.getType();
+            Struct designatorType = designatorSymbol.getType();
             if (!designatorType.equals(SymbolTable.intType)) {
                 logTypeMismatchError(designatorStatementIncrement, designatorType, SymbolTable.intType);
                 logAdditionalErrorDescription(designatorStatementIncrement,"You can only increment designators of type int.");
             }
         }
 
-        designatorStatementIncrement.obj = designatorSybol;
+        designatorStatementIncrement.obj = designatorSymbol;
     }
 
     @Override
@@ -1093,22 +1154,22 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logSyntaxNodeTraversal(designatorStatementDecrement);
 
         Designator designator = designatorStatementDecrement.getDesignator();
-        Obj designatorSybol = designator.obj;
+        Obj designatorSymbol = designator.obj;
 
-        if (SymbolTable.isValidSymbol(designatorSybol)) {
-            if (!SymbolTable.canAssignToSymbol(designatorSybol)) {
-                logUnassingableSymbolError(designatorStatementDecrement, designatorSybol);
+        if (SymbolTable.isValidSymbol(designatorSymbol)) {
+            if (!SymbolTable.canAssignToSymbol(designatorSymbol)) {
+                logNonAssignableSymbolError(designatorStatementDecrement, designatorSymbol);
                 logAdditionalErrorDescription(designatorStatementDecrement,"Trying to decrement a non-assignable designator.");
             }
 
-            Struct designatorType = designatorSybol.getType();
+            Struct designatorType = designatorSymbol.getType();
             if (!designatorType.equals(SymbolTable.intType)) {
                 logTypeMismatchError(designatorStatementDecrement, designatorType, SymbolTable.intType);
                 logAdditionalErrorDescription(designatorStatementDecrement,"You can only decrement designators of type int.");
             }
         }
 
-        designatorStatementDecrement.obj = designatorSybol;
+        designatorStatementDecrement.obj = designatorSymbol;
     }
 
     @Override

@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 9/0/2023 21:47:18
+// 10/0/2023 16:27:38
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -76,7 +76,7 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(AdditionOperatorAddition AdditionOperatorAddition) { visit(); }
     public void visit(AssignmentOperator AssignmentOperator) { visit(); }
     public void visit(DesignatorListSingle DesignatorListSingle) { visit(); }
-    public void visit(DeisgnatorListMulti DeisgnatorListMulti) { visit(); }
+    public void visit(DesignatorListMulti DesignatorListMulti) { visit(); }
     public void visit(MaybeDesignatorEpsilon MaybeDesignatorEpsilon) { visit(); }
     public void visit(MaybeDesignatorIsDesignator MaybeDesignatorIsDesignator) { visit(); }
     public void visit(DesignatorStatementUnpack DesignatorStatementUnpack) { visit(); }
@@ -91,6 +91,7 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(ConstFactorBoolean ConstFactorBoolean) { visit(); }
     public void visit(ConstFactorCharacter ConstFactorCharacter) { visit(); }
     public void visit(ConstFactorNumber ConstFactorNumber) { visit(); }
+    public void visit(FunctionInvocationHeader FunctionInvocationHeader) { visit(); }
     public void visit(FactorExpr FactorExpr) { visit(); }
     public void visit(FactorNewClass FactorNewClass) { visit(); }
     public void visit(FactorNewArray FactorNewArray) { visit(); }
@@ -100,6 +101,7 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(FunctionInvocation FunctionInvocation) { visit(); }
     public void visit(MaybeActParsEpsilon MaybeActParsEpsilon) { visit(); }
     public void visit(MaybeActParsIsActPars MaybeActParsIsActPars) { visit(); }
+    public void visit(ActualParameter ActualParameter) { visit(); }
     public void visit(ActParsSingle ActParsSingle) { visit(); }
     public void visit(ActParsMulti ActParsMulti) { visit(); }
     public void visit(TermSingle TermSingle) { visit(); }

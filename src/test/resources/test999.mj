@@ -17,7 +17,9 @@ program test301
 	    temp = z + d;
 		return temp;
 	}
-
+    char sumC(char zz, char dd) {
+        return zz;
+    }
 
 	void main()
 		int bodovi;
@@ -51,7 +53,15 @@ program test301
        // niz = 5;
         niz[2] = 5;
 
-        sum(4, '5');
-        nizch(4, 5);
+    //   sum(4, '5');
+    //  /  nizch(4, 5);
+
+     //  if ( 2 > sum(4, 5) ) {
+   //     }
+
+      //   if ( 2 > sumC('4', '5') ) {
+         //       }
+
+      bodovi =sum(sum(4,5), sum(4,5));
 	}
 }

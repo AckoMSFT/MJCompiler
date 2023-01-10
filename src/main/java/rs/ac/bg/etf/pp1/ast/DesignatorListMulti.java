@@ -1,16 +1,16 @@
 // generated with ast extension for cup
 // version 0.8
-// 9/0/2023 21:47:18
+// 10/0/2023 16:27:38
 
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class DeisgnatorListMulti extends DesignatorList {
+public class DesignatorListMulti extends DesignatorList {
 
     private DesignatorList DesignatorList;
     private MaybeDesignator MaybeDesignator;
 
-    public DeisgnatorListMulti (DesignatorList DesignatorList, MaybeDesignator MaybeDesignator) {
+    public DesignatorListMulti (DesignatorList DesignatorList, MaybeDesignator MaybeDesignator) {
         this.DesignatorList=DesignatorList;
         if(DesignatorList!=null) DesignatorList.setParent(this);
         this.MaybeDesignator=MaybeDesignator;
@@ -57,7 +57,7 @@ public class DeisgnatorListMulti extends DesignatorList {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("DeisgnatorListMulti(\n");
+        buffer.append("DesignatorListMulti(\n");
 
         if(DesignatorList!=null)
             buffer.append(DesignatorList.toString("  "+tab));
@@ -72,7 +72,7 @@ public class DeisgnatorListMulti extends DesignatorList {
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [DeisgnatorListMulti]");
+        buffer.append(") [DesignatorListMulti]");
         return buffer.toString();
     }
 }

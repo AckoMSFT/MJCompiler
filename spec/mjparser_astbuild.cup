@@ -146,7 +146,8 @@ nonterminal RelationalOperator RelationalOperator;
 /* Methods */
 nonterminal ActPars ActPars;
 nonterminal MaybeActPars MaybeActPars;
-nonterminal FunctionInvocation FunctionInvocation;
+nonterminal ActualParameter ActualParameter;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj FunctionInvocation, FunctionInvocationHeader;
 
 /* Formal parameter */
 nonterminal FormPars FormPars;
@@ -439,8 +440,13 @@ Term ::=
 /* ActPars := Expr {"," Expr } */
 
 ActPars ::=
-    (ActParsMulti) ActPars:A1 COMMA Expr:E2 {: RESULT=new ActParsMulti(A1, E2); RESULT.setLine(A1left); :}
-    | (ActParsSingle) Expr:E1 {: RESULT=new ActParsSingle(E1); RESULT.setLine(E1left); :};
+    (ActParsMulti) ActPars:A1 COMMA ActualParameter:A2 {: RESULT=new ActParsMulti(A1, A2); RESULT.setLine(A1left); :}
+    | (ActParsSingle) ActualParameter:A1 {: RESULT=new ActParsSingle(A1); RESULT.setLine(A1left); :};
+
+/* ActualParameter := Expr */
+
+ActualParameter ::=
+    (ActualParameter) Expr:E1 {: RESULT=new ActualParameter(E1); RESULT.setLine(E1left); :};
 
 /* MaybeActPars := [ActPars] */
 
@@ -465,11 +471,14 @@ FunctionInvocation ::=
 
 Factor ::=
     (FactorDesignator) Designator:D1 {: RESULT=new FactorDesignator(D1); RESULT.setLine(D1left); :}
-    | (FactorFunctionInvocation) Designator:D1 FunctionInvocation:F2 {: RESULT=new FactorFunctionInvocation(D1, F2); RESULT.setLine(D1left); :}
+    | (FactorFunctionInvocation) FunctionInvocationHeader:F1 FunctionInvocation:F2 {: RESULT=new FactorFunctionInvocation(F1, F2); RESULT.setLine(F1left); :}
     | (FactorConstant) ConstFactor:C1 {: RESULT=new FactorConstant(C1); RESULT.setLine(C1left); :}
     | (FactorNewArray) NEW Type:T1 ArrayElement:A2 {: RESULT=new FactorNewArray(T1, A2); RESULT.setLine(T1left); :}
     | (FactorNewClass) NEW Type:T1 FunctionInvocation:F2 {: RESULT=new FactorNewClass(T1, F2); RESULT.setLine(T1left); :}
     | (FactorExpr) LEFT_PARENTHESES Expr:E1 RIGHT_PARENTHESES {: RESULT=new FactorExpr(E1); RESULT.setLine(E1left); :};
+
+FunctionInvocationHeader ::=
+    (FunctionInvocationHeader) Designator:name {: RESULT=new FunctionInvocationHeader(name); RESULT.setLine(nameleft); :};
 
 /*
         ConstFactor = numConst
@@ -502,7 +511,7 @@ DesignatorAccessList ::=
 
 DesignatorStatement ::=
     (DesignatorStatementAssignment) Designator:D1 AssignmentOperation:A2 {: RESULT=new DesignatorStatementAssignment(D1, A2); RESULT.setLine(D1left); :}
-    | (DesignatorStatementFunctionInvocation) Designator:D1 FunctionInvocation:F2 {: RESULT=new DesignatorStatementFunctionInvocation(D1, F2); RESULT.setLine(D1left); :}
+    | (DesignatorStatementFunctionInvocation) FunctionInvocationHeader:F1 FunctionInvocation:F2 {: RESULT=new DesignatorStatementFunctionInvocation(F1, F2); RESULT.setLine(F1left); :}
     | (DesignatorStatementIncrement) Designator:D1 INCREMENT {: RESULT=new DesignatorStatementIncrement(D1); RESULT.setLine(D1left); :}
     | (DesignatorStatementDecrement) Designator:D1 DECREMENT {: RESULT=new DesignatorStatementDecrement(D1); RESULT.setLine(D1left); :}
     | (DesignatorStatementUnpack) LEFT_BRACKET DesignatorList:D1 RIGHT_BRACKET AssignmentOperator:A2 Designator:D3 {: RESULT=new DesignatorStatementUnpack(D1, A2, D3); RESULT.setLine(D1left); :};
@@ -512,7 +521,7 @@ MaybeDesignator ::=
     | (MaybeDesignatorEpsilon) {: RESULT=new MaybeDesignatorEpsilon(); :} /* epsilon */;
 
 DesignatorList ::=
-    (DeisgnatorListMulti) DesignatorList:D1 COMMA MaybeDesignator:M2 {: RESULT=new DeisgnatorListMulti(D1, M2); RESULT.setLine(D1left); :}
+    (DesignatorListMulti) DesignatorList:D1 COMMA MaybeDesignator:M2 {: RESULT=new DesignatorListMulti(D1, M2); RESULT.setLine(D1left); :}
     | (DesignatorListSingle) MaybeDesignator:M1 {: RESULT=new DesignatorListSingle(M1); RESULT.setLine(M1left); :};
 
 /* Assignop = "=" */

@@ -112,9 +112,21 @@ public class MJParserTest {
             logger.info("No semantic error detected. Proceeding with code generation.");
 
             CodeGenerator codeGenerator = new CodeGenerator();
+            program.traverseBottomUp(codeGenerator);
 
             Code.mainPc = codeGenerator.getMainPC();
 
+
+            Code.dataSize = semanticAnalyzer.globalVarCount;
+            Code.mainPc = codeGenerator.getMainPC();
+
+
+            File objFile = new File("src/test/resources/program.obj");
+            if (objFile.exists()) {
+                objFile.delete();
+            }
+
+            Code.write(new FileOutputStream(objFile));
 
             //RuleVisitor v = new RuleVisitor();
             //program.traverseBottomUp(v);

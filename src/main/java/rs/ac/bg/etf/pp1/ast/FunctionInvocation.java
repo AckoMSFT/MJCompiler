@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 9/0/2023 21:47:18
+// 10/0/2023 16:27:38
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -9,6 +9,8 @@ public class FunctionInvocation implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
+    public rs.etf.pp1.symboltable.concepts.Obj obj = null;
+
     private MaybeActPars MaybeActPars;
 
     public FunctionInvocation (MaybeActPars MaybeActPars) {

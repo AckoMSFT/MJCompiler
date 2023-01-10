@@ -1,25 +1,25 @@
 // generated with ast extension for cup
 // version 0.8
-// 9/0/2023 21:47:18
+// 10/0/2023 16:27:38
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class ActParsSingle extends ActPars {
 
-    private Expr Expr;
+    private ActualParameter ActualParameter;
 
-    public ActParsSingle (Expr Expr) {
-        this.Expr=Expr;
-        if(Expr!=null) Expr.setParent(this);
+    public ActParsSingle (ActualParameter ActualParameter) {
+        this.ActualParameter=ActualParameter;
+        if(ActualParameter!=null) ActualParameter.setParent(this);
     }
 
-    public Expr getExpr() {
-        return Expr;
+    public ActualParameter getActualParameter() {
+        return ActualParameter;
     }
 
-    public void setExpr(Expr Expr) {
-        this.Expr=Expr;
+    public void setActualParameter(ActualParameter ActualParameter) {
+        this.ActualParameter=ActualParameter;
     }
 
     public void accept(Visitor visitor) {
@@ -27,16 +27,16 @@ public class ActParsSingle extends ActPars {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(Expr!=null) Expr.accept(visitor);
+        if(ActualParameter!=null) ActualParameter.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(Expr!=null) Expr.traverseTopDown(visitor);
+        if(ActualParameter!=null) ActualParameter.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(Expr!=null) Expr.traverseBottomUp(visitor);
+        if(ActualParameter!=null) ActualParameter.traverseBottomUp(visitor);
         accept(visitor);
     }
 
@@ -45,8 +45,8 @@ public class ActParsSingle extends ActPars {
         buffer.append(tab);
         buffer.append("ActParsSingle(\n");
 
-        if(Expr!=null)
-            buffer.append(Expr.toString("  "+tab));
+        if(ActualParameter!=null)
+            buffer.append(ActualParameter.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");
