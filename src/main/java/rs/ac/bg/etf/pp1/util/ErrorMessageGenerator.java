@@ -42,6 +42,9 @@ public class ErrorMessageGenerator {
         PARAMETER_COUNT_MISMATCH,
         FORMAL_AND_ACTUAL_PARAMETER_MISMATCH,
         INVALID_FUNCTION_INVOCATION,
+        INVALID_FOR_EACH_ITERATOR_DESIGNATOR,
+        TYPE_MISMATCH_FOR_EACH_ITERATOR_DESIGNATOR,
+        INVALID_FOR_EACH_DESIGNATOR_TYPE,
     }
 
     public static String generateMessage(MessageType messageType, Object... params) {
@@ -50,6 +53,7 @@ public class ErrorMessageGenerator {
         SYMBOL_TYPE symbolType;
         int formalParameterCount, actualParameterCount;
         String formalParameter, actualParameter;
+        String actualDesignator, iteratorDesignator;
 
         switch (messageType) {
             case SYNTAX_NODE_TRAVERSAL:
@@ -160,6 +164,19 @@ public class ErrorMessageGenerator {
             case INVALID_FUNCTION_INVOCATION:
                 symbol = (String) params[0];
                 return String.format("Cannot perform a function invocation on symbol %s as it is not a Meth symbol.", symbol);
+            case INVALID_FOR_EACH_ITERATOR_DESIGNATOR:
+                symbol = (String) params[0];
+                return String.format("Invalid foreach statement iterator designator. It must be a local or global variable. Actual iterator designator: %s.", symbol);
+            case INVALID_FOR_EACH_DESIGNATOR_TYPE:
+                actualDesignator = (String) params[0];
+                return String.format("Invalid type for foreach statement designator. " +
+                        "It must be an array, actual foreach statement designator %s.", actualDesignator);
+            case TYPE_MISMATCH_FOR_EACH_ITERATOR_DESIGNATOR:
+                actualDesignator = (String) params[0];
+                iteratorDesignator = (String) params[1];
+                return String.format("Type mismatch between foreach statement designator and iterator designator. " +
+                        "Foreach statement designator must be an array of type of iterator designator. " +
+                        "Foreach statement designator: %s, iterator designator %s.", actualDesignator, iteratorDesignator);
             default:
                 return "NOT_YET_IMPLEMENTED";
         }

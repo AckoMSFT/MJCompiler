@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/0/2023 16:27:38
+// 10/0/2023 18:19:30
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -9,21 +9,21 @@ public class MemberAccess implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String I1;
+    private String designator;
     private DesignatorAccessList DesignatorAccessList;
 
-    public MemberAccess (String I1, DesignatorAccessList DesignatorAccessList) {
-        this.I1=I1;
+    public MemberAccess (String designator, DesignatorAccessList DesignatorAccessList) {
+        this.designator=designator;
         this.DesignatorAccessList=DesignatorAccessList;
         if(DesignatorAccessList!=null) DesignatorAccessList.setParent(this);
     }
 
-    public String getI1() {
-        return I1;
+    public String getDesignator() {
+        return designator;
     }
 
-    public void setI1(String I1) {
-        this.I1=I1;
+    public void setDesignator(String designator) {
+        this.designator=designator;
     }
 
     public DesignatorAccessList getDesignatorAccessList() {
@@ -73,7 +73,7 @@ public class MemberAccess implements SyntaxNode {
         buffer.append(tab);
         buffer.append("MemberAccess(\n");
 
-        buffer.append(" "+tab+I1);
+        buffer.append(" "+tab+designator);
         buffer.append("\n");
 
         if(DesignatorAccessList!=null)

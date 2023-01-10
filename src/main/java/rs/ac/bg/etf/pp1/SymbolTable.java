@@ -159,11 +159,13 @@ public class SymbolTable extends Tab {
                 return "Meth";
             case Fld:
                 return "Fld";
+            case Elem:
+                return "Elem";
             case Prog:
                 return "Prog";
         }
 
-        return "null";
+        return "NOT_YET_IMPLEMENTED";
     }
 
     public static String ObjToString(Obj obj) {

@@ -188,6 +188,22 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logError(syntaxNode, MessageType.INVALID_FUNCTION_INVOCATION, designator);
     }
 
+    private void logInvalidForEachIteratorDesignatorError(SyntaxNode syntaxNode, Obj designatorSymbol) {
+        String designator = SymbolTable.ObjToString(designatorSymbol);
+        logError(syntaxNode, MessageType.INVALID_FOR_EACH_ITERATOR_DESIGNATOR, designator);
+    }
+
+    private void logTypeMismatchForEachIteratorDesignatorError(SyntaxNode syntaxNode, Obj actualDesignatorSymbol, Obj iteratorDesignatorSymbol) {
+        String actualDesignator = SymbolTable.ObjToString(actualDesignatorSymbol);
+        String iteratorDesignator = SymbolTable.ObjToString(iteratorDesignatorSymbol);
+        logError(syntaxNode, MessageType.TYPE_MISMATCH_FOR_EACH_ITERATOR_DESIGNATOR, actualDesignator, iteratorDesignator);
+    }
+
+    private void logInvalidForEachDesignatorType(SyntaxNode syntaxNode, Obj actualDesignatorSymbol) {
+        String actualDesignator = SymbolTable.ObjToString(actualDesignatorSymbol);
+        logError(syntaxNode, MessageType.INVALID_FOR_EACH_DESIGNATOR_TYPE, actualDesignator);
+    }
+
     @Override
     public void visit(Program program) {
         // TODO (acko) GetNVars?
@@ -817,14 +833,19 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     }
 
     @Override
+    public void visit(StatementWhileHeader statementWhileHeader) {
+        logSyntaxNodeTraversal(statementWhileHeader);
+
+        currentLoopDepth++;
+    }
+    @Override
     public void visit(StatementWhile statementWhile) {
         logSyntaxNodeTraversal(statementWhile);
 
         // Condition must be of type boolean
         // This is already implicitly checked by other visitors
-        // Do nothing
 
-        currentLoopDepth++;
+        currentLoopDepth--;
     }
 
     @Override
@@ -911,12 +932,137 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logSyntaxNodeTraversal(statementPrint);
 
         Expr expr = statementPrint.getExpr();
+        Obj exprSymbol = expr.obj;
+
+        if (!SymbolTable.isValidSymbol(exprSymbol)) {
+            // TODO (acko): Do we need error here?
+            // acko.pet.foreach(curr => print(curr););
+
+            return;
+        }
+
         Struct type = expr.obj.getType();
 
         if (!SymbolTable.isBasicType(type)) {
             String actualType = SymbolTable.getTypeName(type);
             logError(statementPrint, MessageType.NOT_A_BASIC_TYPE, actualType);
         }
+    }
+
+    @Override
+    public void visit(StatementForEachHeader statementForEachHeader) {
+        logSyntaxNodeTraversal(statementForEachHeader);
+
+        MemberAccess memberAccess = statementForEachHeader.getMemberAccess();
+        String name = memberAccess.getDesignator();
+        DesignatorAccessList designatorAccessList = memberAccess.getDesignatorAccessList();
+
+        boolean isArrayElement = false;
+        if (designatorAccessList instanceof DesignatorAccessListMember) {
+            // Class member access isn't allowed
+            logError(statementForEachHeader, MessageType.CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED);
+        } else if (designatorAccessList instanceof DesignatorAccessListElement) {
+            ArrayElement arrayElement = ((DesignatorAccessListElement) designatorAccessList).getArrayElement();
+            Expr arrayElementIndex = arrayElement.getExpr();
+
+            Obj arrayElementIndexSymbol = arrayElementIndex.obj;
+            if (!SymbolTable.isValidSymbol(arrayElementIndexSymbol)) {
+                // TODO (acko): Do we need error here?
+                return;
+            }
+
+            Struct arrayElementIndexType = arrayElementIndexSymbol.getType();
+
+            if (!arrayElementIndexType.equals(SymbolTable.intType)) {
+                logIncompatibleArrayIndexType(statementForEachHeader, arrayElementIndexType);
+                return;
+            }
+
+            DesignatorAccessList nextDesignatorAccessList = ((DesignatorAccessListElement) designatorAccessList).getDesignatorAccessList();
+
+            if (nextDesignatorAccessList instanceof DesignatorAccessListMember) {
+                // Class member access isn't allowed
+                logError(statementForEachHeader, MessageType.CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED);
+                return;
+            } else if (nextDesignatorAccessList instanceof DesignatorAccessListElement) {
+                logError(statementForEachHeader, MessageType.NON_ONE_DIMENSIONAL_ARRAY_DETECTED);
+                return;
+            }
+
+            isArrayElement = true;
+        }
+
+        // Handle array better?
+        Obj symbol = SymbolTable.getSymbol(name, false);
+        if (!SymbolTable.isValidSymbol(symbol)) {
+            logUndefinedSymbolError(statementForEachHeader, name);
+            return;
+        }
+
+        currentDesignatorName = name;
+        statementForEachHeader.obj = symbol;
+
+        if (isArrayElement) {
+            // TODO(acko): Check if this is actually array?
+            statementForEachHeader.obj = new Obj(Obj.Elem, symbol.getName(), symbol.getType().getElemType());
+        }
+
+        Obj statementForEachHeaderObj = statementForEachHeader.obj;
+        if (statementForEachHeaderObj.getType().getKind() != Struct.Array) {
+            logInvalidForEachDesignatorType(statementForEachHeader, statementForEachHeaderObj);
+            statementForEachHeaderObj = SymbolTable.noObj;
+            return;
+        }
+
+        // TODO(acko): Handle read only...
+        // TODO(acko): Check if already in use?
+
+        logSymbolDebugMessage(statementForEachHeader,"StatementForEachHeader", statementForEachHeader.obj);
+        currentLoopDepth++;
+    }
+
+    @Override
+    public void visit(StatementForEachDesignator statementForEachDesignator) {
+        logSyntaxNodeTraversal(statementForEachDesignator);
+
+        String designatorName = statementForEachDesignator.getName();
+
+        Obj designatorSymbol = SymbolTable.getSymbol(designatorName, false);
+        if (!SymbolTable.isValidSymbol(designatorSymbol)) {
+            logUndefinedSymbolError(statementForEachDesignator, designatorName);
+            return;
+        }
+
+        // Designator must be a local or global variable of the same type as the elements of the type
+        if (designatorSymbol.getKind() != Obj.Var) {
+            logInvalidForEachIteratorDesignatorError(statementForEachDesignator, designatorSymbol);
+            return;
+        }
+
+        StatementForEach statementForEach = (StatementForEach) statementForEachDesignator.getParent();
+        StatementForEachHeader statementForEachHeader = statementForEach.getStatementForEachHeader();
+
+        Obj statementForEachHeaderObj = statementForEachHeader.obj;
+        if (!SymbolTable.isValidSymbol(statementForEachHeaderObj)) {
+            return;
+        }
+
+        if (!(statementForEachHeaderObj.getKind() == Obj.Var
+                && statementForEachHeaderObj.getType().getKind() == Struct.Array
+                && statementForEachHeaderObj.getType().getElemType().equals(designatorSymbol.getType()))) {
+            logTypeMismatchForEachIteratorDesignatorError(statementForEachDesignator, statementForEachHeaderObj, designatorSymbol);
+            return;
+        }
+
+        logSymbolDebugMessage(statementForEachHeader,"DesignatorSymbol", designatorSymbol);
+        logSymbolDebugMessage(statementForEachHeader,"StatementForEachDesignator", statementForEachHeader.obj);
+    }
+
+    @Override
+    public void visit(StatementForEach statementForEach) {
+        logSyntaxNodeTraversal(statementForEach);
+
+        currentLoopDepth--;
     }
 
     /**************************************** Statement ***************************************************************/
@@ -972,9 +1118,17 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         if (designatorAccessList instanceof DesignatorAccessListMember) {
             // Class member access isn't allowed
             logError(designator, MessageType.CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED);
+            return;
         } else if (designatorAccessList instanceof DesignatorAccessListElement) {
             ArrayElement arrayElement = ((DesignatorAccessListElement) designatorAccessList).getArrayElement();
             Expr arrayElementIndex = arrayElement.getExpr();
+
+            Obj arrayElementIndexSymbol = arrayElementIndex.obj;
+            if (!SymbolTable.isValidSymbol(arrayElementIndexSymbol)) {
+                // TODO (acko): Do we need error here?
+                return;
+            }
+
             Struct arrayElementIndexType = arrayElementIndex.obj.getType();
 
             if (!arrayElementIndexType.equals(SymbolTable.intType)) {

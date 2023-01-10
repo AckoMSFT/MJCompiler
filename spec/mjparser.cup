@@ -129,6 +129,7 @@ nonterminal rs.etf.pp1.symboltable.concepts.Obj FormalParam;
 
 /* Statements */
 nonterminal Statement, MaybeElseStatement, StatementList, ConstFactor;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj StatementForEachHeader, StatementForEachDesignator, StatementWhileHeader;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj Expr, Factor, Term;
 nonterminal MaybePrintWidth, MaybeReturnValue;
 
@@ -334,19 +335,28 @@ MaybeFormPars ::=
 /* MemberAccess := ident DesignatorAccessList "." */
 
 MemberAccess ::=
-    (MemberAccess) IDENTIFIER DesignatorAccessList DOT;
+    (MemberAccess) IDENTIFIER:designator DesignatorAccessList DOT;
 
 Statement ::=
     (StatementDesignator) DesignatorStatement SEMI_COLON
     | (StatementIfElse) IF LEFT_PARENTHESES ConditionErrorRecovery Statement MaybeElseStatement
-    | (StatementWhile) WHILE LEFT_PARENTHESES Condition RIGHT_PARENTHESES Statement
+    | (StatementWhile) StatementWhileHeader Condition RIGHT_PARENTHESES Statement
     | (StatementBreak) BREAK SEMI_COLON
     | (StatementContinue) CONTINUE SEMI_COLON
     | (StatementRead) READ LEFT_PARENTHESES Designator RIGHT_PARENTHESES SEMI_COLON
     | (StatementReturn) RETURN MaybeReturnValue SEMI_COLON
     | (StatementPrint) PRINT LEFT_PARENTHESES Expr MaybePrintWidth RIGHT_PARENTHESES SEMI_COLON
-    | (StatementForEach) MemberAccess FOR_EACH LEFT_PARENTHESES IDENTIFIER LAMBDA Statement RIGHT_PARENTHESES SEMI_COLON
+    | (StatementForEach) StatementForEachHeader StatementForEachDesignator Statement RIGHT_PARENTHESES SEMI_COLON
     | (StatementBlock) LEFT_BRACE StatementList RIGHT_BRACE;
+
+StatementWhileHeader ::=
+    (StatementWhileHeader) WHILE LEFT_PARENTHESES;
+
+StatementForEachHeader ::=
+    (StatementForEachHeader) MemberAccess FOR_EACH;
+
+StatementForEachDesignator ::=
+    (StatementForEachDesignator) LEFT_PARENTHESES IDENTIFIER:name LAMBDA;
 
 ConditionErrorRecovery ::=
     (ConditionErrorRecoveryCondition) Condition RIGHT_PARENTHESES

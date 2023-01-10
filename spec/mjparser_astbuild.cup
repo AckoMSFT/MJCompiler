@@ -159,6 +159,7 @@ nonterminal Statement Statement;
 nonterminal MaybeElseStatement MaybeElseStatement;
 nonterminal StatementList StatementList;
 nonterminal ConstFactor ConstFactor;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj StatementForEachHeader, StatementForEachDesignator, StatementWhileHeader;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj Expr, Factor, Term;
 nonterminal MaybePrintWidth MaybePrintWidth;
 nonterminal MaybeReturnValue MaybeReturnValue;
@@ -368,19 +369,28 @@ MaybeFormPars ::=
 /* MemberAccess := ident DesignatorAccessList "." */
 
 MemberAccess ::=
-    (MemberAccess) IDENTIFIER:I1 DesignatorAccessList:D2 DOT {: RESULT=new MemberAccess(I1, D2); RESULT.setLine(I1left); :};
+    (MemberAccess) IDENTIFIER:designator DesignatorAccessList:D1 DOT {: RESULT=new MemberAccess(designator, D1); RESULT.setLine(designatorleft); :};
 
 Statement ::=
     (StatementDesignator) DesignatorStatement:D1 SEMI_COLON {: RESULT=new StatementDesignator(D1); RESULT.setLine(D1left); :}
     | (StatementIfElse) IF LEFT_PARENTHESES ConditionErrorRecovery:C1 Statement:S2 MaybeElseStatement:M3 {: RESULT=new StatementIfElse(C1, S2, M3); RESULT.setLine(C1left); :}
-    | (StatementWhile) WHILE LEFT_PARENTHESES Condition:C1 RIGHT_PARENTHESES Statement:S2 {: RESULT=new StatementWhile(C1, S2); RESULT.setLine(C1left); :}
+    | (StatementWhile) StatementWhileHeader:S1 Condition:C2 RIGHT_PARENTHESES Statement:S3 {: RESULT=new StatementWhile(S1, C2, S3); RESULT.setLine(S1left); :}
     | (StatementBreak) BREAK SEMI_COLON {: RESULT=new StatementBreak(); :}
     | (StatementContinue) CONTINUE SEMI_COLON {: RESULT=new StatementContinue(); :}
     | (StatementRead) READ LEFT_PARENTHESES Designator:D1 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new StatementRead(D1); RESULT.setLine(D1left); :}
     | (StatementReturn) RETURN MaybeReturnValue:M1 SEMI_COLON {: RESULT=new StatementReturn(M1); RESULT.setLine(M1left); :}
     | (StatementPrint) PRINT LEFT_PARENTHESES Expr:E1 MaybePrintWidth:M2 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new StatementPrint(E1, M2); RESULT.setLine(E1left); :}
-    | (StatementForEach) MemberAccess:M1 FOR_EACH LEFT_PARENTHESES IDENTIFIER:I2 LAMBDA Statement:S3 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new StatementForEach(M1, I2, S3); RESULT.setLine(M1left); :}
+    | (StatementForEach) StatementForEachHeader:S1 StatementForEachDesignator:S2 Statement:S3 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new StatementForEach(S1, S2, S3); RESULT.setLine(S1left); :}
     | (StatementBlock) LEFT_BRACE StatementList:S1 RIGHT_BRACE {: RESULT=new StatementBlock(S1); RESULT.setLine(S1left); :};
+
+StatementWhileHeader ::=
+    (StatementWhileHeader) WHILE LEFT_PARENTHESES {: RESULT=new StatementWhileHeader(); :};
+
+StatementForEachHeader ::=
+    (StatementForEachHeader) MemberAccess:M1 FOR_EACH {: RESULT=new StatementForEachHeader(M1); RESULT.setLine(M1left); :};
+
+StatementForEachDesignator ::=
+    (StatementForEachDesignator) LEFT_PARENTHESES IDENTIFIER:name LAMBDA {: RESULT=new StatementForEachDesignator(name); RESULT.setLine(nameleft); :};
 
 ConditionErrorRecovery ::=
     (ConditionErrorRecoveryCondition) Condition:C1 RIGHT_PARENTHESES {: RESULT=new ConditionErrorRecoveryCondition(C1); RESULT.setLine(C1left); :}

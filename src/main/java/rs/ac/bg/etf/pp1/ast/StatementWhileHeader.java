@@ -5,9 +5,29 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class MaybeArrayEpsilon extends MaybeArray {
+public class StatementWhileHeader implements SyntaxNode {
 
-    public MaybeArrayEpsilon () {
+    private SyntaxNode parent;
+    private int line;
+    public rs.etf.pp1.symboltable.concepts.Obj obj = null;
+
+    public StatementWhileHeader () {
+    }
+
+    public SyntaxNode getParent() {
+        return parent;
+    }
+
+    public void setParent(SyntaxNode parent) {
+        this.parent=parent;
+    }
+
+    public int getLine() {
+        return line;
+    }
+
+    public void setLine(int line) {
+        this.line=line;
     }
 
     public void accept(Visitor visitor) {
@@ -28,10 +48,10 @@ public class MaybeArrayEpsilon extends MaybeArray {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("MaybeArrayEpsilon(\n");
+        buffer.append("StatementWhileHeader(\n");
 
         buffer.append(tab);
-        buffer.append(") [MaybeArrayEpsilon]");
+        buffer.append(") [StatementWhileHeader]");
         return buffer.toString();
     }
 }

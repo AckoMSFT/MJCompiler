@@ -5,22 +5,25 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class MemberElement implements SyntaxNode {
+public class StatementForEachHeader implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    private String name;
+    public rs.etf.pp1.symboltable.concepts.Obj obj = null;
 
-    public MemberElement (String name) {
-        this.name=name;
+    private MemberAccess MemberAccess;
+
+    public StatementForEachHeader (MemberAccess MemberAccess) {
+        this.MemberAccess=MemberAccess;
+        if(MemberAccess!=null) MemberAccess.setParent(this);
     }
 
-    public String getName() {
-        return name;
+    public MemberAccess getMemberAccess() {
+        return MemberAccess;
     }
 
-    public void setName(String name) {
-        this.name=name;
+    public void setMemberAccess(MemberAccess MemberAccess) {
+        this.MemberAccess=MemberAccess;
     }
 
     public SyntaxNode getParent() {
@@ -44,26 +47,32 @@ public class MemberElement implements SyntaxNode {
     }
 
     public void childrenAccept(Visitor visitor) {
+        if(MemberAccess!=null) MemberAccess.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
+        if(MemberAccess!=null) MemberAccess.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
+        if(MemberAccess!=null) MemberAccess.traverseBottomUp(visitor);
         accept(visitor);
     }
 
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("MemberElement(\n");
+        buffer.append("StatementForEachHeader(\n");
 
-        buffer.append(" "+tab+name);
+        if(MemberAccess!=null)
+            buffer.append(MemberAccess.toString("  "+tab));
+        else
+            buffer.append(tab+"  null");
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [MemberElement]");
+        buffer.append(") [StatementForEachHeader]");
         return buffer.toString();
     }
 }

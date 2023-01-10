@@ -1,38 +1,39 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/0/2023 16:27:38
+// 10/0/2023 18:19:30
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class StatementForEach extends Statement {
 
-    private MemberAccess MemberAccess;
-    private String I2;
+    private StatementForEachHeader StatementForEachHeader;
+    private StatementForEachDesignator StatementForEachDesignator;
     private Statement Statement;
 
-    public StatementForEach (MemberAccess MemberAccess, String I2, Statement Statement) {
-        this.MemberAccess=MemberAccess;
-        if(MemberAccess!=null) MemberAccess.setParent(this);
-        this.I2=I2;
+    public StatementForEach (StatementForEachHeader StatementForEachHeader, StatementForEachDesignator StatementForEachDesignator, Statement Statement) {
+        this.StatementForEachHeader=StatementForEachHeader;
+        if(StatementForEachHeader!=null) StatementForEachHeader.setParent(this);
+        this.StatementForEachDesignator=StatementForEachDesignator;
+        if(StatementForEachDesignator!=null) StatementForEachDesignator.setParent(this);
         this.Statement=Statement;
         if(Statement!=null) Statement.setParent(this);
     }
 
-    public MemberAccess getMemberAccess() {
-        return MemberAccess;
+    public StatementForEachHeader getStatementForEachHeader() {
+        return StatementForEachHeader;
     }
 
-    public void setMemberAccess(MemberAccess MemberAccess) {
-        this.MemberAccess=MemberAccess;
+    public void setStatementForEachHeader(StatementForEachHeader StatementForEachHeader) {
+        this.StatementForEachHeader=StatementForEachHeader;
     }
 
-    public String getI2() {
-        return I2;
+    public StatementForEachDesignator getStatementForEachDesignator() {
+        return StatementForEachDesignator;
     }
 
-    public void setI2(String I2) {
-        this.I2=I2;
+    public void setStatementForEachDesignator(StatementForEachDesignator StatementForEachDesignator) {
+        this.StatementForEachDesignator=StatementForEachDesignator;
     }
 
     public Statement getStatement() {
@@ -48,18 +49,21 @@ public class StatementForEach extends Statement {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(MemberAccess!=null) MemberAccess.accept(visitor);
+        if(StatementForEachHeader!=null) StatementForEachHeader.accept(visitor);
+        if(StatementForEachDesignator!=null) StatementForEachDesignator.accept(visitor);
         if(Statement!=null) Statement.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(MemberAccess!=null) MemberAccess.traverseTopDown(visitor);
+        if(StatementForEachHeader!=null) StatementForEachHeader.traverseTopDown(visitor);
+        if(StatementForEachDesignator!=null) StatementForEachDesignator.traverseTopDown(visitor);
         if(Statement!=null) Statement.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(MemberAccess!=null) MemberAccess.traverseBottomUp(visitor);
+        if(StatementForEachHeader!=null) StatementForEachHeader.traverseBottomUp(visitor);
+        if(StatementForEachDesignator!=null) StatementForEachDesignator.traverseBottomUp(visitor);
         if(Statement!=null) Statement.traverseBottomUp(visitor);
         accept(visitor);
     }
@@ -69,13 +73,16 @@ public class StatementForEach extends Statement {
         buffer.append(tab);
         buffer.append("StatementForEach(\n");
 
-        if(MemberAccess!=null)
-            buffer.append(MemberAccess.toString("  "+tab));
+        if(StatementForEachHeader!=null)
+            buffer.append(StatementForEachHeader.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");
 
-        buffer.append(" "+tab+I2);
+        if(StatementForEachDesignator!=null)
+            buffer.append(StatementForEachDesignator.toString("  "+tab));
+        else
+            buffer.append(tab+"  null");
         buffer.append("\n");
 
         if(Statement!=null)

@@ -63,5 +63,25 @@ program test301
          //       }
 
       bodovi =sum(sum(4,5), sum(4,5));
+
+      while(2>1) {
+      break;
+      }
+       niz.foreach(bodovi =>  {
+
+      //  bt = bodovi;
+        print(bodovi);
+       }
+       );
+
+        // ovo ne moze
+      // niz[pet].foreach(bodovi => print(bodovi););
+
+       //niz.foreach(main => print(bodovi););
+
+     //  niz.foreach(nizch => print(bodovi););
+
+      // pet.foreach(nizch => print(bodovi););
+
 	}
 }
