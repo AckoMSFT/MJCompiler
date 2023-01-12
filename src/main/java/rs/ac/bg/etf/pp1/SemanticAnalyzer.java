@@ -1130,6 +1130,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     @Override
     public void visit(MaybeDesignatorIsDesignator maybeDesignatorIsDesignator) {
         logSyntaxNodeTraversal(maybeDesignatorIsDesignator);
+
+        Obj designatorSymbol = maybeDesignatorIsDesignator.getDesignator().obj;
+        if (inUnpackStatement) {
+            unpackStatetementDesignators.add(designatorSymbol);
+        }
     }
 
     @Override
@@ -1168,10 +1173,6 @@ public class SemanticAnalyzer extends VisitorAdaptor {
             case Obj.Meth:
                 logSymbolUsage(designatorIdentifier, name, ErrorMessageGenerator.SYMBOL_TYPE.GLOBAL_FUNCTION_CALL, designatorSymbol);
                 break;
-        }
-
-        if (inUnpackStatement) {
-            unpackStatetementDesignators.add(designatorSymbol);
         }
     }
 
@@ -1373,6 +1374,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     public void visit(DesignatorStatementUnpackHeader designatorStatementUnpackHeader) {
         logSyntaxNodeTraversal(designatorStatementUnpackHeader);
 
+        unpackStatetementDesignators.clear();
         inUnpackStatement = true;
     }
 
@@ -1419,7 +1421,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
             Struct unpackStatementDesignatorType = unpackStatementDesignator.getType();
 
             // lhsDesignator must be compatible with rhsDesignatorSymbol
-            if (!unpackStatementDesignatorType.compatibleWith(rhsDesignatorSymbolElemType)) {
+            if (!rhsDesignatorSymbolElemType.assignableTo(unpackStatementDesignatorType)) {
                 logIncompatibleUnpackStatementLHSDesignatorType(
                         designatorStatementUnpack, unpackStatementDesignator, rhsDesignatorSymbol);
             }

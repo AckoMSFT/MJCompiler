@@ -160,6 +160,7 @@ nonterminal MaybeElseStatement MaybeElseStatement;
 nonterminal StatementList StatementList;
 nonterminal ConstFactor ConstFactor;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj StatementIfElseHeader, StatementIfElseIntermezzo;
+nonterminal java.lang.Integer StatementElseHeader;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj StatementForEachHeader, StatementForEachDesignator, StatementWhileHeader;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj DesignatorStatementUnpackHeader, DesignatorStatementIntermezzo;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj Expr, Factor, Term;
@@ -401,8 +402,13 @@ MaybePrintWidth ::=
     | (MaybePrintWidthEpsilon) {: RESULT=new MaybePrintWidthEpsilon(); :} /* epsilon */;
 
 MaybeElseStatement ::=
-    (MaybeElseStatementIsElseStatement) ELSE Statement:S1 {: RESULT=new MaybeElseStatementIsElseStatement(S1); RESULT.setLine(S1left); :}
+    (MaybeElseStatementIsElseStatement) StatementElseHeader:S1 Statement:S2 {: RESULT=new MaybeElseStatementIsElseStatement(S1, S2); RESULT.setLine(S1left); :}
     | (MaybeElseStatementEpsilon) {: RESULT=new MaybeElseStatementEpsilon(); :} /* epsilon */;
+
+/* StatementElseHeader = "ELSE" */
+
+StatementElseHeader ::=
+    (StatementElseHeader) ELSE {: RESULT=new StatementElseHeader(); :};
 
 /* StatementList = {Statement} */
 StatementList ::=

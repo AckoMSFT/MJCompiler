@@ -34,6 +34,11 @@ public class CodeGenerator extends VisitorAdaptor {
 
     private static final int UNCONDITIONAL_JUMP = 0;
 
+    private static boolean inUnpackStatement = false;
+
+    private ArrayList<Obj> unpackStatetementDesignators;
+
+
     Logger logger = LogManager.getLogger(CodeGenerator.class);
 
     private int runtimeErrorCount = 0;
@@ -81,8 +86,8 @@ public class CodeGenerator extends VisitorAdaptor {
 
         // Initialize private members
         branchJumpAddressStack = new BranchJumpAddressStack();
-        //loopJumpAddressStack = new JumpAddressStack();
         loopJumpAddressStack = new LoopJumpAddressStack();
+        unpackStatetementDesignators = new ArrayList<>();
     }
 
     private void logInfo(SyntaxNode syntaxNode, ErrorMessageGenerator.MessageType messageType, Object... params) {
@@ -576,12 +581,31 @@ public class CodeGenerator extends VisitorAdaptor {
     /****************************************** Designator ************************************************************/
 
     @Override
+    public void visit(MaybeDesignatorEpsilon maybeDesignatorEpsilon) {
+        logSyntaxNodeTraversal(maybeDesignatorEpsilon);
+
+        if (inUnpackStatement) {
+            unpackStatetementDesignators.add(null);
+        }
+    }
+
+    @Override
+    public void visit(MaybeDesignatorIsDesignator maybeDesignatorIsDesignator) {
+        logSyntaxNodeTraversal(maybeDesignatorIsDesignator);
+
+        Obj designatorSymbol = maybeDesignatorIsDesignator.getDesignator().obj;
+        if (inUnpackStatement) {
+            unpackStatetementDesignators.add(designatorSymbol);
+        }
+    }
+
+    @Override
     public void visit(DesignatorIdentifier designatorIdentifier) {
+        logSyntaxNodeTraversal(designatorIdentifier);
         SyntaxNode designatorIdentifierParent = designatorIdentifier.getParent();
 
+        Obj designatorIdentifierSymbol = designatorIdentifier.obj;
         if (designatorIdentifierParent instanceof DesignatorElementAccess) {
-            Obj designatorIdentifierSymbol = designatorIdentifier.obj;
-
             logSymbolDebugMessage(designatorIdentifier, "Loading designator for array element access", designatorIdentifierSymbol);
             Code.load(designatorIdentifierSymbol);
         }
@@ -617,32 +641,55 @@ public class CodeGenerator extends VisitorAdaptor {
         Condition condition = ((ConditionErrorRecoveryCondition) conditionErrorRecovery).getCondition();
         Obj conditionSymbol = condition.obj;
 
-        //System.out.println("STATEMENT IF ELSE CONDITION " + SymbolTable.ObjToString(conditionSymbol));
+        logSymbolDebugMessage(statementIfElseHeader, "Adding false jump for the " +
+                "last CondTerm in the Condition", conditionSymbol);
 
-        Code.putFalseJump(conditionSymbol.getAdr(), 0);
-        branchJumpAddressStack.pushFalseJump(Code.pc - 2);
+        Code.putFalseJump(conditionSymbol.getAdr(), ZERO);
+        branchJumpAddressStack.pushFalseJump(Code.pc - TWO);
+
+        logDebugMessage(statementIfElseHeader, "Patching all true jumps");
         branchJumpAddressStack.patchTrueJumps();
-
-        // TODO (acko): else statement
-
     }
 
     @Override
     public void visit(StatementIfElseIntermezzo statementIfElseIntermezzo) {
         logSyntaxNodeTraversal(statementIfElseIntermezzo);
-
-        // TODO (acko): else statement
-
         branchJumpAddressStack.pushNewEntry();
+    }
+
+    @Override
+    public void visit(StatementElseHeader statementElseHeader) {
+        logSyntaxNodeTraversal(statementElseHeader);
+
+        logDebugMessage(statementElseHeader, "Adding unconditional jump for else statement");
+        Code.putJump(UNCONDITIONAL_JUMP);
+        statementElseHeader.integer = Code.pc - TWO;
+
+        logDebugMessage(statementElseHeader, "Patching all false jumps");
+        branchJumpAddressStack.patchFalseJumps();
     }
 
     @Override
     public void visit(StatementIfElse statementIfElse) {
         logSyntaxNodeTraversal(statementIfElse);
 
-        // TODO (acko): else statement
+        MaybeElseStatement maybeElseStatement = statementIfElse.getMaybeElseStatement();
 
-        branchJumpAddressStack.patchFalseJumps();
+        // If there is an else statement
+        if (maybeElseStatement instanceof MaybeElseStatementIsElseStatement) {
+            StatementElseHeader statementElseHeader = ((MaybeElseStatementIsElseStatement) maybeElseStatement).getStatementElseHeader();
+            Statement statementElse = ((MaybeElseStatementIsElseStatement) maybeElseStatement).getStatement();
+
+            // Patch unconditional jump
+            int value = statementElseHeader.integer;
+            Code.fixup(value);
+
+            logDebugMessage(statementIfElse, String.format("Patching unconditional jump for else statement %d", value));
+        } else {
+            logDebugMessage(statementIfElse, "Patching all false jumps");
+            branchJumpAddressStack.patchFalseJumps();
+        }
+
         branchJumpAddressStack.pop();
     }
 
@@ -702,7 +749,7 @@ public class CodeGenerator extends VisitorAdaptor {
         Expr expr = statementPrint.getExpr();
         MaybePrintWidth maybePrintWidth = statementPrint.getMaybePrintWidth();
 
-        int printWidth = 0;
+        int printWidth = 5;
         if (maybePrintWidth instanceof MaybePrintWidthIsPrintWidth) {
             printWidth = ((MaybePrintWidthIsPrintWidth) maybePrintWidth).getPrintWidth();
         }
@@ -711,13 +758,68 @@ public class CodeGenerator extends VisitorAdaptor {
         Struct exprType = exprSymbol.getType();
         logSymbolDebugMessage(statementPrint, "Printing expr", exprSymbol);
 
-        Code.loadConst(printWidth);
         if (exprType.equals(SymbolTable.charType)) {
-            // Print word
+            // Print byte
+            printWidth = 1;
+            Code.loadConst(printWidth);
             Code.put(Code.bprint);
         } else {
-            // Print write
+            // Print word
+            Code.loadConst(printWidth);
             Code.put(Code.print);
+        }
+    }
+
+    @Override
+    public void visit(DesignatorStatementUnpackHeader designatorStatementUnpackHeader) {
+        logSyntaxNodeTraversal(designatorStatementUnpackHeader);
+
+        unpackStatetementDesignators.clear();
+        inUnpackStatement = true;
+    }
+
+    @Override
+    public void visit(DesignatorStatementIntermezzo designatorStatementIntermezzo) {
+        logSyntaxNodeTraversal(designatorStatementIntermezzo);
+
+        inUnpackStatement = false;
+    }
+
+    @Override
+    public void visit(DesignatorStatementUnpack designatorStatementUnpack) {
+        logSyntaxNodeTraversal(designatorStatementUnpack);
+
+        for (Obj unpackStatementDesignator: unpackStatetementDesignators) {
+            logSymbolDebugMessage(designatorStatementUnpack, "Detected unpack statement LHS designator", unpackStatementDesignator);
+        }
+
+        Designator rhsDesignator = designatorStatementUnpack.getDesignator();
+        Obj rhsDesignatorSymbol = rhsDesignator.obj;
+
+        logSymbolDebugMessage(designatorStatementUnpack, "Detected unpack statement RHS designator", rhsDesignatorSymbol);
+
+        int lhsDesignatorCount = unpackStatetementDesignators.size();
+        for (int i = lhsDesignatorCount - 1; i >= 0; i--) {
+            Obj lhsDesignatorSymbol = unpackStatetementDesignators.get(i);
+
+            if (!SymbolTable.isValidSymbol(lhsDesignatorSymbol)) {
+                // Skip null lhs designator
+                continue;
+            }
+
+            // Load rhs array element
+            int rhsArrayIndex = i;
+            Code.load(rhsDesignatorSymbol);
+            Code.loadConst(rhsArrayIndex);
+            Code.put(Code.aload);
+
+            // If LHS is an array element use astore instead of store
+            if (lhsDesignatorSymbol.getKind() != Obj.Var) {
+                Code.put(Code.astore);
+            }
+            else {
+                Code.store(lhsDesignatorSymbol);
+            }
         }
     }
 
