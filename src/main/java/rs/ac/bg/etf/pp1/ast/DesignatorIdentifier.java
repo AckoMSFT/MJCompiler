@@ -1,13 +1,24 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/0/2023 18:19:30
+// 12/0/2023 4:32:8
 
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class DesignatorAccessListEpsilon extends DesignatorAccessList {
+public class DesignatorIdentifier extends Designator {
 
-    public DesignatorAccessListEpsilon () {
+    private String name;
+
+    public DesignatorIdentifier (String name) {
+        this.name=name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name=name;
     }
 
     public void accept(Visitor visitor) {
@@ -28,10 +39,13 @@ public class DesignatorAccessListEpsilon extends DesignatorAccessList {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("DesignatorAccessListEpsilon(\n");
+        buffer.append("DesignatorIdentifier(\n");
+
+        buffer.append(" "+tab+name);
+        buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [DesignatorAccessListEpsilon]");
+        buffer.append(") [DesignatorIdentifier]");
         return buffer.toString();
     }
 }

@@ -83,5 +83,6 @@ program test301
 
       // pet.foreach(nizch => print(bodovi););
 
+        [a, , b] = niz;
 	}
 }

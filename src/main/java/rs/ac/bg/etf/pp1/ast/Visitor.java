@@ -1,56 +1,58 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/0/2023 18:19:30
+// 12/0/2023 4:32:8
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public interface Visitor { 
 
-    public void visit(ReturnType ReturnType);
-    public void visit(MaybeArray MaybeArray);
-    public void visit(VarDeclaration VarDeclaration);
+    public void visit(MaybeFormPars MaybeFormPars);
+    public void visit(FormPars FormPars);
+    public void visit(Factor Factor);
+    public void visit(Statement Statement);
+    public void visit(LocalVariableDeclarationList LocalVariableDeclarationList);
+    public void visit(MaybeClassMethodList MaybeClassMethodList);
+    public void visit(Expr Expr);
+    public void visit(ConstDeclarationList ConstDeclarationList);
+    public void visit(VarDecl VarDecl);
+    public void visit(MemberAccess MemberAccess);
+    public void visit(GlobalDeclarationList GlobalDeclarationList);
+    public void visit(LocalVarDeclList LocalVarDeclList);
+    public void visit(AssignmentOperation AssignmentOperation);
+    public void visit(MultiplicationOperator MultiplicationOperator);
+    public void visit(MethodDeclarationList MethodDeclarationList);
+    public void visit(MaybeDesignator MaybeDesignator);
     public void visit(Constant Constant);
-    public void visit(VariableDeclarationList VariableDeclarationList);
+    public void visit(MaybePrintWidth MaybePrintWidth);
+    public void visit(DesignatorAccessList DesignatorAccessList);
+    public void visit(VarDeclaration VarDeclaration);
+    public void visit(DesignatorList DesignatorList);
+    public void visit(Condition Condition);
+    public void visit(DesignatorStatement DesignatorStatement);
     public void visit(Sign Sign);
     public void visit(RelationalOperator RelationalOperator);
-    public void visit(GlobalDeclaration GlobalDeclaration);
-    public void visit(MaybeClassMethodList MaybeClassMethodList);
-    public void visit(ConditionErrorRecovery ConditionErrorRecovery);
     public void visit(StatementList StatementList);
-    public void visit(MethodDeclarationList MethodDeclarationList);
-    public void visit(MaybeExtendedClass MaybeExtendedClass);
-    public void visit(GlobalDeclarationList GlobalDeclarationList);
-    public void visit(Factor Factor);
     public void visit(MaybeActPars MaybeActPars);
-    public void visit(CondTerm CondTerm);
-    public void visit(MultiplicationOperator MultiplicationOperator);
-    public void visit(MaybeFormPars MaybeFormPars);
-    public void visit(ClassVarDeclList ClassVarDeclList);
-    public void visit(Term Term);
-    public void visit(LocalVariableDeclarationList LocalVariableDeclarationList);
-    public void visit(Condition Condition);
-    public void visit(DesignatorAccessList DesignatorAccessList);
     public void visit(ConstructorDeclList ConstructorDeclList);
-    public void visit(FormalParam FormalParam);
-    public void visit(MaybeReturnValue MaybeReturnValue);
-    public void visit(AssignmentOperation AssignmentOperation);
-    public void visit(MaybeElseStatement MaybeElseStatement);
-    public void visit(Expr Expr);
-    public void visit(ActPars ActPars);
-    public void visit(DesignatorList DesignatorList);
-    public void visit(DesignatorStatement DesignatorStatement);
-    public void visit(AdditionOperator AdditionOperator);
     public void visit(ConstFactor ConstFactor);
-    public void visit(Statement Statement);
-    public void visit(VarDecl VarDecl);
+    public void visit(GlobalDeclaration GlobalDeclaration);
+    public void visit(MaybeArray MaybeArray);
+    public void visit(ReturnType ReturnType);
+    public void visit(FormalParam FormalParam);
+    public void visit(CondTerm CondTerm);
+    public void visit(VariableDeclarationList VariableDeclarationList);
     public void visit(ClassDecl ClassDecl);
+    public void visit(MaybeElseStatement MaybeElseStatement);
+    public void visit(AdditionOperator AdditionOperator);
+    public void visit(MaybeExtendedClass MaybeExtendedClass);
+    public void visit(ConditionErrorRecovery ConditionErrorRecovery);
+    public void visit(ClassVarDeclList ClassVarDeclList);
+    public void visit(ActPars ActPars);
+    public void visit(Designator Designator);
     public void visit(CondFact CondFact);
-    public void visit(MaybePrintWidth MaybePrintWidth);
-    public void visit(ConstDeclarationList ConstDeclarationList);
-    public void visit(FormPars FormPars);
-    public void visit(MaybeDesignator MaybeDesignator);
-    public void visit(LocalVarDeclList LocalVarDeclList);
+    public void visit(MaybeReturnValue MaybeReturnValue);
+    public void visit(Term Term);
     public void visit(AssignmentOperationError AssignmentOperationError);
     public void visit(AssignmentOperationExpr AssignmentOperationExpr);
     public void visit(ArrayElement ArrayElement);
@@ -79,15 +81,16 @@ public interface Visitor {
     public void visit(DesignatorListMulti DesignatorListMulti);
     public void visit(MaybeDesignatorEpsilon MaybeDesignatorEpsilon);
     public void visit(MaybeDesignatorIsDesignator MaybeDesignatorIsDesignator);
+    public void visit(DesignatorStatementIntermezzo DesignatorStatementIntermezzo);
+    public void visit(DesignatorStatementUnpackHeader DesignatorStatementUnpackHeader);
     public void visit(DesignatorStatementUnpack DesignatorStatementUnpack);
     public void visit(DesignatorStatementDecrement DesignatorStatementDecrement);
     public void visit(DesignatorStatementIncrement DesignatorStatementIncrement);
     public void visit(DesignatorStatementFunctionInvocation DesignatorStatementFunctionInvocation);
     public void visit(DesignatorStatementAssignment DesignatorStatementAssignment);
-    public void visit(DesignatorAccessListEpsilon DesignatorAccessListEpsilon);
-    public void visit(DesignatorAccessListElement DesignatorAccessListElement);
-    public void visit(DesignatorAccessListMember DesignatorAccessListMember);
-    public void visit(Designator Designator);
+    public void visit(DesignatorElementAccess DesignatorElementAccess);
+    public void visit(DesignatorMemberAccess DesignatorMemberAccess);
+    public void visit(DesignatorIdentifier DesignatorIdentifier);
     public void visit(ConstFactorBoolean ConstFactorBoolean);
     public void visit(ConstFactorCharacter ConstFactorCharacter);
     public void visit(ConstFactorNumber ConstFactorNumber);
@@ -127,6 +130,8 @@ public interface Visitor {
     public void visit(StatementForEachDesignator StatementForEachDesignator);
     public void visit(StatementForEachHeader StatementForEachHeader);
     public void visit(StatementWhileHeader StatementWhileHeader);
+    public void visit(StatementIfElseIntermezzo StatementIfElseIntermezzo);
+    public void visit(StatementIfElseHeader StatementIfElseHeader);
     public void visit(StatementBlock StatementBlock);
     public void visit(StatementForEach StatementForEach);
     public void visit(StatementPrint StatementPrint);
@@ -137,7 +142,6 @@ public interface Visitor {
     public void visit(StatementWhile StatementWhile);
     public void visit(StatementIfElse StatementIfElse);
     public void visit(StatementDesignator StatementDesignator);
-    public void visit(MemberAccess MemberAccess);
     public void visit(MaybeFormParsEpsilon MaybeFormParsEpsilon);
     public void visit(MaybeFormParsIsFormPars MaybeFormParsIsFormPars);
     public void visit(FormalParameterError FormalParameterError);

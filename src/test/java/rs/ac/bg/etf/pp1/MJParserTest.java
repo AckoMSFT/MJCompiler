@@ -4,7 +4,9 @@ import java_cup.runtime.Symbol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rs.ac.bg.etf.pp1.ast.Program;
+import rs.ac.bg.etf.pp1.util.Disassemble;
 import rs.etf.pp1.mj.runtime.Code;
+import rs.etf.pp1.mj.runtime.disasm;
 import rs.etf.pp1.symboltable.Tab;
 
 import java.io.*;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MJParserTest {
+
     static Logger logger = LogManager.getLogger(MJParserTest.class);
 
     public static List<String> findFiles(Path path, String fileExtension)
@@ -53,7 +56,7 @@ public class MJParserTest {
 
 
         String foo = sourceCode.getName();
-        if (!foo.equalsIgnoreCase("test999.mj")) {
+        if (!foo.equalsIgnoreCase("test1312.mj")) {
             logger.info("Skipping...");
             return;
         }
@@ -114,12 +117,6 @@ public class MJParserTest {
             CodeGenerator codeGenerator = new CodeGenerator();
             program.traverseBottomUp(codeGenerator);
 
-            Code.mainPc = codeGenerator.getMainPC();
-
-
-            Code.dataSize = semanticAnalyzer.globalVarCount;
-            Code.mainPc = codeGenerator.getMainPC();
-
 
             File objFile = new File("src/test/resources/program.obj");
             if (objFile.exists()) {
@@ -127,6 +124,19 @@ public class MJParserTest {
             }
 
             Code.write(new FileOutputStream(objFile));
+
+            // DisAssm
+
+            Disassemble disassemble = new Disassemble();
+
+                InputStream ss = new FileInputStream(objFile);
+                byte[] code = new byte[8206];
+                int len = ss.read(code);
+                disassemble.code = code;
+                disassemble.off = 14;
+                disassemble.cur = 14;
+                disassemble.decode(code, len);
+
 
             //RuleVisitor v = new RuleVisitor();
             //program.traverseBottomUp(v);

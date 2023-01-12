@@ -6,6 +6,8 @@ public class ErrorMessageGenerator {
     public enum MessageType {
         /* Debug */
         SYNTAX_NODE_TRAVERSAL,
+        DEBUG_MESSAGE,
+        DEBUG_OPERATION_MESSAGE,
         DEBUG_SYMBOL_MESSAGE,
         /* Info */
         CONST_DECLARATION,
@@ -45,6 +47,8 @@ public class ErrorMessageGenerator {
         INVALID_FOR_EACH_ITERATOR_DESIGNATOR,
         TYPE_MISMATCH_FOR_EACH_ITERATOR_DESIGNATOR,
         INVALID_FOR_EACH_DESIGNATOR_TYPE,
+        INVALID_UNPACK_STATEMENT_RHS_DESIGNATOR_TYPE,
+        INCOMPATIBLE_UNPACK_STATEMENT_LHS_DESIGNATOR_TYPE,
     }
 
     public static String generateMessage(MessageType messageType, Object... params) {
@@ -54,11 +58,20 @@ public class ErrorMessageGenerator {
         int formalParameterCount, actualParameterCount;
         String formalParameter, actualParameter;
         String actualDesignator, iteratorDesignator;
+        String lhsDesignator, rhsDesignator;
+        String operation;
 
         switch (messageType) {
             case SYNTAX_NODE_TRAVERSAL:
                 SyntaxNode syntaxNode = (SyntaxNode) params[0];
                 return String.format("Traversing syntax node %s.", syntaxNode.getClass().getSimpleName());
+            case DEBUG_MESSAGE:
+                debugMessage = (String) params[0];
+                return String.format("%s.", debugMessage);
+            case DEBUG_OPERATION_MESSAGE:
+                debugMessage = (String) params[0];
+                operation = (String) params[1];
+                return String.format("%s. [ %s ]", debugMessage, operation);
             case DEBUG_SYMBOL_MESSAGE:
                 debugMessage = (String) params[0];
                 symbol = (String) params[1];
@@ -90,7 +103,8 @@ public class ErrorMessageGenerator {
                 return "Program must have a main function with return type void and no arguments.";
             case MAIN_METHOD_RETURN_TYPE_MISMATCH:
                 type = (String) params[0];
-                return String.format("Program must have a main function with return type void. Declared function is of type %s.", type);
+                return String.format("Program must have a main function with return type void. " +
+                        "Declared function is of type %s.", type);
             case MAIN_METHOD_ARGUMENT_MISMATCH:
                 return "Main function is declared with arguments, it shouldn't have any arguments.";
             case TYPE_MISMATCH:
@@ -104,11 +118,13 @@ public class ErrorMessageGenerator {
             case INCOMPATIBLE_RETURN_TYPE:
                 actualType = (String) params[0];
                 expectedType = (String) params[1];
-                return String.format("Incompatible return type. Expected type %s, actual type %s.", expectedType, actualType);
+                return String.format("Incompatible return type. Expected type %s, actual type %s.",
+                        expectedType, actualType);
             case ILLEGAL_RELATIONAL_OPERATOR:
                 lhsType = (String) params[0];
                 relationalOperator = (String) params[1];
-                return String.format("Relational operator %s cannot be applied to lhs with type %s.", relationalOperator, lhsType);
+                return String.format("Relational operator %s cannot be applied to lhs with type %s.",
+                        relationalOperator, lhsType);
             case ADDITIONAL_ERROR_DESCRIPTION:
                 additionalErrorDescription = (String) params[0];
                 return additionalErrorDescription;
@@ -123,16 +139,21 @@ public class ErrorMessageGenerator {
                 return String.format("Name shadowing detected for reserved name %s.", name);
             case NOT_A_BASIC_TYPE:
                 actualType = (String) params[0];
-                return String.format("Expression must have a basic type (int, char, bool). Actual type is %s.", actualType);
+                return String.format("Expression must have a basic type (int, char, bool). " +
+                        "Actual type is %s.", actualType);
             case NON_VOID_RETURN_STATEMENT_INSIDE_VOID_FUNCTION:
                 actualType = (String) params[0];
-                return String.format("Non-void return statement found inside a void function. Actual type is %s.", actualType);
+                return String.format("Non-void return statement found inside a void function. " +
+                        "Actual type is %s.", actualType);
             case CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED:
-                return "Class member access operator detected. This is not supported in Acko's MJCompiler since it's not done for level C.";
+                return "Class member access operator detected. This is not supported in Acko's MJCompiler " +
+                        "since it's not done for level C.";
             case CLASS_INSTANTIATION_NOT_SUPPORTED:
-                return "Class instantiation detected. This is not supported in Acko's MJCompiler since it's not done for level C.";
+                return "Class instantiation detected. This is not supported in Acko's MJCompiler " +
+                        "since it's not done for level C.";
             case CLASS_DECLARATION_NOT_SUPPORTED:
-                return "Class declaration detected. This is not supported in Acko's MJCompiler since it's not done for level C.";
+                return "Class declaration detected. This is not supported in Acko's MJCompiler " +
+                        "since it's not done for level C.";
             case INCOMPATIBLE_ARRAY_INDEX_TYPE:
                 actualType = (String) params[0];
                 return String.format("Array index must be of type int. Actual type %s.", actualType);
@@ -146,27 +167,33 @@ public class ErrorMessageGenerator {
                 symbolType = (SYMBOL_TYPE) params[1];
                 actualType = GetSymbolTypeName(symbolType);
                 symbolDescription = (String) params[2];
-                return String.format("Detected symbol usage. Name %s, symbol type %s. %s.", name, actualType, symbolDescription);
+                return String.format("Detected symbol usage. Name %s, symbol type %s. " +
+                        "%s.", name, actualType, symbolDescription);
             case NON_BASIC_TYPE_READ:
                 actualType = (String) params[1];
                 return String.format("You can only read basic types (int, char, bool). Actual type is %s.", actualType);
             case NON_ASSIGNABLE_SYMBOL:
                 symbol = (String) params[0];
-                return String.format("Cannot assign value to %s. You can only assign value to Var and Elem symbol types.", symbol);
+                return String.format("Cannot assign value to %s. You can only assign value to Var and " +
+                        "Elem symbol types.", symbol);
             case PARAMETER_COUNT_MISMATCH:
                 formalParameterCount = (int) params[0];
                 actualParameterCount = (int) params[1];
-                return String.format("Parameter count mismatch. Formal parameter count %d, actual parameter count %d", formalParameterCount, actualParameterCount);
+                return String.format("Parameter count mismatch. Formal parameter count %d, actual " +
+                        "parameter count %d", formalParameterCount, actualParameterCount);
             case FORMAL_AND_ACTUAL_PARAMETER_MISMATCH:
                 formalParameter = (String) params[0];
                 actualParameter = (String) params[1];
-                return String.format("Cannot assign actual parameter %s to formal parameter %s during function invocation due to type mismatch.", actualParameter, formalParameter);
+                return String.format("Cannot assign actual parameter %s to formal parameter %s during function " +
+                        "invocation due to type mismatch.", actualParameter, formalParameter);
             case INVALID_FUNCTION_INVOCATION:
                 symbol = (String) params[0];
-                return String.format("Cannot perform a function invocation on symbol %s as it is not a Meth symbol.", symbol);
+                return String.format("Cannot perform a function invocation on symbol %s " +
+                        "as it is not a Meth symbol.", symbol);
             case INVALID_FOR_EACH_ITERATOR_DESIGNATOR:
                 symbol = (String) params[0];
-                return String.format("Invalid foreach statement iterator designator. It must be a local or global variable. Actual iterator designator: %s.", symbol);
+                return String.format("Invalid foreach statement iterator designator. It must be a local or global variable. " +
+                        "Actual iterator designator: %s.", symbol);
             case INVALID_FOR_EACH_DESIGNATOR_TYPE:
                 actualDesignator = (String) params[0];
                 return String.format("Invalid type for foreach statement designator. " +
@@ -177,6 +204,16 @@ public class ErrorMessageGenerator {
                 return String.format("Type mismatch between foreach statement designator and iterator designator. " +
                         "Foreach statement designator must be an array of type of iterator designator. " +
                         "Foreach statement designator: %s, iterator designator %s.", actualDesignator, iteratorDesignator);
+            case INVALID_UNPACK_STATEMENT_RHS_DESIGNATOR_TYPE:
+                actualDesignator = (String) params[0];
+                return String.format("Invalid type for RHS designator in unpack statement. " +
+                        "RHS designator must be an array. Actual RHS designator: %s.", actualDesignator);
+            case INCOMPATIBLE_UNPACK_STATEMENT_LHS_DESIGNATOR_TYPE:
+                lhsDesignator = (String) params[0];
+                rhsDesignator = (String) params[1];
+                return String.format("Invalid type for LHS designator in unpack statement. " +
+                        "LHS designator must be assignment-compatible with RHS designator. LHS designator: %s, " +
+                        "RHS designator: %s.", lhsDesignator, rhsDesignator);
             default:
                 return "NOT_YET_IMPLEMENTED";
         }

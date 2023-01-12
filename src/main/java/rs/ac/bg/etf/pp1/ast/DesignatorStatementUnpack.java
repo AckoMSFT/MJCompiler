@@ -1,23 +1,34 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/0/2023 18:19:30
+// 12/0/2023 4:32:8
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class DesignatorStatementUnpack extends DesignatorStatement {
 
+    private DesignatorStatementUnpackHeader DesignatorStatementUnpackHeader;
     private DesignatorList DesignatorList;
-    private AssignmentOperator AssignmentOperator;
+    private DesignatorStatementIntermezzo DesignatorStatementIntermezzo;
     private Designator Designator;
 
-    public DesignatorStatementUnpack (DesignatorList DesignatorList, AssignmentOperator AssignmentOperator, Designator Designator) {
+    public DesignatorStatementUnpack (DesignatorStatementUnpackHeader DesignatorStatementUnpackHeader, DesignatorList DesignatorList, DesignatorStatementIntermezzo DesignatorStatementIntermezzo, Designator Designator) {
+        this.DesignatorStatementUnpackHeader=DesignatorStatementUnpackHeader;
+        if(DesignatorStatementUnpackHeader!=null) DesignatorStatementUnpackHeader.setParent(this);
         this.DesignatorList=DesignatorList;
         if(DesignatorList!=null) DesignatorList.setParent(this);
-        this.AssignmentOperator=AssignmentOperator;
-        if(AssignmentOperator!=null) AssignmentOperator.setParent(this);
+        this.DesignatorStatementIntermezzo=DesignatorStatementIntermezzo;
+        if(DesignatorStatementIntermezzo!=null) DesignatorStatementIntermezzo.setParent(this);
         this.Designator=Designator;
         if(Designator!=null) Designator.setParent(this);
+    }
+
+    public DesignatorStatementUnpackHeader getDesignatorStatementUnpackHeader() {
+        return DesignatorStatementUnpackHeader;
+    }
+
+    public void setDesignatorStatementUnpackHeader(DesignatorStatementUnpackHeader DesignatorStatementUnpackHeader) {
+        this.DesignatorStatementUnpackHeader=DesignatorStatementUnpackHeader;
     }
 
     public DesignatorList getDesignatorList() {
@@ -28,12 +39,12 @@ public class DesignatorStatementUnpack extends DesignatorStatement {
         this.DesignatorList=DesignatorList;
     }
 
-    public AssignmentOperator getAssignmentOperator() {
-        return AssignmentOperator;
+    public DesignatorStatementIntermezzo getDesignatorStatementIntermezzo() {
+        return DesignatorStatementIntermezzo;
     }
 
-    public void setAssignmentOperator(AssignmentOperator AssignmentOperator) {
-        this.AssignmentOperator=AssignmentOperator;
+    public void setDesignatorStatementIntermezzo(DesignatorStatementIntermezzo DesignatorStatementIntermezzo) {
+        this.DesignatorStatementIntermezzo=DesignatorStatementIntermezzo;
     }
 
     public Designator getDesignator() {
@@ -49,21 +60,24 @@ public class DesignatorStatementUnpack extends DesignatorStatement {
     }
 
     public void childrenAccept(Visitor visitor) {
+        if(DesignatorStatementUnpackHeader!=null) DesignatorStatementUnpackHeader.accept(visitor);
         if(DesignatorList!=null) DesignatorList.accept(visitor);
-        if(AssignmentOperator!=null) AssignmentOperator.accept(visitor);
+        if(DesignatorStatementIntermezzo!=null) DesignatorStatementIntermezzo.accept(visitor);
         if(Designator!=null) Designator.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
+        if(DesignatorStatementUnpackHeader!=null) DesignatorStatementUnpackHeader.traverseTopDown(visitor);
         if(DesignatorList!=null) DesignatorList.traverseTopDown(visitor);
-        if(AssignmentOperator!=null) AssignmentOperator.traverseTopDown(visitor);
+        if(DesignatorStatementIntermezzo!=null) DesignatorStatementIntermezzo.traverseTopDown(visitor);
         if(Designator!=null) Designator.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
+        if(DesignatorStatementUnpackHeader!=null) DesignatorStatementUnpackHeader.traverseBottomUp(visitor);
         if(DesignatorList!=null) DesignatorList.traverseBottomUp(visitor);
-        if(AssignmentOperator!=null) AssignmentOperator.traverseBottomUp(visitor);
+        if(DesignatorStatementIntermezzo!=null) DesignatorStatementIntermezzo.traverseBottomUp(visitor);
         if(Designator!=null) Designator.traverseBottomUp(visitor);
         accept(visitor);
     }
@@ -73,14 +87,20 @@ public class DesignatorStatementUnpack extends DesignatorStatement {
         buffer.append(tab);
         buffer.append("DesignatorStatementUnpack(\n");
 
+        if(DesignatorStatementUnpackHeader!=null)
+            buffer.append(DesignatorStatementUnpackHeader.toString("  "+tab));
+        else
+            buffer.append(tab+"  null");
+        buffer.append("\n");
+
         if(DesignatorList!=null)
             buffer.append(DesignatorList.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");
 
-        if(AssignmentOperator!=null)
-            buffer.append(AssignmentOperator.toString("  "+tab));
+        if(DesignatorStatementIntermezzo!=null)
+            buffer.append(DesignatorStatementIntermezzo.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

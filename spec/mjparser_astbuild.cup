@@ -159,14 +159,15 @@ nonterminal Statement Statement;
 nonterminal MaybeElseStatement MaybeElseStatement;
 nonterminal StatementList StatementList;
 nonterminal ConstFactor ConstFactor;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj StatementIfElseHeader, StatementIfElseIntermezzo;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj StatementForEachHeader, StatementForEachDesignator, StatementWhileHeader;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj DesignatorStatementUnpackHeader, DesignatorStatementIntermezzo;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj Expr, Factor, Term;
 nonterminal MaybePrintWidth MaybePrintWidth;
 nonterminal MaybeReturnValue MaybeReturnValue;
 
 /* Designators */
-nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator, DesignatorStatement;
-nonterminal DesignatorAccessList DesignatorAccessList;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator, DesignatorStatement, DesignatorAccessList;
 nonterminal MemberAccess MemberAccess;
 nonterminal MaybeDesignator MaybeDesignator;
 nonterminal DesignatorList DesignatorList;
@@ -356,24 +357,9 @@ MaybeFormPars ::=
     | "{" {Statement} "}".
 */
 
-/*
-    Shift/Reduce conflict found in state #73
-      between Designator ::= IDENTIFIER DesignatorAccessList (*)
-      and     MemberElement ::= (*) DOT IDENTIFIER
-      under symbol DOT
-      Resolved in favor of shifting.
-
-    Need to introduce a new non-terminal MemberAccess for IDENTIFIER DesignatorAccessList DOT
-*/
-
-/* MemberAccess := ident DesignatorAccessList "." */
-
-MemberAccess ::=
-    (MemberAccess) IDENTIFIER:designator DesignatorAccessList:D1 DOT {: RESULT=new MemberAccess(designator, D1); RESULT.setLine(designatorleft); :};
-
 Statement ::=
     (StatementDesignator) DesignatorStatement:D1 SEMI_COLON {: RESULT=new StatementDesignator(D1); RESULT.setLine(D1left); :}
-    | (StatementIfElse) IF LEFT_PARENTHESES ConditionErrorRecovery:C1 Statement:S2 MaybeElseStatement:M3 {: RESULT=new StatementIfElse(C1, S2, M3); RESULT.setLine(C1left); :}
+    | (StatementIfElse) StatementIfElseHeader:S1 Statement:S2 MaybeElseStatement:M3 {: RESULT=new StatementIfElse(S1, S2, M3); RESULT.setLine(S1left); :}
     | (StatementWhile) StatementWhileHeader:S1 Condition:C2 RIGHT_PARENTHESES Statement:S3 {: RESULT=new StatementWhile(S1, C2, S3); RESULT.setLine(S1left); :}
     | (StatementBreak) BREAK SEMI_COLON {: RESULT=new StatementBreak(); :}
     | (StatementContinue) CONTINUE SEMI_COLON {: RESULT=new StatementContinue(); :}
@@ -382,6 +368,12 @@ Statement ::=
     | (StatementPrint) PRINT LEFT_PARENTHESES Expr:E1 MaybePrintWidth:M2 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new StatementPrint(E1, M2); RESULT.setLine(E1left); :}
     | (StatementForEach) StatementForEachHeader:S1 StatementForEachDesignator:S2 Statement:S3 RIGHT_PARENTHESES SEMI_COLON {: RESULT=new StatementForEach(S1, S2, S3); RESULT.setLine(S1left); :}
     | (StatementBlock) LEFT_BRACE StatementList:S1 RIGHT_BRACE {: RESULT=new StatementBlock(S1); RESULT.setLine(S1left); :};
+
+StatementIfElseHeader ::=
+    (StatementIfElseHeader) StatementIfElseIntermezzo:S1 ConditionErrorRecovery:C2 {: RESULT=new StatementIfElseHeader(S1, C2); RESULT.setLine(S1left); :};
+
+StatementIfElseIntermezzo ::=
+    (StatementIfElseIntermezzo) IF LEFT_PARENTHESES {: RESULT=new StatementIfElseIntermezzo(); :};
 
 StatementWhileHeader ::=
     (StatementWhileHeader) WHILE LEFT_PARENTHESES {: RESULT=new StatementWhileHeader(); :};
@@ -405,7 +397,7 @@ MaybeReturnValue ::=
 /* MaybePrintWidth = ["," numConst] */
 
 MaybePrintWidth ::=
-    (MaybePrintWidthIsPrintWidth) COMMA CONST_NUMBER:C1 {: RESULT=new MaybePrintWidthIsPrintWidth(C1); RESULT.setLine(C1left); :}
+    (MaybePrintWidthIsPrintWidth) COMMA CONST_NUMBER:printWidth {: RESULT=new MaybePrintWidthIsPrintWidth(printWidth); RESULT.setLine(printWidthleft); :}
     | (MaybePrintWidthEpsilon) {: RESULT=new MaybePrintWidthEpsilon(); :} /* epsilon */;
 
 MaybeElseStatement ::=
@@ -504,14 +496,9 @@ ConstFactor ::=
 /* Designator = ident {"." ident | "[" Expr "]"} */
 
 Designator ::=
-    (Designator) IDENTIFIER:name DesignatorAccessList:designatorAccessList {: RESULT=new Designator(name, designatorAccessList); RESULT.setLine(nameleft); :};
-
-/* DesignatorAccessList = {"." ident | "[" Expr "]"} */
-
-DesignatorAccessList ::=
-    (DesignatorAccessListMember) DesignatorAccessList:D1 MemberElement:M2 {: RESULT=new DesignatorAccessListMember(D1, M2); RESULT.setLine(D1left); :}
-    | (DesignatorAccessListElement) DesignatorAccessList:D1 ArrayElement:A2 {: RESULT=new DesignatorAccessListElement(D1, A2); RESULT.setLine(D1left); :}
-    | (DesignatorAccessListEpsilon) {: RESULT=new DesignatorAccessListEpsilon(); :} /* epsilon */;
+    (DesignatorIdentifier) IDENTIFIER:name {: RESULT=new DesignatorIdentifier(name); RESULT.setLine(nameleft); :}
+    | (DesignatorMemberAccess) Designator:D1 DOT IDENTIFIER:name {: RESULT=new DesignatorMemberAccess(D1, name); RESULT.setLine(D1left); :}
+    | (DesignatorElementAccess) Designator:D1 ArrayElement:A2 {: RESULT=new DesignatorElementAccess(D1, A2); RESULT.setLine(D1left); :};
 
 /*
     DesignatorStatement =
@@ -524,7 +511,13 @@ DesignatorStatement ::=
     | (DesignatorStatementFunctionInvocation) FunctionInvocationHeader:F1 FunctionInvocation:F2 {: RESULT=new DesignatorStatementFunctionInvocation(F1, F2); RESULT.setLine(F1left); :}
     | (DesignatorStatementIncrement) Designator:D1 INCREMENT {: RESULT=new DesignatorStatementIncrement(D1); RESULT.setLine(D1left); :}
     | (DesignatorStatementDecrement) Designator:D1 DECREMENT {: RESULT=new DesignatorStatementDecrement(D1); RESULT.setLine(D1left); :}
-    | (DesignatorStatementUnpack) LEFT_BRACKET DesignatorList:D1 RIGHT_BRACKET AssignmentOperator:A2 Designator:D3 {: RESULT=new DesignatorStatementUnpack(D1, A2, D3); RESULT.setLine(D1left); :};
+    | (DesignatorStatementUnpack) DesignatorStatementUnpackHeader:D1 DesignatorList:D2 DesignatorStatementIntermezzo:D3 Designator:D4 {: RESULT=new DesignatorStatementUnpack(D1, D2, D3, D4); RESULT.setLine(D1left); :};
+
+DesignatorStatementUnpackHeader ::=
+    (DesignatorStatementUnpackHeader) LEFT_BRACKET {: RESULT=new DesignatorStatementUnpackHeader(); :};
+
+DesignatorStatementIntermezzo ::=
+    (DesignatorStatementIntermezzo) RIGHT_BRACKET AssignmentOperator:A1 {: RESULT=new DesignatorStatementIntermezzo(A1); RESULT.setLine(A1left); :};
 
 MaybeDesignator ::=
     (MaybeDesignatorIsDesignator) Designator:D1 {: RESULT=new MaybeDesignatorIsDesignator(D1); RESULT.setLine(D1left); :}

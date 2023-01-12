@@ -129,13 +129,15 @@ nonterminal rs.etf.pp1.symboltable.concepts.Obj FormalParam;
 
 /* Statements */
 nonterminal Statement, MaybeElseStatement, StatementList, ConstFactor;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj StatementIfElseHeader, StatementIfElseIntermezzo;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj StatementForEachHeader, StatementForEachDesignator, StatementWhileHeader;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj DesignatorStatementUnpackHeader, DesignatorStatementIntermezzo;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj Expr, Factor, Term;
 nonterminal MaybePrintWidth, MaybeReturnValue;
 
 /* Designators */
-nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator, DesignatorStatement;
-nonterminal DesignatorAccessList, MemberAccess, MaybeDesignator, DesignatorList;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator, DesignatorStatement, DesignatorAccessList;
+nonterminal MemberAccess, MaybeDesignator, DesignatorList;
 
 /* Conditions */
 nonterminal ConditionErrorRecovery;
@@ -322,24 +324,9 @@ MaybeFormPars ::=
     | "{" {Statement} "}".
 */
 
-/*
-    Shift/Reduce conflict found in state #73
-      between Designator ::= IDENTIFIER DesignatorAccessList (*)
-      and     MemberElement ::= (*) DOT IDENTIFIER
-      under symbol DOT
-      Resolved in favor of shifting.
-
-    Need to introduce a new non-terminal MemberAccess for IDENTIFIER DesignatorAccessList DOT
-*/
-
-/* MemberAccess := ident DesignatorAccessList "." */
-
-MemberAccess ::=
-    (MemberAccess) IDENTIFIER:designator DesignatorAccessList DOT;
-
 Statement ::=
     (StatementDesignator) DesignatorStatement SEMI_COLON
-    | (StatementIfElse) IF LEFT_PARENTHESES ConditionErrorRecovery Statement MaybeElseStatement
+    | (StatementIfElse) StatementIfElseHeader Statement MaybeElseStatement
     | (StatementWhile) StatementWhileHeader Condition RIGHT_PARENTHESES Statement
     | (StatementBreak) BREAK SEMI_COLON
     | (StatementContinue) CONTINUE SEMI_COLON
@@ -348,6 +335,12 @@ Statement ::=
     | (StatementPrint) PRINT LEFT_PARENTHESES Expr MaybePrintWidth RIGHT_PARENTHESES SEMI_COLON
     | (StatementForEach) StatementForEachHeader StatementForEachDesignator Statement RIGHT_PARENTHESES SEMI_COLON
     | (StatementBlock) LEFT_BRACE StatementList RIGHT_BRACE;
+
+StatementIfElseHeader ::=
+    (StatementIfElseHeader) StatementIfElseIntermezzo ConditionErrorRecovery;
+
+StatementIfElseIntermezzo ::=
+    (StatementIfElseIntermezzo) IF LEFT_PARENTHESES;
 
 StatementWhileHeader ::=
     (StatementWhileHeader) WHILE LEFT_PARENTHESES;
@@ -371,7 +364,7 @@ MaybeReturnValue ::=
 /* MaybePrintWidth = ["," numConst] */
 
 MaybePrintWidth ::=
-    (MaybePrintWidthIsPrintWidth) COMMA CONST_NUMBER
+    (MaybePrintWidthIsPrintWidth) COMMA CONST_NUMBER:printWidth
     | (MaybePrintWidthEpsilon) /* epsilon */;
 
 MaybeElseStatement ::=
@@ -470,14 +463,9 @@ ConstFactor ::=
 /* Designator = ident {"." ident | "[" Expr "]"} */
 
 Designator ::=
-    (Designator) IDENTIFIER:name DesignatorAccessList:designatorAccessList;
-
-/* DesignatorAccessList = {"." ident | "[" Expr "]"} */
-
-DesignatorAccessList ::=
-    (DesignatorAccessListMember) DesignatorAccessList MemberElement
-    | (DesignatorAccessListElement) DesignatorAccessList ArrayElement
-    | (DesignatorAccessListEpsilon) /* epsilon */;
+    (DesignatorIdentifier) IDENTIFIER:name
+    | (DesignatorMemberAccess) Designator DOT IDENTIFIER:name
+    | (DesignatorElementAccess) Designator ArrayElement;
 
 /*
     DesignatorStatement =
@@ -490,7 +478,13 @@ DesignatorStatement ::=
     | (DesignatorStatementFunctionInvocation) FunctionInvocationHeader FunctionInvocation
     | (DesignatorStatementIncrement) Designator INCREMENT
     | (DesignatorStatementDecrement) Designator DECREMENT
-    | (DesignatorStatementUnpack) LEFT_BRACKET DesignatorList RIGHT_BRACKET AssignmentOperator Designator;
+    | (DesignatorStatementUnpack) DesignatorStatementUnpackHeader DesignatorList DesignatorStatementIntermezzo Designator;
+
+DesignatorStatementUnpackHeader ::=
+    (DesignatorStatementUnpackHeader) LEFT_BRACKET;
+
+DesignatorStatementIntermezzo ::=
+    (DesignatorStatementIntermezzo) RIGHT_BRACKET AssignmentOperator;
 
 MaybeDesignator ::=
     (MaybeDesignatorIsDesignator) Designator

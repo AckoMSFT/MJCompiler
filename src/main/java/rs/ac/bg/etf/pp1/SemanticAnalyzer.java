@@ -1,5 +1,6 @@
 package rs.ac.bg.etf.pp1;
 
+import jdk.nashorn.internal.runtime.regexp.joni.Syntax;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rs.ac.bg.etf.pp1.ast.*;
@@ -13,8 +14,7 @@ import rs.etf.pp1.symboltable.concepts.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static rs.ac.bg.etf.pp1.SymbolTable.FP_POS_INVALID;
-import static rs.ac.bg.etf.pp1.SymbolTable.LEVEL_LOCAL;
+import static rs.ac.bg.etf.pp1.SymbolTable.*;
 
 public class SemanticAnalyzer extends VisitorAdaptor {
 
@@ -47,7 +47,13 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
     private Obj currentMethodSymbol = Tab.noObj;
 
-    private String currentDesignatorName = null;
+    private boolean inUnpackStatement = false;
+
+    private ArrayList<Obj> unpackStatetementDesignators;
+
+    SemanticAnalyzer() {
+        unpackStatetementDesignators = new ArrayList<>();
+    }
 
     private void logInfo(SyntaxNode syntaxNode, MessageType messageType, Object... params) {
         String message = ErrorMessageGenerator.generateMessage(messageType, params);
@@ -204,6 +210,17 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logError(syntaxNode, MessageType.INVALID_FOR_EACH_DESIGNATOR_TYPE, actualDesignator);
     }
 
+    private void logInvalidUnpackStatementRHSDesignatorType(SyntaxNode syntaxNode, Obj rhsDesignatorSymbol) {
+        String rhsDesignator = SymbolTable.ObjToString(rhsDesignatorSymbol);
+        logError(syntaxNode, MessageType.INVALID_UNPACK_STATEMENT_RHS_DESIGNATOR_TYPE, rhsDesignator);
+    }
+
+
+    private void logIncompatibleUnpackStatementLHSDesignatorType(SyntaxNode syntaxNode, Obj lhsDesignatorSymbol, Obj rhsDesignatorSymbol) {
+        String lhsDesignator = SymbolTable.ObjToString(lhsDesignatorSymbol);
+        String rhsDesignator = SymbolTable.ObjToString(rhsDesignatorSymbol);
+        logError(syntaxNode, MessageType.INCOMPATIBLE_UNPACK_STATEMENT_LHS_DESIGNATOR_TYPE, lhsDesignator, rhsDesignator);
+    }
     @Override
     public void visit(Program program) {
         // TODO (acko) GetNVars?
@@ -318,6 +335,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
         boolean isArray = variableDeclaration.getMaybeArray() instanceof MaybeArrayIsArray;
         Obj sym = SymbolTable.insert(Obj.Var, variableName, isArray ? new Struct(Struct.Array, currentTypeSymbol) : currentTypeSymbol);
+        sym.setLevel(LEVEL_GLOBAL);
+        sym.setFpPos(FP_POS_INVALID);
 
         logGlobalVariableDeclaration(variableDeclaration, variableName, SymbolTable.getTypeName(currentTypeSymbol) + (isArray ? "[]" : ""));
     }
@@ -510,7 +529,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
             Struct formalParameterType = formalParameter.getType();
             Struct actualParameterType = actualParameter.getType();
 
-            if (!actualParameterType.compatibleWith(formalParameterType)) {
+            if (!actualParameterType.assignableTo(formalParameterType)) {
                 logFormalAndActualParameterMismatch(factorFunctionInvocation, formalParameter, actualParameter);
             }
 
@@ -952,7 +971,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     @Override
     public void visit(StatementForEachHeader statementForEachHeader) {
         logSyntaxNodeTraversal(statementForEachHeader);
-
+/*
         MemberAccess memberAccess = statementForEachHeader.getMemberAccess();
         String name = memberAccess.getDesignator();
         DesignatorAccessList designatorAccessList = memberAccess.getDesignatorAccessList();
@@ -999,12 +1018,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
             return;
         }
 
-        currentDesignatorName = name;
         statementForEachHeader.obj = symbol;
 
         if (isArrayElement) {
             // TODO(acko): Check if this is actually array?
-            statementForEachHeader.obj = new Obj(Obj.Elem, symbol.getName(), symbol.getType().getElemType());
+            //// TODO(acko): FIX ME PLEASE
+             statementForEachHeader.obj = new Obj(Obj.Elem, symbol.getName(), symbol.getType().getElemType());
         }
 
         Obj statementForEachHeaderObj = statementForEachHeader.obj;
@@ -1019,6 +1038,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
         logSymbolDebugMessage(statementForEachHeader,"StatementForEachHeader", statementForEachHeader.obj);
         currentLoopDepth++;
+        */ // TOOD (acko): Fix foreach
+
     }
 
     @Override
@@ -1073,14 +1094,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         Designator = ident {"." ident | "[" Expr "]"}
 
         Designator ::=
-            (DesignatorIdentifier) IDENTIFIER DesignatorAccessList;
-
-        DesignatorAccessList = {"." ident | "[" Expr "]"}
-
-        DesignatorAccessList ::=
-            (DesignatorAccessListMember) DesignatorAccessList MemberElement
-            | (DesignatorAccessListElement) DesignatorAccessList ArrayElement
-            | (DesignatorAccessListEpsilon) ;
+            (DesignatorIdentifier) IDENTIFIER:name
+            | (DesignatorMemberAccess) Designator DOT IDENTIFIER:name
+            | (DesignatorElementAccess) Designator ArrayElement;
 
         DesignatorStatement =
             Designator (Assignop Expr | "(" [ActPars] ")" | "++" | "--")
@@ -1101,94 +1117,121 @@ public class SemanticAnalyzer extends VisitorAdaptor {
             (DesignatorListMulti) DesignatorList COMMA MaybeDesignator
             | (DesignatorListSingle) MaybeDesignator;
      */
+
     @Override
-    public void visit(Designator designator) {
-        logSyntaxNodeTraversal(designator);
+    public void visit(MaybeDesignatorEpsilon maybeDesignatorEpsilon) {
+        logSyntaxNodeTraversal(maybeDesignatorEpsilon);
 
-        String name = designator.getName();
-        DesignatorAccessList designatorAccessList = designator.getDesignatorAccessList();
-
-        boolean isArrayElement = false;
-
-        // Designator = ident {"." ident | "[" Expr "]"}
-        // This means that we can indefinitely chain class member access and array index access
-        // Since this project is for level B (i.e. no classes) and we don't have >1-dimensional data types supported
-        // Designator can only be variable or array element
-
-        if (designatorAccessList instanceof DesignatorAccessListMember) {
-            // Class member access isn't allowed
-            logError(designator, MessageType.CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED);
-            return;
-        } else if (designatorAccessList instanceof DesignatorAccessListElement) {
-            ArrayElement arrayElement = ((DesignatorAccessListElement) designatorAccessList).getArrayElement();
-            Expr arrayElementIndex = arrayElement.getExpr();
-
-            Obj arrayElementIndexSymbol = arrayElementIndex.obj;
-            if (!SymbolTable.isValidSymbol(arrayElementIndexSymbol)) {
-                // TODO (acko): Do we need error here?
-                return;
-            }
-
-            Struct arrayElementIndexType = arrayElementIndex.obj.getType();
-
-            if (!arrayElementIndexType.equals(SymbolTable.intType)) {
-                logIncompatibleArrayIndexType(designator, arrayElementIndexType);
-                return;
-            }
-
-            DesignatorAccessList nextDesignatorAccessList = ((DesignatorAccessListElement) designatorAccessList).getDesignatorAccessList();
-
-            if (nextDesignatorAccessList instanceof DesignatorAccessListMember) {
-                // Class member access isn't allowed
-                logError(designator, MessageType.CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED);
-                return;
-            } else if (nextDesignatorAccessList instanceof DesignatorAccessListElement) {
-                logError(designator, MessageType.NON_ONE_DIMENSIONAL_ARRAY_DETECTED);
-                return;
-            }
-
-            isArrayElement = true;
+        if (inUnpackStatement) {
+            unpackStatetementDesignators.add(null);
         }
+    }
 
-        // Handle array better?
-        Obj symbol = SymbolTable.getSymbol(name, false);
-        if (!SymbolTable.isValidSymbol(symbol)) {
-            logUndefinedSymbolError(designator, name);
+    @Override
+    public void visit(MaybeDesignatorIsDesignator maybeDesignatorIsDesignator) {
+        logSyntaxNodeTraversal(maybeDesignatorIsDesignator);
+    }
+
+    @Override
+    public void visit(DesignatorIdentifier designatorIdentifier) {
+        logSyntaxNodeTraversal(designatorIdentifier);
+
+        String name = designatorIdentifier.getName();
+
+        Obj designatorSymbol = SymbolTable.getSymbol(name, false);
+        if (!SymbolTable.isValidSymbol(designatorSymbol)) {
+            logUndefinedSymbolError(designatorIdentifier, name);
             return;
         }
 
-        currentDesignatorName = name;
-        designator.obj = symbol;
-
-        if (isArrayElement) {
-            // TODO(acko): Check if this is actually array?
-            designator.obj = new Obj(Obj.Elem, symbol.getName(), symbol.getType().getElemType());
-        }
+        designatorIdentifier.obj = designatorSymbol;
 
         // Log symbol usage
-        switch (symbol.getKind()) {
+        switch (designatorSymbol.getKind()) {
             case Obj.Con:
-                logSymbolUsage(designator, name, ErrorMessageGenerator.SYMBOL_TYPE.SYMBOLIC_CONSTANT, symbol);
+                logSymbolUsage(designatorIdentifier, name, ErrorMessageGenerator.SYMBOL_TYPE.SYMBOLIC_CONSTANT, designatorSymbol);
                 break;
             case Obj.Var:
                 // Global variable
-                if (symbol.getLevel() == 0) {
-                    logSymbolUsage(designator, name, ErrorMessageGenerator.SYMBOL_TYPE.GLOBAL_VARIABLE, symbol);
+                if (designatorSymbol.getLevel() == 0) {
+                    logSymbolUsage(designatorIdentifier, name, ErrorMessageGenerator.SYMBOL_TYPE.GLOBAL_VARIABLE, designatorSymbol);
                 } else {
                     // Formal parameter
-                    if (symbol.getFpPos() != -1) {
-                        logSymbolUsage(designator, name, ErrorMessageGenerator.SYMBOL_TYPE.FORMAL_PARAMETER, symbol);
+                    if (designatorSymbol.getFpPos() != -1) {
+                        logSymbolUsage(designatorIdentifier, name, ErrorMessageGenerator.SYMBOL_TYPE.FORMAL_PARAMETER, designatorSymbol);
                     } else {
                         // Local variable
-                        logSymbolUsage(designator, name, ErrorMessageGenerator.SYMBOL_TYPE.LOCAL_VARIABLE, symbol);
+                        logSymbolUsage(designatorIdentifier, name, ErrorMessageGenerator.SYMBOL_TYPE.LOCAL_VARIABLE, designatorSymbol);
                     }
                 }
                 break;
             case Obj.Meth:
-                logSymbolUsage(designator, name, ErrorMessageGenerator.SYMBOL_TYPE.GLOBAL_FUNCTION_CALL, symbol);
+                logSymbolUsage(designatorIdentifier, name, ErrorMessageGenerator.SYMBOL_TYPE.GLOBAL_FUNCTION_CALL, designatorSymbol);
                 break;
-
         }
+
+        if (inUnpackStatement) {
+            unpackStatetementDesignators.add(designatorSymbol);
+        }
+    }
+
+    @Override
+    public void visit(DesignatorMemberAccess designatorMemberAccess) {
+        logSyntaxNodeTraversal(designatorMemberAccess);
+
+        // Class member access isn't allowed
+        logError(designatorMemberAccess, MessageType.CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED);
+    }
+
+    @Override
+    public void visit(DesignatorElementAccess designatorElementAccess) {
+        logSyntaxNodeTraversal(designatorElementAccess);
+
+        designatorElementAccess.obj = SymbolTable.noObj;
+        SyntaxNode designatorElementAccessParent = designatorElementAccess.getDesignator();
+
+        if (designatorElementAccessParent instanceof DesignatorMemberAccess) {
+            // Class member access isn't allowed
+            logError(designatorElementAccess, MessageType.CLASS_MEMBER_DESIGNATOR_NOT_SUPPORTED);
+            return;
+        }
+
+        if (designatorElementAccessParent instanceof DesignatorElementAccess) {
+            // Two (or more) - dimensional arrays aren't allowed
+            logError(designatorElementAccess, MessageType.NON_ONE_DIMENSIONAL_ARRAY_DETECTED);
+            return;
+        }
+
+        // Parent must be DesignatorIdentifier
+
+        DesignatorIdentifier designatorIdentifier = (DesignatorIdentifier) designatorElementAccessParent;
+        Obj designatorIdentifierSymbol = designatorIdentifier.obj;
+
+        String designatorIdentifierName = designatorIdentifierSymbol.getName();
+        Struct designatorIdentifierElemType = designatorIdentifierSymbol.getType().getElemType();
+
+        ArrayElement arrayElement = designatorElementAccess.getArrayElement();
+        Expr arrayElementIndex = arrayElement.getExpr();
+
+        Obj arrayElementIndexSymbol = arrayElementIndex.obj;
+        if (!SymbolTable.isValidSymbol(arrayElementIndexSymbol)) {
+            // TODO (acko): Do we need error here?
+            return;
+        }
+
+        String arrayElementIndexName = arrayElementIndexSymbol.getName();
+        Struct arrayElementIndexType = arrayElementIndexSymbol.getType();
+
+        if (!arrayElementIndexType.equals(SymbolTable.intType)) {
+            logIncompatibleArrayIndexType(designatorElementAccess, arrayElementIndexType);
+            return;
+        }
+
+        String designatorElementAccessName = String.format("%s[%s]", designatorIdentifierName, arrayElementIndexName);
+        Obj designatorElementAccessSymbol = new Obj(Obj.Elem, designatorElementAccessName, designatorIdentifierElemType);
+
+        logSymbolUsage(designatorElementAccess, designatorElementAccessName, ErrorMessageGenerator.SYMBOL_TYPE.ARRAY_ELEMENT_ACCESS, designatorElementAccessSymbol);
+        designatorElementAccess.obj = designatorElementAccessSymbol;
     }
 
     @Override
@@ -1274,7 +1317,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
             Struct formalParameterType = formalParameter.getType();
             Struct actualParameterType = actualParameter.getType();
 
-            if (!actualParameterType.compatibleWith(formalParameterType)) {
+            if (!actualParameterType.assignableTo(formalParameterType)) {
                 logFormalAndActualParameterMismatch(designatorStatementFunctionInvocation, formalParameter, actualParameter);
             }
         }
@@ -1327,10 +1370,60 @@ public class SemanticAnalyzer extends VisitorAdaptor {
     }
 
     @Override
+    public void visit(DesignatorStatementUnpackHeader designatorStatementUnpackHeader) {
+        logSyntaxNodeTraversal(designatorStatementUnpackHeader);
+
+        inUnpackStatement = true;
+    }
+
+    @Override
+    public void visit(DesignatorStatementIntermezzo designatorStatementIntermezzo) {
+        logSyntaxNodeTraversal(designatorStatementIntermezzo);
+
+        inUnpackStatement = false;
+    }
+
+    @Override
     public void visit(DesignatorStatementUnpack designatorStatementUnpack) {
         logSyntaxNodeTraversal(designatorStatementUnpack);
 
-        // TODO (acko): Not yet implemented
+        for (Obj unpackStatementDesignator: unpackStatetementDesignators) {
+            logSymbolDebugMessage(designatorStatementUnpack, "Detected unpack statement LHS designator", unpackStatementDesignator);
+        }
+
+        Designator rhsDesignator = designatorStatementUnpack.getDesignator();
+        Obj rhsDesignatorSymbol = rhsDesignator.obj;
+
+        logSymbolDebugMessage(designatorStatementUnpack, "Detected unpack statement RHS designator", rhsDesignatorSymbol);
+
+        // rhsDesignatorSymbol must be a valid symbol
+        if (!SymbolTable.isValidSymbol(rhsDesignatorSymbol)) {
+            logInvalidUnpackStatementRHSDesignatorType(designatorStatementUnpack, rhsDesignatorSymbol);
+            return;
+        }
+
+        Struct rhsDesignatorSymbolType = rhsDesignatorSymbol.getType();
+        Struct rhsDesignatorSymbolElemType = rhsDesignatorSymbolType.getElemType();
+
+        // rhsDesignatorSymbol must be an array
+        if (rhsDesignatorSymbolType.getKind() != Struct.Array) {
+            logInvalidUnpackStatementRHSDesignatorType(designatorStatementUnpack, rhsDesignatorSymbol);
+            return;
+        }
+
+        for (Obj unpackStatementDesignator: unpackStatetementDesignators) {
+            if (!SymbolTable.isValidSymbol(unpackStatementDesignator)) {
+                continue;
+            }
+
+            Struct unpackStatementDesignatorType = unpackStatementDesignator.getType();
+
+            // lhsDesignator must be compatible with rhsDesignatorSymbol
+            if (!unpackStatementDesignatorType.compatibleWith(rhsDesignatorSymbolElemType)) {
+                logIncompatibleUnpackStatementLHSDesignatorType(
+                        designatorStatementUnpack, unpackStatementDesignator, rhsDesignatorSymbol);
+            }
+        }
     }
 
     /**************************************** Designator **************************************************************/

@@ -1,56 +1,58 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/0/2023 18:19:30
+// 12/0/2023 4:32:8
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public abstract class VisitorAdaptor implements Visitor { 
 
-    public void visit(ReturnType ReturnType) { }
-    public void visit(MaybeArray MaybeArray) { }
-    public void visit(VarDeclaration VarDeclaration) { }
+    public void visit(MaybeFormPars MaybeFormPars) { }
+    public void visit(FormPars FormPars) { }
+    public void visit(Factor Factor) { }
+    public void visit(Statement Statement) { }
+    public void visit(LocalVariableDeclarationList LocalVariableDeclarationList) { }
+    public void visit(MaybeClassMethodList MaybeClassMethodList) { }
+    public void visit(Expr Expr) { }
+    public void visit(ConstDeclarationList ConstDeclarationList) { }
+    public void visit(VarDecl VarDecl) { }
+    public void visit(MemberAccess MemberAccess) { }
+    public void visit(GlobalDeclarationList GlobalDeclarationList) { }
+    public void visit(LocalVarDeclList LocalVarDeclList) { }
+    public void visit(AssignmentOperation AssignmentOperation) { }
+    public void visit(MultiplicationOperator MultiplicationOperator) { }
+    public void visit(MethodDeclarationList MethodDeclarationList) { }
+    public void visit(MaybeDesignator MaybeDesignator) { }
     public void visit(Constant Constant) { }
-    public void visit(VariableDeclarationList VariableDeclarationList) { }
+    public void visit(MaybePrintWidth MaybePrintWidth) { }
+    public void visit(DesignatorAccessList DesignatorAccessList) { }
+    public void visit(VarDeclaration VarDeclaration) { }
+    public void visit(DesignatorList DesignatorList) { }
+    public void visit(Condition Condition) { }
+    public void visit(DesignatorStatement DesignatorStatement) { }
     public void visit(Sign Sign) { }
     public void visit(RelationalOperator RelationalOperator) { }
-    public void visit(GlobalDeclaration GlobalDeclaration) { }
-    public void visit(MaybeClassMethodList MaybeClassMethodList) { }
-    public void visit(ConditionErrorRecovery ConditionErrorRecovery) { }
     public void visit(StatementList StatementList) { }
-    public void visit(MethodDeclarationList MethodDeclarationList) { }
-    public void visit(MaybeExtendedClass MaybeExtendedClass) { }
-    public void visit(GlobalDeclarationList GlobalDeclarationList) { }
-    public void visit(Factor Factor) { }
     public void visit(MaybeActPars MaybeActPars) { }
-    public void visit(CondTerm CondTerm) { }
-    public void visit(MultiplicationOperator MultiplicationOperator) { }
-    public void visit(MaybeFormPars MaybeFormPars) { }
-    public void visit(ClassVarDeclList ClassVarDeclList) { }
-    public void visit(Term Term) { }
-    public void visit(LocalVariableDeclarationList LocalVariableDeclarationList) { }
-    public void visit(Condition Condition) { }
-    public void visit(DesignatorAccessList DesignatorAccessList) { }
     public void visit(ConstructorDeclList ConstructorDeclList) { }
-    public void visit(FormalParam FormalParam) { }
-    public void visit(MaybeReturnValue MaybeReturnValue) { }
-    public void visit(AssignmentOperation AssignmentOperation) { }
-    public void visit(MaybeElseStatement MaybeElseStatement) { }
-    public void visit(Expr Expr) { }
-    public void visit(ActPars ActPars) { }
-    public void visit(DesignatorList DesignatorList) { }
-    public void visit(DesignatorStatement DesignatorStatement) { }
-    public void visit(AdditionOperator AdditionOperator) { }
     public void visit(ConstFactor ConstFactor) { }
-    public void visit(Statement Statement) { }
-    public void visit(VarDecl VarDecl) { }
+    public void visit(GlobalDeclaration GlobalDeclaration) { }
+    public void visit(MaybeArray MaybeArray) { }
+    public void visit(ReturnType ReturnType) { }
+    public void visit(FormalParam FormalParam) { }
+    public void visit(CondTerm CondTerm) { }
+    public void visit(VariableDeclarationList VariableDeclarationList) { }
     public void visit(ClassDecl ClassDecl) { }
+    public void visit(MaybeElseStatement MaybeElseStatement) { }
+    public void visit(AdditionOperator AdditionOperator) { }
+    public void visit(MaybeExtendedClass MaybeExtendedClass) { }
+    public void visit(ConditionErrorRecovery ConditionErrorRecovery) { }
+    public void visit(ClassVarDeclList ClassVarDeclList) { }
+    public void visit(ActPars ActPars) { }
+    public void visit(Designator Designator) { }
     public void visit(CondFact CondFact) { }
-    public void visit(MaybePrintWidth MaybePrintWidth) { }
-    public void visit(ConstDeclarationList ConstDeclarationList) { }
-    public void visit(FormPars FormPars) { }
-    public void visit(MaybeDesignator MaybeDesignator) { }
-    public void visit(LocalVarDeclList LocalVarDeclList) { }
+    public void visit(MaybeReturnValue MaybeReturnValue) { }
+    public void visit(Term Term) { }
     public void visit(AssignmentOperationError AssignmentOperationError) { visit(); }
     public void visit(AssignmentOperationExpr AssignmentOperationExpr) { visit(); }
     public void visit(ArrayElement ArrayElement) { visit(); }
@@ -79,15 +81,16 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(DesignatorListMulti DesignatorListMulti) { visit(); }
     public void visit(MaybeDesignatorEpsilon MaybeDesignatorEpsilon) { visit(); }
     public void visit(MaybeDesignatorIsDesignator MaybeDesignatorIsDesignator) { visit(); }
+    public void visit(DesignatorStatementIntermezzo DesignatorStatementIntermezzo) { visit(); }
+    public void visit(DesignatorStatementUnpackHeader DesignatorStatementUnpackHeader) { visit(); }
     public void visit(DesignatorStatementUnpack DesignatorStatementUnpack) { visit(); }
     public void visit(DesignatorStatementDecrement DesignatorStatementDecrement) { visit(); }
     public void visit(DesignatorStatementIncrement DesignatorStatementIncrement) { visit(); }
     public void visit(DesignatorStatementFunctionInvocation DesignatorStatementFunctionInvocation) { visit(); }
     public void visit(DesignatorStatementAssignment DesignatorStatementAssignment) { visit(); }
-    public void visit(DesignatorAccessListEpsilon DesignatorAccessListEpsilon) { visit(); }
-    public void visit(DesignatorAccessListElement DesignatorAccessListElement) { visit(); }
-    public void visit(DesignatorAccessListMember DesignatorAccessListMember) { visit(); }
-    public void visit(Designator Designator) { visit(); }
+    public void visit(DesignatorElementAccess DesignatorElementAccess) { visit(); }
+    public void visit(DesignatorMemberAccess DesignatorMemberAccess) { visit(); }
+    public void visit(DesignatorIdentifier DesignatorIdentifier) { visit(); }
     public void visit(ConstFactorBoolean ConstFactorBoolean) { visit(); }
     public void visit(ConstFactorCharacter ConstFactorCharacter) { visit(); }
     public void visit(ConstFactorNumber ConstFactorNumber) { visit(); }
@@ -127,6 +130,8 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(StatementForEachDesignator StatementForEachDesignator) { visit(); }
     public void visit(StatementForEachHeader StatementForEachHeader) { visit(); }
     public void visit(StatementWhileHeader StatementWhileHeader) { visit(); }
+    public void visit(StatementIfElseIntermezzo StatementIfElseIntermezzo) { visit(); }
+    public void visit(StatementIfElseHeader StatementIfElseHeader) { visit(); }
     public void visit(StatementBlock StatementBlock) { visit(); }
     public void visit(StatementForEach StatementForEach) { visit(); }
     public void visit(StatementPrint StatementPrint) { visit(); }
@@ -137,7 +142,6 @@ public abstract class VisitorAdaptor implements Visitor {
     public void visit(StatementWhile StatementWhile) { visit(); }
     public void visit(StatementIfElse StatementIfElse) { visit(); }
     public void visit(StatementDesignator StatementDesignator) { visit(); }
-    public void visit(MemberAccess MemberAccess) { visit(); }
     public void visit(MaybeFormParsEpsilon MaybeFormParsEpsilon) { visit(); }
     public void visit(MaybeFormParsIsFormPars MaybeFormParsIsFormPars) { visit(); }
     public void visit(FormalParameterError FormalParameterError) { visit(); }

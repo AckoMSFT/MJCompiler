@@ -1,28 +1,28 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/0/2023 18:19:30
+// 12/0/2023 4:32:8
 
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class DesignatorAccessListElement extends DesignatorAccessList {
+public class DesignatorElementAccess extends Designator {
 
-    private DesignatorAccessList DesignatorAccessList;
+    private Designator Designator;
     private ArrayElement ArrayElement;
 
-    public DesignatorAccessListElement (DesignatorAccessList DesignatorAccessList, ArrayElement ArrayElement) {
-        this.DesignatorAccessList=DesignatorAccessList;
-        if(DesignatorAccessList!=null) DesignatorAccessList.setParent(this);
+    public DesignatorElementAccess (Designator Designator, ArrayElement ArrayElement) {
+        this.Designator=Designator;
+        if(Designator!=null) Designator.setParent(this);
         this.ArrayElement=ArrayElement;
         if(ArrayElement!=null) ArrayElement.setParent(this);
     }
 
-    public DesignatorAccessList getDesignatorAccessList() {
-        return DesignatorAccessList;
+    public Designator getDesignator() {
+        return Designator;
     }
 
-    public void setDesignatorAccessList(DesignatorAccessList DesignatorAccessList) {
-        this.DesignatorAccessList=DesignatorAccessList;
+    public void setDesignator(Designator Designator) {
+        this.Designator=Designator;
     }
 
     public ArrayElement getArrayElement() {
@@ -38,18 +38,18 @@ public class DesignatorAccessListElement extends DesignatorAccessList {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(DesignatorAccessList!=null) DesignatorAccessList.accept(visitor);
+        if(Designator!=null) Designator.accept(visitor);
         if(ArrayElement!=null) ArrayElement.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(DesignatorAccessList!=null) DesignatorAccessList.traverseTopDown(visitor);
+        if(Designator!=null) Designator.traverseTopDown(visitor);
         if(ArrayElement!=null) ArrayElement.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(DesignatorAccessList!=null) DesignatorAccessList.traverseBottomUp(visitor);
+        if(Designator!=null) Designator.traverseBottomUp(visitor);
         if(ArrayElement!=null) ArrayElement.traverseBottomUp(visitor);
         accept(visitor);
     }
@@ -57,10 +57,10 @@ public class DesignatorAccessListElement extends DesignatorAccessList {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("DesignatorAccessListElement(\n");
+        buffer.append("DesignatorElementAccess(\n");
 
-        if(DesignatorAccessList!=null)
-            buffer.append(DesignatorAccessList.toString("  "+tab));
+        if(Designator!=null)
+            buffer.append(Designator.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");
@@ -72,7 +72,7 @@ public class DesignatorAccessListElement extends DesignatorAccessList {
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [DesignatorAccessListElement]");
+        buffer.append(") [DesignatorElementAccess]");
         return buffer.toString();
     }
 }

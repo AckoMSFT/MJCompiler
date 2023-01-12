@@ -1,31 +1,31 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/0/2023 18:19:30
+// 12/0/2023 4:32:8
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class StatementIfElse extends Statement {
 
-    private ConditionErrorRecovery ConditionErrorRecovery;
+    private StatementIfElseHeader StatementIfElseHeader;
     private Statement Statement;
     private MaybeElseStatement MaybeElseStatement;
 
-    public StatementIfElse (ConditionErrorRecovery ConditionErrorRecovery, Statement Statement, MaybeElseStatement MaybeElseStatement) {
-        this.ConditionErrorRecovery=ConditionErrorRecovery;
-        if(ConditionErrorRecovery!=null) ConditionErrorRecovery.setParent(this);
+    public StatementIfElse (StatementIfElseHeader StatementIfElseHeader, Statement Statement, MaybeElseStatement MaybeElseStatement) {
+        this.StatementIfElseHeader=StatementIfElseHeader;
+        if(StatementIfElseHeader!=null) StatementIfElseHeader.setParent(this);
         this.Statement=Statement;
         if(Statement!=null) Statement.setParent(this);
         this.MaybeElseStatement=MaybeElseStatement;
         if(MaybeElseStatement!=null) MaybeElseStatement.setParent(this);
     }
 
-    public ConditionErrorRecovery getConditionErrorRecovery() {
-        return ConditionErrorRecovery;
+    public StatementIfElseHeader getStatementIfElseHeader() {
+        return StatementIfElseHeader;
     }
 
-    public void setConditionErrorRecovery(ConditionErrorRecovery ConditionErrorRecovery) {
-        this.ConditionErrorRecovery=ConditionErrorRecovery;
+    public void setStatementIfElseHeader(StatementIfElseHeader StatementIfElseHeader) {
+        this.StatementIfElseHeader=StatementIfElseHeader;
     }
 
     public Statement getStatement() {
@@ -49,20 +49,20 @@ public class StatementIfElse extends Statement {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(ConditionErrorRecovery!=null) ConditionErrorRecovery.accept(visitor);
+        if(StatementIfElseHeader!=null) StatementIfElseHeader.accept(visitor);
         if(Statement!=null) Statement.accept(visitor);
         if(MaybeElseStatement!=null) MaybeElseStatement.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(ConditionErrorRecovery!=null) ConditionErrorRecovery.traverseTopDown(visitor);
+        if(StatementIfElseHeader!=null) StatementIfElseHeader.traverseTopDown(visitor);
         if(Statement!=null) Statement.traverseTopDown(visitor);
         if(MaybeElseStatement!=null) MaybeElseStatement.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(ConditionErrorRecovery!=null) ConditionErrorRecovery.traverseBottomUp(visitor);
+        if(StatementIfElseHeader!=null) StatementIfElseHeader.traverseBottomUp(visitor);
         if(Statement!=null) Statement.traverseBottomUp(visitor);
         if(MaybeElseStatement!=null) MaybeElseStatement.traverseBottomUp(visitor);
         accept(visitor);
@@ -73,8 +73,8 @@ public class StatementIfElse extends Statement {
         buffer.append(tab);
         buffer.append("StatementIfElse(\n");
 
-        if(ConditionErrorRecovery!=null)
-            buffer.append(ConditionErrorRecovery.toString("  "+tab));
+        if(StatementIfElseHeader!=null)
+            buffer.append(StatementIfElseHeader.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

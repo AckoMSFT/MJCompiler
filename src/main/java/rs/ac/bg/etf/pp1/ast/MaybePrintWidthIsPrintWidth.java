@@ -1,24 +1,24 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/0/2023 18:19:30
+// 12/0/2023 4:32:8
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class MaybePrintWidthIsPrintWidth extends MaybePrintWidth {
 
-    private Integer C1;
+    private Integer printWidth;
 
-    public MaybePrintWidthIsPrintWidth (Integer C1) {
-        this.C1=C1;
+    public MaybePrintWidthIsPrintWidth (Integer printWidth) {
+        this.printWidth=printWidth;
     }
 
-    public Integer getC1() {
-        return C1;
+    public Integer getPrintWidth() {
+        return printWidth;
     }
 
-    public void setC1(Integer C1) {
-        this.C1=C1;
+    public void setPrintWidth(Integer printWidth) {
+        this.printWidth=printWidth;
     }
 
     public void accept(Visitor visitor) {
@@ -41,7 +41,7 @@ public class MaybePrintWidthIsPrintWidth extends MaybePrintWidth {
         buffer.append(tab);
         buffer.append("MaybePrintWidthIsPrintWidth(\n");
 
-        buffer.append(" "+tab+C1);
+        buffer.append(" "+tab+printWidth);
         buffer.append("\n");
 
         buffer.append(tab);

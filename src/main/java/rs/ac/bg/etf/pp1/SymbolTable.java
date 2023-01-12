@@ -19,6 +19,10 @@ public class SymbolTable extends Tab {
     public static int LEVEL_LOCAL = 1;
     public static int FP_POS_INVALID = -1;
 
+    public static final String DUMMY_NAME = "dummy";
+
+    public static final int DUMMY_LEVEL = -1;
+
     public static String[] reservedNames = new String[] {
             "int",
             "char",
@@ -82,6 +86,8 @@ public class SymbolTable extends Tab {
                         return "Arr of char";
                     case Bool:
                         return "Arr of bool";
+                    case None:
+                        return "Arr of notype";
                     default:
                         return "NOT_YET_IMPLEMENTED";
                 }
@@ -169,12 +175,17 @@ public class SymbolTable extends Tab {
     }
 
     public static String ObjToString(Obj obj) {
+        if (!isValidSymbol(obj)) {
+            return "Symbol {null}";
+        }
+
         String name = obj.getName();
         String kind = objKindToString(obj.getKind());
         String type = getTypeName(obj.getType());
         int level = obj.getLevel();
         int fpPos = obj.getFpPos();
-
-        return String.format("Symbol {name %s, kind %s, type %s, level %d, fpPos %d}", name, kind, type, level, fpPos);
+        int adr = obj.getAdr();
+        return String.format("Symbol {name %s, kind %s, type %s, level %d, fpPos %d, adr %d}",
+                name, kind, type, level, fpPos, adr);
     }
 }

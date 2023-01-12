@@ -1,8 +1,12 @@
 package rs.ac.bg.etf.pp1.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import rs.ac.bg.etf.pp1.ast.*;
 
 public class OperatorHelper {
+
+    static Logger logger = LogManager.getLogger(OperatorHelper.class);
 
     public static String getOperatorCode(AdditionOperator additionOperator) {
         if (additionOperator instanceof AdditionOperatorAddition) {
@@ -13,6 +17,8 @@ public class OperatorHelper {
             return "-";
         }
 
+        // Should never happen
+        logger.error("Unrecognized addition operator detected!!!");
         return null;
     }
 
@@ -29,6 +35,8 @@ public class OperatorHelper {
             return "%";
         }
 
+        // Should never happen
+        logger.error("Unrecognized multiplication operator detected!!!");
         return null;
     }
 
@@ -57,6 +65,8 @@ public class OperatorHelper {
             return "<=";
         }
 
+        // Should never happen
+        logger.error("Unrecognized relational operator detected!!!");
         return null;
     }
 }

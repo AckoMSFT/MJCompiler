@@ -15,6 +15,10 @@
                 <exclude name="util/ErrorMessageGenerator.java"/>
                 <exclude name="util/OperatorHelper.java"/>
                 <exclude name="util/ActualParametersStack.java"/>
+                <exclude name="util/InstructionHelper.java"/>
+                <exclude name="util/BranchJumpAddressStack.java"/>
+                <exclude name="util/LoopJumpAddressStack.java"/>
+                <exclude name="util/Disassemble.java"/>
             </fileset>
         </delete>
 
@@ -75,6 +79,30 @@
             <classpath>
                 <pathelement location="lib/mj-runtime-1.1.jar"/>
             </classpath>
+        </java>
+    </target>
+
+    <target name="run">
+        <java classname="rs.etf.pp1.mj.runtime.Run">
+            <arg value="src/test/resources/program.obj"/>
+            <classpath>
+                <pathelement location="lib/mj-runtime-1.1.jar" />
+            </classpath>
+            <redirector input="src/test/resources/input.txt" output="src/test/resources/output.txt" alwayslog="true"/>
+        </java>
+    </target>
+
+    <target name="runDebug">
+        <java classname="rs.etf.pp1.mj.runtime.Run">
+            <arg value="src/test/resources/program.obj"/>
+            <arg value="-debug"/>
+
+            <classpath>
+                <pathelement location="lib/mj-runtime-1.1.jar" />
+            </classpath>
+
+
+            <redirector input="src/test/resources/input.txt" output="src/test/resources/output.txt" alwayslog="true"/>
         </java>
     </target>
 </project>
