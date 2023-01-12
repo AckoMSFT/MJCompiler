@@ -488,6 +488,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         FunctionInvocationHeader functionInvocationHeader = factorFunctionInvocation.getFunctionInvocationHeader();
 
         Obj methodSymbol = functionInvocationHeader.obj;
+        if (!SymbolTable.isValidSymbol(methodSymbol)) {
+            return;
+        }
+
         Collection<Obj> localSymbols = methodSymbol.getLocalSymbols();
 
         int formalParameterCount = 0;

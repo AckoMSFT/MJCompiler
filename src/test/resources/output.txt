@@ -1,2 +1,2 @@
-    9    6    6    1    2    2    1    6bc    5
-Completion took 1 ms
+    9    6    6    1    2    2    1    6bc    5    2    3a    1ab    2b    3    4    3
+Completion took 2 ms

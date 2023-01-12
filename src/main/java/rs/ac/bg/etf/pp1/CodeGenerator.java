@@ -526,28 +526,27 @@ public class CodeGenerator extends VisitorAdaptor {
         logSyntaxNodeTraversal(designatorStatementIncrement);
 
         Obj designatorSymbol = designatorStatementIncrement.obj;
+        int designatorKind = designatorSymbol.getKind();
         int designatorLevel = designatorSymbol.getLevel();
         int designatorValue = designatorSymbol.getAdr();
 
-        if (designatorSymbol.getKind() != Obj.Var) {
-            // TODO ( acko) ???
-            return;
-        }
-
         logSymbolDebugMessage(designatorStatementIncrement, "Incrementing designator", designatorSymbol);
 
-
-        if (designatorLevel == SymbolTable.LEVEL_GLOBAL) {
+        if ((designatorKind == Obj.Var) && (designatorLevel == SymbolTable.LEVEL_LOCAL)) {
+            // Local variable
+            Code.put(Code.inc);
+            Code.put(designatorValue);
+            Code.put(ONE);
+        } else {
+            if (designatorKind == Obj.Elem) {
+                // Array element
+                Code.put(Code.dup2);
+            }
             // Global variable
             Code.load(designatorSymbol);
             Code.loadConst(ONE);
             Code.put(Code.add);
             Code.store(designatorSymbol);
-        } else {
-            // Local variable
-            Code.put(Code.inc);
-            Code.put(designatorValue);
-            Code.put(ONE);
         }
     }
 
@@ -556,22 +555,27 @@ public class CodeGenerator extends VisitorAdaptor {
         logSyntaxNodeTraversal(designatorStatementDecrement);
 
         Obj designatorSymbol = designatorStatementDecrement.obj;
+        int designatorKind = designatorSymbol.getKind();
         int designatorLevel = designatorSymbol.getLevel();
         int designatorValue = designatorSymbol.getAdr();
 
         logSymbolDebugMessage(designatorStatementDecrement, "Decrementing designator", designatorSymbol);
 
-        if (designatorLevel == SymbolTable.LEVEL_GLOBAL) {
+        if ((designatorKind == Obj.Var) && (designatorLevel == SymbolTable.LEVEL_LOCAL)) {
+            // Local variable
+            Code.put(Code.inc);
+            Code.put(designatorValue);
+            Code.put(MINUS_ONE);
+        } else {
+            if (designatorKind == Obj.Elem) {
+                // Array element
+                Code.put(Code.dup2);
+            }
             // Global variable
             Code.load(designatorSymbol);
             Code.loadConst(ONE);
             Code.put(Code.sub);
             Code.store(designatorSymbol);
-        } else {
-            // Local variable
-            Code.put(Code.inc);
-            Code.put(designatorValue);
-            Code.put(MINUS_ONE);
         }
     }
 

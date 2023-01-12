@@ -59,6 +59,32 @@ program test301
 		bodovi = -bodovi + (pet * a / 2 - jedan) * bodovi - (3 % 2 + 3 * 2 - 3);
 		print(bodovi);
 
+		print(niz[1]);
+		niz[1]++;
+				print(niz[1]);
+
+
+        niz[1] = 1;
+
+        a = niz[niz[1]];
+        print('a');
+        print(niz[a]);
+        print('a');
+
+        niz[niz[1]]++;
+
+        print('b');
+        print(niz[a]);
+        print('b');
+
+		niz[jedan]++;
+		print(niz[1]);
+		niz[jedan]++;
+		print(niz[1]);
+		niz[jedan]--;
+		print(niz[1]);
+
+
 	}
 }
 
