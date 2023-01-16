@@ -6,13 +6,12 @@ import org.apache.logging.log4j.Logger;
 import rs.ac.bg.etf.pp1.ast.Program;
 import rs.ac.bg.etf.pp1.util.Disassemble;
 import rs.etf.pp1.mj.runtime.Code;
-import rs.etf.pp1.mj.runtime.disasm;
-import rs.etf.pp1.symboltable.Tab;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,6 +19,9 @@ import java.util.stream.Stream;
 public class MJParserTest {
 
     static Logger logger = LogManager.getLogger(MJParserTest.class);
+
+    private static final String TEST_CASES_ROOT_DIRECTORY = "src/test/resources";
+    private static final String MICRO_JAVA_FILE_EXTENSION = "mj";
 
     public static List<String> findFiles(Path path, String fileExtension)
             throws IOException {
@@ -33,10 +35,6 @@ public class MJParserTest {
         try (Stream<Path> walk = Files.walk(path)) {
             result = walk
                     .filter(p -> !Files.isDirectory(p))
-                    // this is a path, not string,
-                    // this only test if path end with a certain path
-                    //.filter(p -> p.endsWith(fileExtension))
-                    // convert path to string first
                     .map(p -> p.toString().toLowerCase())
                     .filter(f -> f.endsWith(fileExtension))
                     .collect(Collectors.toList());
@@ -54,18 +52,11 @@ public class MJParserTest {
 
         logger.info("Parsing source file: " + sourceCode.getAbsolutePath());
 
-
-        String foo = sourceCode.getName();
-        if (!foo.equalsIgnoreCase("test1312.mj")) {
-            logger.info("Skipping...");
-            return;
-        }
-
         try (BufferedReader br = new BufferedReader(new FileReader(sourceCode))) {
             MJLexer mjLexer = new MJLexer(br);
             MJParser mjParser = new MJParser(mjLexer);
 
-            Symbol s = mjParser.parse();  //pocetak parsiranja
+            Symbol s = mjParser.parse();
 
             if (mjParser.fatalErrorDected) {
                 logger.error("Detected fatal error while parsing [" + sourceCode.getAbsolutePath() + "]. " +
@@ -78,23 +69,19 @@ public class MJParserTest {
                         "will not proceed with semantic analysis and code generation.");
 
                 Program program = (Program) (s.value);
-
                 logger.info(program.toString(""));
 
                 return;
             }
 
             logger.info("No syntax errors detected, parsing completed successfully! :)");
-            //logger.info(s.value);
 
             Program program = (Program) (s.value);
 
             logger.info(program.toString(""));
-            logger.info("===================================");
+            logger.info("============================================================================================");
 
             SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
-
-            logger.info("===================================");
 
             SymbolTable.init();
 
@@ -103,14 +90,18 @@ public class MJParserTest {
             SymbolTableDumpVisitor stdv = new SymbolTableDumpVisitor();
             SymbolTable.dump(stdv);
 
+            logger.info("============================================================================================");
+
+            logger.info("Declared #" + semanticAnalyzer.constCount + " const variables.");
+            logger.info("Declared #" + semanticAnalyzer.globalVarCount + " global variables.");
+            logger.info("Declared #" + semanticAnalyzer.localVarCount + " local variables.");
+
             if (semanticAnalyzer.semanticErrorCount > 0) {
                 logger.error("Found #" + semanticAnalyzer.semanticErrorCount + " semantic errors. Will not proceed with code generation.");
                 return;
             }
 
-            logger.info("Declared #" + semanticAnalyzer.constCount + " const variables.");
-            logger.info("Declared #" + semanticAnalyzer.globalVarCount + " global variables.");
-            logger.info("Declared #" + semanticAnalyzer.localVarCount + " local variables.");
+            logger.info("============================================================================================");
 
             logger.info("No semantic error detected. Proceeding with code generation.");
 
@@ -137,50 +128,20 @@ public class MJParserTest {
                 disassemble.cur = 14;
                 disassemble.decode(code, len);
 
-
-            //RuleVisitor v = new RuleVisitor();
-            //program.traverseBottomUp(v);
-            //Tab.init();
-
-            //SemanticPass sp = new SemanticPass();
-            // program.traverseBottomUp(sp);
-
-            //log.info("===================================");
-
-            // Tab.dump();
-
-         /*   if (!p.errorDetected && sp.passed()) {
-                log.info("Parsiranje uspesno zavrseno <3");
-
-                File objFile = new File("src/test/resources/program.obj");
-                if (objFile.exists()) {
-                    objFile.delete();
-                }
-
-                log.info("Generating bytecode file: " + objFile.getAbsolutePath());
-
-                CodeGenerator codeGenerator = new CodeGenerator();
-                program.traverseBottomUp(codeGenerator);
-
-                Code.dataSize = sp.nVars;
-                Code.mainPc = codeGenerator.getMainPc();
-
-                Code.write(new FileOutputStream(objFile));
-
-                log.info("=============================");
-                log.info("   Code generated successfuly :)");
-            } else {
-                log.error("Parsiranje nije uspesno zavrseno -.-");
-            }
-            */
         }
     }
 
     public static void main(String[] args) throws Exception {
 
-        List<String> files = findFiles(Paths.get("src/test/resources"), "mj");
+        String testFile = "src\\test\\resources\\test999.mj";
+
+        List<String> files = findFiles(Paths.get(TEST_CASES_ROOT_DIRECTORY), MICRO_JAVA_FILE_EXTENSION);
         for (String file: files) {
-            ParseFile(file);
+            if (!file.equalsIgnoreCase(testFile)) {
+                logger.info("Skipping... " + file);
+            } else {
+                ParseFile(file);
+            }
         }
     }
 }

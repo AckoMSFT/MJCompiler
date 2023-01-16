@@ -1,0 +1,39 @@
+// Test301
+
+program test999
+
+
+	int niz[], arra[], a, b;
+
+{
+	void main()
+
+	{
+	    niz = new int[3];
+	    arra = new int[3];
+
+        arra[0] = 3;
+        arra[1] = 2;
+        arra[2] = 1;
+
+        a = 0;
+
+        [niz[a+2],niz[0]] = arra;
+
+// arra 3 2 1
+// [niz[2],niz[0]] = arra
+//
+// niz[0] = arra[1]
+// niz[2] = arra[0]
+
+        print(niz[0]);
+        print(niz[1]);
+        print(niz[2]);
+
+	}
+}
+
+// todo(acko): da li radi sa manje elemenata?
+// ovo ne radi
+// ako uradim arr onda nadje promenljivu od len???
+

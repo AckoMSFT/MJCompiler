@@ -2,7 +2,6 @@ package rs.ac.bg.etf.pp1.util;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import rs.ac.bg.etf.pp1.SemanticAnalyzer;
 import rs.ac.bg.etf.pp1.ast.*;
 import rs.etf.pp1.mj.runtime.Code;
 

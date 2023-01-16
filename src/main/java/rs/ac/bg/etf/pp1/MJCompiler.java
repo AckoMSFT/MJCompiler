@@ -8,6 +8,6 @@ public class MJCompiler {
     static Logger logger = LogManager.getLogger(MJCompiler.class);
 
     public static void main(String[] args) {
-        logger.info("Hello world!");
+        logger.info("Hi! I am Acko's MJCompiler. Nice to meet you.");
     }
 }

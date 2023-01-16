@@ -380,7 +380,7 @@ StatementWhileHeader ::=
     (StatementWhileHeader) WHILE LEFT_PARENTHESES {: RESULT=new StatementWhileHeader(); :};
 
 StatementForEachHeader ::=
-    (StatementForEachHeader) MemberAccess:M1 FOR_EACH {: RESULT=new StatementForEachHeader(M1); RESULT.setLine(M1left); :};
+    (StatementForEachHeader) Designator:D1 DOT FOR_EACH {: RESULT=new StatementForEachHeader(D1); RESULT.setLine(D1left); :};
 
 StatementForEachDesignator ::=
     (StatementForEachDesignator) LEFT_PARENTHESES IDENTIFIER:name LAMBDA {: RESULT=new StatementForEachDesignator(name); RESULT.setLine(nameleft); :};

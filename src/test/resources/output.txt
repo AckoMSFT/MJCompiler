@@ -1,2 +1,20 @@
-    9    6    6    1    2    2    1    6bc    5    2    3a    1ab    2b    3    4    3
-Completion took 2 ms
+test i/o
+  3
+    1a    0
+20130010
+test arrElem inc/dec
+    1    1    0    1   -1
+test unpack
+    1    2    3    4    5
+    5    4    3    2    1
+   10    4    3    2    1
+   30    4    3    2   10
+    0    0    0
+   30   20   10
+   30   20   50
+    4    3    2    1    0
+  555  444  333  222  111
+test read
+  555  444  333  222   42
+
+Completion took 5 ms

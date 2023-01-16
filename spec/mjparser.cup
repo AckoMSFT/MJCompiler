@@ -137,8 +137,8 @@ nonterminal rs.etf.pp1.symboltable.concepts.Obj Expr, Factor, Term;
 nonterminal MaybePrintWidth, MaybeReturnValue;
 
 /* Designators */
-nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator, DesignatorStatement, DesignatorAccessList;
-nonterminal MemberAccess, MaybeDesignator, DesignatorList;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator, DesignatorStatement;
+nonterminal MaybeDesignator, DesignatorList;
 
 /* Conditions */
 nonterminal ConditionErrorRecovery;
@@ -347,7 +347,7 @@ StatementWhileHeader ::=
     (StatementWhileHeader) WHILE LEFT_PARENTHESES;
 
 StatementForEachHeader ::=
-    (StatementForEachHeader) MemberAccess FOR_EACH;
+    (StatementForEachHeader) Designator DOT FOR_EACH;
 
 StatementForEachDesignator ::=
     (StatementForEachDesignator) LEFT_PARENTHESES IDENTIFIER:name LAMBDA;

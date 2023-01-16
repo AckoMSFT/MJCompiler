@@ -28,15 +28,15 @@ class Sfera extends Predmet
 {
 	int r;
 	{
-		//Sfera() {
-		//  vrsta = 's';
-		//  postaviPoluprecnik(1);
-		//}
+		Sfera() {
+		  vrsta = 's';
+		  r = 1;
+		}
 
-		//Sfera(int r) {
-		//	vrsta = 's';
-		//	postaviPoluprecnik(r);
-		//}
+		Sfera(int r) {
+			vrsta = 's';
+			this.r = r;
+		}
 
 		 void postaviPoluprecnik(int r) {this.r = r; }
 
@@ -54,20 +54,26 @@ class Kvadar extends Predmet
 {
 	 int a, b, c;
 	{
-		//Kvadar() {
-		//  vrsta = 'k';
-		//  postaviStranice(1, 2, 3);
-		//}
+		Kvadar() {
+		  vrsta = 'k';
+		  a = 1;
+		  b = 2;
+		  c = 3;
+		}
 
-		//Kvadar(int a, int b, int c) {
-		//  vrsta = 'k';
-		//  postaviStranice(a, b, c);
-		//}
+		Kvadar(int a, int b, int c) {
+		  vrsta = 'k';
+		  this.a = a;
+		  this.b = b;
+                  this.c = c;
+		}
 
-		//Kvadar(int a) {
-		//  vrsta = 'k';
-		//  postaviStranice(a, a + 1, a + 2);
-		//}
+		Kvadar(int a) {
+		  vrsta = 'k';
+		  this.a = a;
+		  b = a + 1;
+                  c = a + 2;
+		}
 
 		 void postaviStranice(int a, int b, int c) {this.a = a; this.b = b; this.c = c;}
 		 int zapremina()

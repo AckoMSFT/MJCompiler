@@ -39,11 +39,19 @@ public class LoopJumpAddressStack {
     }
 
     public void pushContinueJumpAddress(int continueJumpAddress) {
+        if (continueJumpAddressStack.empty()) {
+            return;
+        }
+
         ArrayList<Integer> currentContinueJumpAddressList = continueJumpAddressStack.peek();
         currentContinueJumpAddressList.add(continueJumpAddress);
     }
 
     public void pushBreakJumpAddress(int breakJumpAddress) {
+        if (breakJumpAddressStack.empty()) {
+            return;
+        }
+
         ArrayList<Integer> currentBreakJumpAddressList = breakJumpAddressStack.peek();
         currentBreakJumpAddressList.add(breakJumpAddress);
     }

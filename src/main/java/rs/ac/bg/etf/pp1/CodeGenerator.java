@@ -9,6 +9,7 @@ import rs.etf.pp1.symboltable.concepts.Obj;
 import rs.etf.pp1.symboltable.concepts.Struct;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 import static rs.ac.bg.etf.pp1.SymbolTable.DUMMY_LEVEL;
@@ -37,7 +38,6 @@ public class CodeGenerator extends VisitorAdaptor {
     private static boolean inUnpackStatement = false;
 
     private ArrayList<Obj> unpackStatetementDesignators;
-
 
     Logger logger = LogManager.getLogger(CodeGenerator.class);
 

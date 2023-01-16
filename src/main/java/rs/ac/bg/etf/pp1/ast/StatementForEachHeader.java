@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 12/0/2023 4:43:31
+// 13/0/2023 5:29:16
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -11,19 +11,19 @@ public class StatementForEachHeader implements SyntaxNode {
     private int line;
     public rs.etf.pp1.symboltable.concepts.Obj obj = null;
 
-    private MemberAccess MemberAccess;
+    private Designator Designator;
 
-    public StatementForEachHeader (MemberAccess MemberAccess) {
-        this.MemberAccess=MemberAccess;
-        if(MemberAccess!=null) MemberAccess.setParent(this);
+    public StatementForEachHeader (Designator Designator) {
+        this.Designator=Designator;
+        if(Designator!=null) Designator.setParent(this);
     }
 
-    public MemberAccess getMemberAccess() {
-        return MemberAccess;
+    public Designator getDesignator() {
+        return Designator;
     }
 
-    public void setMemberAccess(MemberAccess MemberAccess) {
-        this.MemberAccess=MemberAccess;
+    public void setDesignator(Designator Designator) {
+        this.Designator=Designator;
     }
 
     public SyntaxNode getParent() {
@@ -47,16 +47,16 @@ public class StatementForEachHeader implements SyntaxNode {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(MemberAccess!=null) MemberAccess.accept(visitor);
+        if(Designator!=null) Designator.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(MemberAccess!=null) MemberAccess.traverseTopDown(visitor);
+        if(Designator!=null) Designator.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(MemberAccess!=null) MemberAccess.traverseBottomUp(visitor);
+        if(Designator!=null) Designator.traverseBottomUp(visitor);
         accept(visitor);
     }
 
@@ -65,8 +65,8 @@ public class StatementForEachHeader implements SyntaxNode {
         buffer.append(tab);
         buffer.append("StatementForEachHeader(\n");
 
-        if(MemberAccess!=null)
-            buffer.append(MemberAccess.toString("  "+tab));
+        if(Designator!=null)
+            buffer.append(Designator.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

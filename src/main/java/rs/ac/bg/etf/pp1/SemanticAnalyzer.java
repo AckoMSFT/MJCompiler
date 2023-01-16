@@ -1,6 +1,5 @@
 package rs.ac.bg.etf.pp1;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Syntax;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rs.ac.bg.etf.pp1.ast.*;

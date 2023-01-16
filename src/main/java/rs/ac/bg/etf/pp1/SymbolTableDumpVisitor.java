@@ -43,10 +43,8 @@ public class SymbolTableDumpVisitor extends DumpSymbolTableVisitor {
                 }
             case 4:
                 this.output.append("Class [");
-                Iterator var3 = structToVisit.getMembers().iterator();
 
-                while (var3.hasNext()) {
-                    Obj obj = (Obj) var3.next();
+                for (Obj obj : structToVisit.getMembers()) {
                     obj.accept(this);
                 }
 
