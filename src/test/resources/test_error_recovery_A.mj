@@ -1,0 +1,15 @@
+program test_error_recovery_A
+    int a, +, c;
+    char b+-;
+    bool array[];
+{
+    void main() {
+        c = 2 + 5 + 6 - -; // oops missing 42 before -
+        a = c - 2;
+    }
+}
+// Error recovery:
+//  - global variable declaration
+//      - ignore everything until ',' or ';'
+//  - assign statement
+//      - ignore everything until ';'

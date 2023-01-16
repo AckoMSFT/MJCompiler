@@ -62,4 +62,7 @@ program test301
 	}
 }
 
-
+// Input:
+//  302
+// Output:
+//     9    6    6    1    2    2    1    6bc  122

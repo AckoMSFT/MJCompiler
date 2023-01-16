@@ -133,7 +133,7 @@ public class MJParserTest {
 
     public static void main(String[] args) throws Exception {
 
-        String testFile = "src\\test\\resources\\test999.mj";
+        String testFile = "src\\test\\resources\\test_error_recovery_A.mj";
 
         List<String> files = findFiles(Paths.get(TEST_CASES_ROOT_DIRECTORY), MICRO_JAVA_FILE_EXTENSION);
         for (String file: files) {
