@@ -96,11 +96,9 @@
         <java classname="rs.etf.pp1.mj.runtime.Run">
             <arg value="src/test/resources/acko.obj"/>
             <arg value="-debug"/>
-
             <classpath>
                 <pathelement location="lib/mj-runtime-1.1.jar" />
             </classpath>
-
             <redirector input="src/test/resources/input.txt" output="src/test/resources/output.txt" alwayslog="true"/>
         </java>
     </target>
