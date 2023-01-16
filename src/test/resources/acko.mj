@@ -1,15 +1,5 @@
-program acko123
-
-class foo
+program acko
 {
-}
-
-class bar extends foo
-{
-}
-
-{
-    void main ()
-    {
+    void main() {
     }
 }

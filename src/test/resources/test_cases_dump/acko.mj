@@ -1,0 +1,15 @@
+program acko123
+
+class foo
+{
+}
+
+class bar extends foo
+{
+}
+
+{
+    void main ()
+    {
+    }
+}

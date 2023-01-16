@@ -21,6 +21,7 @@ public class MJParserTest {
     static Logger logger = LogManager.getLogger(MJParserTest.class);
 
     private static final String TEST_CASES_ROOT_DIRECTORY = "src/test/resources";
+    private static final String TEST_CASES_DUMP_DIRECTORY = "test_cases_dump";
     private static final String MICRO_JAVA_FILE_EXTENSION = "mj";
 
     public static List<String> findFiles(Path path, String fileExtension)
@@ -109,35 +110,37 @@ public class MJParserTest {
             program.traverseBottomUp(codeGenerator);
 
 
-            File objFile = new File("src/test/resources/program.obj");
+            File objFile = new File(sourceCodePath.replace(".mj", ".obj"));
             if (objFile.exists()) {
                 objFile.delete();
             }
 
             Code.write(new FileOutputStream(objFile));
 
-            // DisAssm
+            // Disassemble (for debugging purposes)
 
             Disassemble disassemble = new Disassemble();
 
-                InputStream ss = new FileInputStream(objFile);
-                byte[] code = new byte[8206];
-                int len = ss.read(code);
-                disassemble.code = code;
-                disassemble.off = 14;
-                disassemble.cur = 14;
-                disassemble.decode(code, len);
-
+            InputStream ss = new FileInputStream(objFile);
+            byte[] code = new byte[8206];
+            int len = ss.read(code);
+            disassemble.code = code;
+            disassemble.off = 14;
+            disassemble.cur = 14;
+            disassemble.decode(code, len);
         }
     }
 
     public static void main(String[] args) throws Exception {
 
-        String testFile = "src\\test\\resources\\test_error_recovery_A.mj";
+        boolean testSingle = false;
+        boolean skipTestCasesDump = true;
+        String testFile = "src\\test\\resources\\acko.mj";
 
         List<String> files = findFiles(Paths.get(TEST_CASES_ROOT_DIRECTORY), MICRO_JAVA_FILE_EXTENSION);
         for (String file: files) {
-            if (!file.equalsIgnoreCase(testFile)) {
+            if (((testSingle && !file.equalsIgnoreCase(testFile))) ||
+                    (skipTestCasesDump && file.contains(TEST_CASES_DUMP_DIRECTORY))) {
                 logger.info("Skipping... " + file);
             } else {
                 ParseFile(file);
