@@ -1,5 +1,28 @@
-program acko
+program ord // Error: program cannot be named by an already defined symbol
+
+int a;
+const int b = 10;
+const char b = '1', c = 'c'; // Error: duplicate constant declaration of 'b'
+int d, e[];
+const bool g = true, h = false;
+const char i = 'c';
+
+	int a;
+	int c, d;
 {
-    void main() {
-    }
+		void main() char c2; {
+			a = 1;
+			ord(a); // Error: incompatible parameter types
+			c2 = ord(c2);
+			a++;
+			a--;
+			[, a, b, ] = e;
+			a = b * c + (-1) - 2 / 4 % d; // Error: multiplying by c not permitted
+			a = new int(); // Error: 'new' can only instantiate classes
+			if (a > b) { // Error: conditional expression must be a boolean
+				if (g || a && c[0] < c[1]) {} // Error: both sides of an OR must be booleans + reference types may only be compared with == or !=
+				break; // Error: break can only be used within loops
+			}
+		}
+
 }

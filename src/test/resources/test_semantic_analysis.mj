@@ -1,0 +1,38 @@
+program p1
+int int1, int2, int3;
+char char1, charArr[];
+bool bool1, boolArr[];
+int int1; // Semantic error: Symbol int1 is already in use.
+{
+    void voidFn() {
+        return 5; // Semantic error: Non-void return statement found inside a void function. Actual type is int.
+        return a; // Semantic error: Detected usage of undefined symbol with name a.
+    }
+
+    int foo() int int1; { // Semantic error: Symbol int1 is already in use.
+        return 'c'; // Semantic error: Incompatible return type. Expected type int, actual type char.
+
+        if (5) { // Semantic error: Type mismatch. Expected type bool, actual type int.
+        }
+
+        [int1, int2, int3] = charArr; // Semantic error: Invalid type for LHS designator in unpack statement.
+                                      //    LHS designator must be assignment-compatible with RHS designator.
+                                      //    LHS designator: Symbol {name int1, kind Var, type int, level 0, fpPos -1, adr 0},
+                                      //    RHS designator: Symbol {name charArr, kind Var, type Arr of char, level 0, fpPos -1, adr 4}.
+                                      // Semantic error: Invalid type for LHS designator in unpack statement.
+                                      //    LHS designator must be assignment-compatible with RHS designator.
+                                      //    LHS designator: Symbol {name int2, kind Var, type int, level 0, fpPos -1, adr 1},
+                                      //    RHS designator: Symbol {name charArr, kind Var, type Arr of char, level 0, fpPos -1, adr 4}.
+                                      // Semantic error: Invalid type for LHS designator in unpack statement.
+                                      //    LHS designator must be assignment-compatible with RHS designator.
+                                      //    LHS designator: Symbol {name int3, kind Var, type int, level 0, fpPos -1, adr 2},
+                                      //    RHS designator: Symbol {name charArr, kind Var, type Arr of char, level 0, fpPos -1, adr 4}.
+
+        [int1, int2, int3] = char1; // Semantic error: Invalid type for RHS designator in unpack statement.
+                                    // RHS designator must be an array. Actual RHS designator:
+                                    // Symbol {name char1, kind Var, type char, level 0, fpPos -1, adr 3}.
+
+    }
+
+    // Semantic error: No main function detected!
+}

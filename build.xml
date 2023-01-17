@@ -75,7 +75,7 @@
 
     <target name="disasm">
         <java classname="rs.etf.pp1.mj.runtime.disasm">
-            <arg value="src/test/resources/program.obj"/>
+            <arg value="src/test/resources/foobar.obj"/>
             <classpath>
                 <pathelement location="lib/mj-runtime-1.1.jar"/>
             </classpath>
@@ -84,7 +84,7 @@
 
     <target name="run">
         <java classname="rs.etf.pp1.mj.runtime.Run">
-            <arg value="src/test/resources/acko.obj"/>
+            <arg value="src/test/resources/foobar.obj"/>
             <classpath>
                 <pathelement location="lib/mj-runtime-1.1.jar" />
             </classpath>
@@ -94,7 +94,7 @@
 
     <target name="runDebug">
         <java classname="rs.etf.pp1.mj.runtime.Run">
-            <arg value="src/test/resources/acko.obj"/>
+            <arg value="src/test/resources/foobar.obj"/>
             <arg value="-debug"/>
             <classpath>
                 <pathelement location="lib/mj-runtime-1.1.jar" />

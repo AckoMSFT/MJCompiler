@@ -71,6 +71,7 @@ public class MJCompiler {
             SymbolTable.init();
 
             program.traverseBottomUp(semanticAnalyzer);
+            semanticAnalyzer.checkIfMainFunctionIsPresent();
 
             logger.info("Symbol table dump:");
 

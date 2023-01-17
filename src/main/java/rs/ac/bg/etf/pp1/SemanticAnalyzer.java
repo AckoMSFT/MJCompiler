@@ -131,6 +131,20 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         logger.error(String.format("[Line #%d] Additional error description: %s", syntaxNode.getLine(), message));
     }
 
+    private void logNoMainFunction() {
+        semanticErrorCount++;
+        logger.error("Semantic error: No main function detected!");
+    }
+
+    public boolean checkIfMainFunctionIsPresent() {
+        if (declaredMain) {
+            return true;
+        } else {
+            logNoMainFunction();
+            return false;
+        }
+    }
+
     private boolean checkIfSymbolIsInUse(SyntaxNode node, String symbolName) {
         return checkIfSymbolIsInUse(node, symbolName, false);
     }
@@ -417,6 +431,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
             }
 
             // TODO (acko): Arguments...
+            declaredMain = true;
         } else {
             if (!hasReturnStatement) {
                 logError(methodDeclaration, MessageType.RETURN_STATEMENT_NOT_FOUND, currentMethodSymbol.getName());
@@ -930,6 +945,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
         MaybeReturnValue maybeReturnValue = statementReturn.getMaybeReturnValue();
         if (maybeReturnValue instanceof MaybeReturnValueIsReturnValue) {
             Expr expr = ((MaybeReturnValueIsReturnValue) maybeReturnValue).getExpr();
+            if (!SymbolTable.isValidSymbol(expr.obj)) {
+                return;
+            }
+
             Struct type = expr.obj.getType();
 
             if (returnType.equals(SymbolTable.noType)) {

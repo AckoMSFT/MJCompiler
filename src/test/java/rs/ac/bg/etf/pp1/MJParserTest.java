@@ -87,6 +87,7 @@ public class MJParserTest {
             SymbolTable.init();
 
             program.traverseBottomUp(semanticAnalyzer);
+            semanticAnalyzer.checkIfMainFunctionIsPresent();
 
             SymbolTableDumpVisitor stdv = new SymbolTableDumpVisitor();
             SymbolTable.dump(stdv);

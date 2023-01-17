@@ -1,10 +1,2 @@
-
-  pos: instruction operands
-     | expressionstack
------------------------------
-   19: enter       0 0 
-     | 
-   22: exit        
-     | 
-   23: return      
-Completion took 3 ms
+    9    6    6    1    2    2    1    6bc    5
+Completion took 1 ms
